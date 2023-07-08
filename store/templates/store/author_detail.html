@@ -1,0 +1,66 @@
+{% extends 'store/base3.html' %}
+{% load static %}
+{% block title %} Authors & Events {% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'authors' %}">Authors & Events</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ author.first_names}} {{ author.last_names}}</li>
+{% endblock %}
+{% block content %}
+<div class="container-fluid ">
+    <div class="container d-flex px-0">
+        <div class="container px-0 mt-5 position-relative a-detail-border">
+            <div class="container mx-0 row d-flex justify-content-end ps-lg-5">
+                <div class="col-12 col-md-6 col-lg-6 ms-lg-5 py-5 pe-md-3 me-md-5">
+                    <h3 class="h3 b">{{ author.first_names}} {{ author.last_names}}</h3>
+                    <p class="fs-6 py-2 text-justify desc-p" style="font-family:montserratregular">
+                        {{ author.description }}
+                    </p>
+                    <p>
+                        <i class="bi bi-linkedin fs-3 me-3"></i>
+                        <i class="bi bi-instagram fs-3 me-3"></i>
+                        <i class="bi bi-twitter fs-3 me-3"></i>
+                        <i class="bi bi-facebook fs-3 me-3"></i>
+                        <i class="bi bi-envelope fs-3 me-3"></i>
+                    </p>
+                </div>
+            </div>
+
+            <div class="container mt-2 mb-5">
+                <div class="container row justify-content-start">
+                    <div class="row py-3">
+                    <p class="fs-2 ps-md-5">Textbooks From This Author</p>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row justify-content-evenly mt-1 mb-3">
+                {% for book in related_books %}
+                    <div class="col-6 col-lg-3 d-flex my-4 justify-content-center book-border">
+                        <div class="border-0 justify-content-center">
+                            <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                            {% for contributor in book.contributors.all %}
+                            <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
+                            {% endfor %}
+                        </div>
+
+                            <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
+
+                    </div>
+                {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="container position-absolute author-img">
+
+                <img class="d-none d-md-block" src="{{ author.image.url }}" alt="{{ author.first_names}} {{ author.last_names}}">
+
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+
+
+{% endblock %}

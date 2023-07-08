@@ -1,0 +1,59 @@
+{% extends 'store/base1.html'%}
+{% block title %}
+F.A.Qs
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">About LearnRite International Publishers</li>
+{% endblock %}
+{% block content %}
+ <div class="container-fluid pt-3">
+       <div class="container mt-5">
+            <h2 class="h2 mb-3">Frequently Asked Questions </h2>
+            <p class="fs-5 fw-normal">
+             Everything you need to know about LearnRite International Publishers. Can't find what you're looking for?
+            </p>
+       </div>
+
+       <div class="container mb-5">
+         <div class="accordion border-0" id="accordionExample">
+          <div class="accordion-item border-0 my-3">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                1.	ARE YOUR BOOKS IN BOOKSHOPS?
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                Our books are not distributed to any book stores. It is in fact prohibited and anyone or organisation found with our books in their stores will face the penalty for breaking our law against having our books in bookshops. We supply our books directly to schools that have been verified by our company.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item border-0 my-3">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                2.	CAN I GET A SALES REP FOR MY SCHOOL?
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                Before any transaction occurs, a sales rep will be assigned to verify your school and once found to be legitimate, he or she will represent us with any further transactions of our books with your school and to help save you any stress.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item border-0 my-3">
+            <h2 class="accordion-header " id="headingThree">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                3.	DO I GET A DISCOUNT WHEN I BUY BOOKS?
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                Depending on the quantity of books, you are entitled to 10% discount on your purchase.
+              </div>
+            </div>
+          </div>
+         </div>
+       </div>
+
+ </div>
+{% endblock %}

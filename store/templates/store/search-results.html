@@ -1,0 +1,77 @@
+{% extends 'store/base3.html' %}
+{% load static %}
+{% block title %}
+    {% if form.is_valid and search_text %}
+        Search Results for "{{ search_text }}"
+    {% else %}
+        Search Results
+    {% endif %}
+{% endblock %}
+
+
+{% block breadcrumb %}
+    {% if form.is_valid and search_text %}
+        <li class="breadcrumb-item active" aria-current="page"><em>"{{ search_text }}"</em></li>
+    {% else %}
+        <li class="breadcrumb-item active" aria-current="page">Search Results</li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{%if form.is_valid and search_text %}
+<div class="container mb-5 plainlinks">
+    <h3>Search results for <em>"{{ search_text }}"</em></h3>
+    <ul class="list-group mt-2">
+        {% for book in books %}
+        <li class="list-group-item py-2">
+            <span class="fs-6 fw-bold">Title: </span><a href="{% url 'book_detail' book.pk%}" class="fs-6">{{ book }}</a>
+            <br>
+            <span class="fs-6 fw-bold">Contributors: </span>
+            {% for contributor in book.contributors.all %}
+                {{contributor.first_names}} {{contributor.last_names}},
+            {% endfor %}
+        </li>
+        {% empty %}
+            <li class="list-group-item">No results found</li>
+        {% endfor %}
+    </ul>
+    <div class="pagination justify-content-center my-5">
+        <ul class="pagination pagination-sm d-flex w-100">
+            {% if books.has_previous %}
+                <li class="page-item me-auto">
+                    <a class="page-link" href="?search_in={{ search_cat }}&amp;search={{ search_text }}&amp;page={{ books.previous_page_number }}"><i class="bi bi-arrow-left-short"></i>Previous</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled me-auto">
+                    <a class="page-link" href="#"><i class="bi bi-arrow-left-short"></i>Previous</a>
+                </li>
+            {% endif %}
+
+            {% for num in books.paginator.page_range %}
+                {% if books.number == num %}
+                    <li class="page-item active ">
+                        <a class="page-link" href="?search_in={{ search_cat }}&amp;search={{ search_text }}&amp;page={{ num }}">{{ num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item ">
+                        <a class="page-link" href="?search_in={{ search_cat }}&amp;search={{ search_text }}&amp;page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+
+            {% endfor %}
+
+            {% if books.has_next %}
+                <li class="page-item ms-auto">
+                    <a class="page-link" href="?search_in={{ search_cat }}&amp;search={{ search_text }}&amp;page={{ books.next_page_number }}">Next<i class="bi bi-arrow-right-short"></i></a>
+                </li>
+                {% else %}
+                <li class="page-item disabled ms-auto">
+                    <a class="page-link" href="#">Next<i class="bi bi-arrow-right-short"></i></a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

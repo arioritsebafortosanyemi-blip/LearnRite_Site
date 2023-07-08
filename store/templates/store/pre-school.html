@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_filter %}
+{% block title %} Pre-School Books {% endblock %}
+{% block style %}
+    <style>
+    .navbar-bg-img {
+        background-image: url("{% static 'store/Preschool_navbg.png' %}");
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 55vh;
+    }
+    </style>
+{% endblock %}
+{% block banner %}
+
+    <div class="container mt-3 d-none d-md-block">
+        <h2 class="h2 fs-3">Best selling pre-school book today</h2>
+        <p class="fs-5 fw-semibold">{{ best_seller.title }}</p>
+        <p class="fs-6">By
+            {% for contributor in best_seller.contributors.all %}
+
+                {% if forloop.counter > 1 %}
+                ,
+
+                {% endif %}
+                {{ contributor }}
+            {% endfor %}
+        </p>
+         <a class="btn btn-dark btn-large px-4 py-2" href="{%url 'book_detail' best_seller.pk %}">
+
+            Buy Book
+            <svg width="40" height="9" viewBox="0 0 40 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M39.4243 4.92426C39.6586 4.68995 39.6586 4.31005 39.4243 4.07574L35.6059 0.257359C35.3716 0.0230446 34.9917 0.0230446 34.7574 0.257359C34.523 0.491674 34.523 0.871573 34.7574 1.10589L38.1515 4.5L34.7574 7.89411C34.523 8.12843 34.523 8.50833 34.7574 8.74264C34.9917 8.97696 35.3716 8.97696 35.6059 8.74264L39.4243 4.92426ZM0 5.1H39V3.9H0V5.1Z" fill="white"/>
+            </svg>
+
+         </a>
+    </div>
+    <div class="position-absolute best-seller d-none d-md-block">
+        <img src="{{ best_seller.book_image.url }}">
+    </div>
+
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'books' %}">Books</a></li>
+<li class="breadcrumb-item active" aria-current="page">Pre-School Books</li>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <h3 class="h3 fs-2">Pre-School Books</h3>
+    </div>
+    <div class="row mt-3">
+        <div class="col-3 pt-1">
+            <div class="mt-5">
+            <form method="GET" target="{% url 'pre-school'%}">
+                <p class="fs-3"> Class </p>
+                {% for label,choice in filter_form.filter_option.field.choices %}
+                    <div class="form-check my-2" style="font-family:montserratregular">
+                      <input class="form-check-input" type="checkbox" name="{{filter_form.filter_option.html_name}}" value="{{ choice | upper }}" id="id_{{ form.filter_option.auto_id }}">
+                      <label class="form-check-label fs-5 ms-2" for="id_{{ form.filter_option.auto_id }}">
+                          {{ label | title_2 }}
+                      </label>
+                    </div>
+                {% endfor %}
+                <button class="btn btn-large btn-outline-dark px-4 py-2 my-2" type="submit">Apply Filter</button>
+            </form>
+            </div>
+        </div>
+        <div class="container col-md-9 col-6">
+            <div class=" container item-display">
+                <div class="h-100 row row-cols-1 row-cols-md-3 g-3 g-md-4 d-flex align-content-md-center flex-wrap">
+                {% for item in items %}
+                    <div class="col d-flex my-5 mx-1 mx-md-3  justify-content-center book-border plainlinks">
+                        <div class="border-0 justify-content-center">
+                            <a class="fs-4" href="{% url 'book_detail' item.pk %}">
+                            <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ item.title }}</p>
+                            </a>
+                                <p class="text-center lh-1 mt-1">
+                            {% for contributor in item.contributors.all %}
+                                {{ contributor }}
+                            {% endfor %}
+                                </p>
+                        </div>
+                        <img class="book-image" src="{{ item.book_image.url }}" alt="{{ item.title }}">
+                    </div>
+                    {% empty %}
+                    <div class="border-0 d-flex justify-content-center w-100 h-100">
+                        <p class="text-center fs-4 lh-1 mt-5">
+                            <em> No Textbooks found </em>
+                        </p>
+                    </div>
+
+                {% endfor %}
+                </div>
+            </div>
+            {% if items %}
+            <div class="pagination row justify-content-center my-5">
+                <ul class="pagination pagination-sm d-flex w-100">
+                    {% if items.has_previous %}
+                        <li class="page-item me-auto">
+                            <a class="page-link" href="?page={{ items.previous_page_number }}"><i class="bi bi-arrow-left-short"></i>Previous</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled me-auto">
+                            <a class="page-link" href="#"><i class="bi bi-arrow-left-short"></i>Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in items.paginator.page_range %}
+                        {% if items.number == num %}
+                            <li class="page-item active ">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item ">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+
+                    {% endfor %}
+
+                    {% if items.has_next %}
+                        <li class="page-item ms-auto">
+                            <a class="page-link no-wrap " href="?page={{ items.next_page_number }}">Next<i class="bi bi-arrow-right-short pb-0"></i></a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled ms-auto">
+                            <a class="page-link no-wrap" href="#">Next<i class="bi bi-arrow-right-short pb-0"></i></a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

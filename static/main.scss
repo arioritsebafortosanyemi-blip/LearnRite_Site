@@ -1,0 +1,99 @@
+$btn-dark: #101828;
+$nav-link-color:#101828;
+$orange: #fe5d26;
+$nav-tabs-border-color: none;
+$nav-tabs-link-active-border-color: $orange;
+$nav-tabs-border-width: 0px;
+$nav-link-hover-color: $nav-link-color;
+$nav-tabs-link-active-color:$nav-link-color $nav-link-color $orange;
+$dropdown-bg: #FFF9D1;
+$dropdown-link-hover-color: none;
+$dropdown-link-hover-bg: none;
+$navbar-light-color: black;
+$navbar-light-hover-color: $orange;
+$dropdown-border-color: none;
+$dropdown-border-radius: none;
+$offcanvas-horizontal-width: 85%;
+$offcanvas-vertical-height: 2%;
+$offcanvas-border-color: none;
+$offcanvas-bg-color:#FFF9D1;
+$btn-close-focus-shadow: none;
+$breadcrumb-active-color:#000000;
+$breadcrumb-divider-color:#BDBDBD;
+
+@import '../static/node_modules/bootstrap/scss/bootstrap.scss';
+@import url('../static/font/comfortaa.css');
+@import url('../static/font/webfontkit-20230331-113624/montserrat.css');
+
+body{
+ font-family:'comfortaaregular', sans-serif;
+ .h1{
+  color: #e03616;
+  font-weight:600;
+  font-size: 55px;
+  line-height: 1;
+  letter-spacing: 4px;
+ }
+
+ .nav-link{
+  .nav-svg{
+    stroke:black;
+  }
+  &:hover{
+    .nav-svg{
+      stroke: #fe5d26;
+    }
+  }
+ }
+
+ .h2{
+  color: #e03616;
+  font-weight:600;
+  font-size: 48px;
+  line-height: 1;
+  letter-spacing: 2px;
+ }
+
+ .h3{
+  color: #FE5D26;
+  font-weight:600;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: 1px;
+ }
+
+ .btn-dark{
+  &:hover {
+   background-color: #e03616;
+   border: 1px solid #e03616;
+  }
+  background-color: $btn-dark;
+  
+ }
+ .btn-outline-dark{
+  border: 2px solid #101828;
+  
+  &:hover {
+   border: 2px solid #e03616;
+   background-color: #e03616;
+   color: white;
+   .svg-arrow {
+    fill: white;
+   }
+  }
+  .svg-arrow {
+   fill:#101828;
+  }
+ }
+ .pinkbg{
+  background-color: #FFFEF9;
+ }
+
+ .nav-tabs .nav-link.active {
+  border-bottom: 3px solid $nav-tabs-link-active-border-color;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+ 
+}

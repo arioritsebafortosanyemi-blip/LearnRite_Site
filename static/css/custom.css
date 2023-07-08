@@ -1,0 +1,555 @@
+  body {
+  margin-right: 0;
+}
+.navbar{
+ min-height:120px;
+}
+
+.navbar-expand-lg .navbar-nav .nav-link{
+    font-size:18px !important;
+    font-weight:semi-bold !important;
+}
+
+.navbar-toggler{
+ width: 20;
+ height: 20;
+ position: relative;
+ transition: 5s ease-in-out;
+ }
+ 
+ .navbar-toggler,
+ .navbar-toggler:focus,
+ .navbar-toggler:active,
+ .navbar-toggler-icon:focus{
+  outline: none;
+  box-shadow: none;
+  border: 0;
+ }
+
+ .navbar-toggler span {
+  margin: 0;
+  padding: 0;
+ }
+
+.toggler-icon {
+ display: block;
+ position: absolute;
+ height: 3px;
+ width: 100%;
+ background: black;
+ opacity:1;
+ transform: rotate(0deg);
+ transition: .25s ease-in-out;
+}
+
+.middle-bar{
+ margin-top: 0px;
+}
+
+/*when navbar is clicked*/
+
+.navbar-toggler .top-bar{
+ margin-top: 0px;
+ transform: rotate(135deg);
+}
+
+.navbar-toggler .middle-bar{
+ opacity: 0;
+ filter: alpha(opacity=0);
+}
+
+.navbar-toggler .bottom-bar{
+ margin-top: 0px;
+ transform: rotate(-135deg);
+}
+
+/*when navbar is collapsed*/
+
+.navbar-toggler.collapsed .top-bar{
+ margin-top: -20px;
+ transform: rotate(0deg);
+ width: 40%;
+ margin-left: 60%;
+}
+
+.navbar-toggler.collapsed .middle-bar{
+  opacity: 1;
+ filter: alpha(opacity=100);
+}
+
+.navbar-toggler.collapsed .bottom-bar{
+ margin-top: 20px;
+ transform: rotate(0deg);
+ width: 70%;
+ margin-left: 30%;
+}
+
+#navdiv{
+ position: relative;
+ background: #FFF9D1;
+ 
+}
+
+.navbar-collapse .dropdown-menu{
+    position: absolute;
+    z-index:9999;
+}
+
+.nav-svg{
+    max-width:18px;
+}
+
+
+.nav-font {
+  font-family: comfortaabold;
+}
+
+.icon-width{
+ width: 20px;
+}
+/**
+@media (min-width: 992px){
+  #books-dropdown {
+    
+    transform: translateX(-35%);
+  }
+}
+**/
+.dropdown-menu a{
+  font-family: montserratregular;
+  font-size: smaller;
+}
+
+.dropdown-menu h3{
+  font-weight: 700;
+  font-size:24px;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+.dropdown-menu #pre-school-dropdown:hover{
+     background-color: #aaffe5;
+}
+
+.dropdown-menu #primary-school-dropdown:hover{
+  background-color: #9d75cb;
+}
+
+.dropdown-menu #high-school-dropdown:hover{
+  background-color: #fee440;
+}
+
+.dropdown-menu #exam-study-dropdown:hover{
+  background-color: #59cd90;
+}
+
+.dropdown-menu #story-books-dropdown:hover{
+  background-color: #fe5d26;
+}
+
+/* Set the off-canvas menu height */
+.offcanvas-end {
+  height: 20%;
+}
+
+/* Push the page content to the right */
+.offcanvas-end {
+  transform: translateX(-100%);
+  
+}
+
+/* Slide the off-canvas menu in from the right */
+.offcanvas-end.show {
+  transform: translateX(115%);
+  transition: transform 0.8s ease-in-out;
+  right: 8%;
+}
+
+/* Off-Canvas Search*/
+#search{
+  background-color: #FFF9D1;
+  font-weight: 600;
+  font-size:larger;
+}
+
+#search:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+#search::placeholder{
+  color: rgba(0, 0, 0, 0.286);
+}
+
+#categories {
+  background-color: #FFF9D1;
+  font-weight: 600;
+  font-size: larger;
+  padding-right: 2rem;
+  
+}
+
+/*About Us Navbar Image*/
+.navbar-bg-img {
+  background-image: url('../static/store/Mask-group.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 55vh;
+}
+
+.navbar-brand{
+    max-width:190px;
+}
+
+.navbar-expand-lg .navbar-nav .nav-link{
+    font-size: 15px;
+}
+
+.image-container {
+ position: relative;
+ width: 450px;
+ height: 200px;
+ overflow: hidden;
+ bottom: 0;
+ left: 0;
+}
+
+.pattern-container{
+  position: absolute;
+  top:0;
+  right: 0;
+  height: 800px;
+  min-width: 80px;
+  overflow: hidden;
+}
+
+
+.image-container img {
+ position: absolute;
+ bottom: 0;
+ left: 0;
+ height: auto;
+ object-fit:fill;
+}
+
+.pattern-container img{
+  position:absolute;
+  top:0;
+  right: 0;
+  object-fit: fill;
+
+  
+}
+
+.carousel-border {
+ border: 12px solid #fe5d26;
+ border-radius: 1%;
+ height: 280px;
+ width: 220px;
+}
+
+.carousel-image{
+    max-height: 200px;
+    max-width:150px;
+
+  bottom: -30px;
+  position: absolute;
+  box-shadow: 5px 5px 9px 4px rgba(204, 204, 204, 0.636) ;
+}
+/*Book Image*/
+.book-border {
+ border: 12px solid #fe5d26;
+ border-radius: 1%;
+ height: 280px;
+ width: 220px;
+ position: relative;
+}
+
+.book-image {
+  max-height: 200px;
+  max-width: 180px;
+  bottom: -40px;
+  position: absolute;
+  box-shadow: 5px 5px 9px 4px rgba(204, 204, 204, 0.636) ;
+}
+
+.navtab-border {
+  border: 18px solid #fe5d26;
+  border-radius: 1%;
+  height: 400px;
+  width: 320px;
+ }
+
+ .journal-border {
+  border: 12px solid #fe5d26;
+  border-radius: 1%;
+  min-width: none;
+  max-width: 550px;
+
+ }
+
+ .author-border {
+  border: 12px solid #fe5d26;
+  border-radius: 1%;
+  max-width: 300px;
+ }
+
+ .author-text a{
+  color: #4F4F4F;
+  text-decoration: none;
+}
+
+
+
+ .journal-img-container{
+  max-width: 100%;
+  overflow: hidden;
+ }
+
+.navtab-image {
+  max-width: 190px;
+  min-width: 110px;
+  bottom: -45px;
+  position: absolute;
+  box-shadow: 5px 5px 9px 4px rgba(204, 204, 204, 0.636) ;
+}
+
+.custom-nav {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.custom-prev, .custom-next {
+  background-color: #FAFAFA;
+  color: black;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.custom-prev :hover, .custom-next :hover{
+  color: #fe5d26;
+ 
+}
+
+.no-right-border{
+  
+  border-top-right-radius: 0%;
+  border-bottom-right-radius: 0%;
+  border: none;
+}
+
+.no-left-border{
+  
+  border-top-left-radius: 0%;
+  border-bottom-left-radius: 0%;
+  
+}
+
+.header-bg{
+    background-color: #FFF9D1;
+}
+
+.footer{
+  background-color: #FFF9D1;
+}
+
+.footer a{
+  font-family: montserratregular;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1%;
+  color: #4F4F4F;
+  text-decoration: none;
+}
+
+.footer-text{
+  font-family: montserratregular;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4F4F4F;
+  text-decoration: none;
+}
+
+
+.footer h6{
+  font-family: montserratregular;
+  font-size: small;
+  font-weight: 600;
+  color: #4F4F4F;
+  text-decoration: none;
+}
+
+.footer-hr{
+  border-color:  black;
+  border-width: 1px;
+  opacity: 0.7;
+ }
+
+ #newsletter-input{
+  border: none;
+  border-radius: 1%;
+  margin-right: 0;
+ }
+
+ #newsletter-input:focus{
+  border: none;
+  box-shadow: none;
+  outline: none;
+ }
+
+.breadcrumb{
+  font-family: montserratregular;
+  font-size: small;
+  font-weight: bold;
+  color: #000000;
+}
+
+.breadcrumb a{
+  text-decoration: none;
+  color: #BDBDBD;
+}
+
+/*About Us CSS*/
+.shaded-bg {
+    background-color: #FAFAFA;
+}
+.shaded-bg .h4{
+  color: #FE5D26;
+  font-weight: 600;
+}
+.career .h4{
+  color: #FE5D26;
+  font-weight: 600;
+}
+.shaded-bg .h5{
+  color: #FE5D26;
+  font-weight: 600;
+}
+
+.container-content{
+    margin-bottom: 0 !important;
+}
+
+.detail-border {
+  border: 16px solid #fe5d26;
+  border-radius: 1%;
+  min-height: 800px;
+  width: 1000px;
+ }
+
+ .detail-img{
+    top: -80px;
+    left: -100px;
+    max-height: 80px;
+ }
+
+ .a-detail-border {
+  border: 16px solid #fe5d26;
+  border-radius: 1%;
+  min-height: 800px;
+  width: 900px;
+  margin-bottom:120px;
+ }
+
+ .author-img{
+    top: -80px;
+    left: -100px;
+    max-height: 80px;
+ }
+
+ .author-img img{
+    max-height:600px;
+    max-width: 400px;
+    box-shadow: 10px 15px 20px rgba(0, 0, 0, 0.4)
+ }
+
+ .desc-p{
+    min-height:300px;
+ }
+
+
+
+.plainlinks a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.plainlinks a:hover {
+    color: inherit;
+}
+
+.plainlinks a:visited {
+    color: inherit;
+}
+
+
+li .bi{
+    font-size:20px;
+    line-height:0px;
+    margin-top:4px;
+    padding:0px;
+    align-items: center;
+}
+
+ .pagination {
+    border: none;
+}
+
+.page-item {
+    border: none;
+}
+
+.page-link {
+    border: none;
+    outline: none;
+    font-size:12px;
+    font-family: 'Inter', sans-serif;
+    color: black;
+    padding: 8px 12px;
+    vertical-align: middle;;
+}
+
+.page-link.active, .active > .page-link{
+    background-color: #F9F5FF !important;
+    border-color: #007bff;
+    color: teal !important;
+    border-radius:5px;
+}
+
+.page-link.disabled, .disabled > .page-link{
+    color: #D9D9D9 !important;
+}
+
+.page-link:hover{
+    border-radius:5px!important;
+    color: black;
+}
+
+.page-link:focus{
+    border-radius:5px!important;
+    box-shadow:none;
+}
+
+.best-seller{
+    bottom:-70px;
+    right:0;
+    margin-right:120px;
+}
+
+.best-seller img{
+    max-height:250px;
+    box-shadow: 10px 15px 20px rgba(0, 0, 0, 0.4);
+}
+
+.item-display{
+    min-height:450px;
+}
+
+.accordion-item button{
+    background-color:#FAFAFA;
+    border:none;
+}

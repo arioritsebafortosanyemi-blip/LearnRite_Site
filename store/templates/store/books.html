@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Books {% endblock %}
+{% block style %}
+    <style>
+    .navbar-bg-img {
+        background-image: url("{% static 'store/book_page_navbg.png' %}");
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 55vh;
+    }
+    </style>
+{% endblock %}
+{% block banner %}
+
+    <div class="container d-flex align-content-center mt-5">
+        <h2 class="h2">Find The Right <br> Textbooks They Need.</h2>
+    </div>
+
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Books</li>
+{% endblock %}
+
+{% block content %}
+<!-- Best Sellers Section -->
+    <div class="container-fluid mx-0 px-0 pt-5" >
+        <div class="container col justify-content-start">
+            <div class="row py-3">
+            <h1 class="h1 ps-md-5">The Best Sellers</h1>
+            </div>
+        </div>
+        <div class="container col">
+            <div class="row justify-content-evenly mt-1">
+        {% for book in best_seller %}
+            <div class="d-flex my-4 justify-content-center book-border">
+                <div class="border-0 justify-content-center plainlinks ">
+                    <a class="fs-4" href="{% url 'book_detail' book.pk %}">
+                        <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    </a>
+                    {% for contributor in book.contributors.all %}
+                    <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
+                    {% endfor %}
+                </div>
+
+                    <img class="book-image" src="{{ book.book_image.url }}" alt="{{ book.title }}">
+
+            </div>
+        {% endfor %}
+            </div>
+        </div>
+        <div class="container-fluid mx-0 bg-white d-flex justify-content-center align-content-center py-5 ">
+            <a class="btn btn-large btn-outline-dark px-4 py-2" href="#">
+
+                View Best Sellers
+                <svg class="ps-1 svg-arrow" width="40" height="9" viewBox="0 0 40 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M39.4243 4.92426C39.6586 4.68995 39.6586 4.31005 39.4243 4.07574L35.6059 0.257359C35.3716 0.0230446 34.9917 0.0230446 34.7574 0.257359C34.523 0.491674 34.523 0.871573 34.7574 1.10589L38.1515 4.5L34.7574 7.89411C34.523 8.12843 34.523 8.50833 34.7574 8.74264C34.9917 8.97696 35.3716 8.97696 35.6059 8.74264L39.4243 4.92426ZM0 5.1H39V3.9H0V5.1Z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+<!-- Pre-School Books Section -->
+    <div class="container-fluid mx-0 px-0 pt-5" >
+        <div class="container col justify-content-start">
+            <div class="row py-3">
+            <h1 class="h1 ps-md-5">Pre-School Books</h1>
+            </div>
+        </div>
+        <div class="container col">
+            <div class="row justify-content-evenly mt-1">
+        {% for book in pre_school %}
+            <div class="d-flex my-4 justify-content-center book-border">
+                <div class="border-0 justify-content-center">
+                    <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    {% for contributor in book.contributors.all %}
+                    <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
+                    {% endfor %}
+                </div>
+
+                    <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
+
+            </div>
+        {% endfor %}
+            </div>
+        </div>
+        <div class="container-fluid mx-0 bg-white d-flex justify-content-center align-content-center py-5 ">
+            <a class="btn btn-large btn-outline-dark px-4 py-2" href="{% url 'pre-school' %}">
+
+                View
+                <svg class="ps-1 svg-arrow" width="40" height="9" viewBox="0 0 40 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M39.4243 4.92426C39.6586 4.68995 39.6586 4.31005 39.4243 4.07574L35.6059 0.257359C35.3716 0.0230446 34.9917 0.0230446 34.7574 0.257359C34.523 0.491674 34.523 0.871573 34.7574 1.10589L38.1515 4.5L34.7574 7.89411C34.523 8.12843 34.523 8.50833 34.7574 8.74264C34.9917 8.97696 35.3716 8.97696 35.6059 8.74264L39.4243 4.92426ZM0 5.1H39V3.9H0V5.1Z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+<!-- Primary School Section -->
+    <div class="container-fluid mx-0 px-0 pt-5" >
+        <div class="container col justify-content-start">
+            <div class="row py-3">
+            <h1 class="h1 ps-md-5">Primary School Books</h1>
+            </div>
+        </div>
+        <div class="container col">
+            <div class="row justify-content-evenly mt-1">
+        {% for book in p_school %}
+            <div class="d-flex my-4 justify-content-center book-border">
+                <div class="border-0 justify-content-center">
+                    <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    {% for contributor in book.contributors.all %}
+                    <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
+                    {% endfor %}
+                </div>
+
+                    <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
+
+            </div>
+        {% endfor %}
+            </div>
+        </div>
+        <div class="container-fluid mx-0 bg-white d-flex justify-content-center align-content-center py-5 ">
+            <a class="btn btn-large btn-outline-dark px-4 py-2" href="{% url 'primary-school' %}">
+
+                View
+                <svg class="ps-1 svg-arrow" width="40" height="9" viewBox="0 0 40 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M39.4243 4.92426C39.6586 4.68995 39.6586 4.31005 39.4243 4.07574L35.6059 0.257359C35.3716 0.0230446 34.9917 0.0230446 34.7574 0.257359C34.523 0.491674 34.523 0.871573 34.7574 1.10589L38.1515 4.5L34.7574 7.89411C34.523 8.12843 34.523 8.50833 34.7574 8.74264C34.9917 8.97696 35.3716 8.97696 35.6059 8.74264L39.4243 4.92426ZM0 5.1H39V3.9H0V5.1Z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+<!-- High School Section -->
+    <div class="container-fluid mx-0 px-0 pt-5" >
+        <div class="container col justify-content-start">
+            <div class="row py-3">
+            <h1 class="h1 ps-md-5">High School Books</h1>
+            </div>
+        </div>
+        <div class="container col">
+            <div class="row justify-content-evenly text-center mt-1">
+        {% if h_school %}
+        {% for book in h_school %}
+            <div class="d-flex my-4 justify-content-center book-border">
+                <div class="border-0 justify-content-center">
+                    <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    {% for contributor in book.contributors.all %}
+                    <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
+                    {% endfor %}
+                </div>
+
+                    <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
+
+            </div>
+        {% endfor %}
+        {% else %}
+        <p class="h1 my-5 ">Coming Soon...</p>
+        {% endif %}
+            </div>
+        </div>
+        <div class="container-fluid mx-0 bg-white d-flex justify-content-center align-content-center py-5 ">
+            <a class="btn btn-large btn-outline-dark px-4 py-2" href="{% url 'high-school'%}">
+
+                View
+                <svg class="ps-1 svg-arrow" width="40" height="9" viewBox="0 0 40 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M39.4243 4.92426C39.6586 4.68995 39.6586 4.31005 39.4243 4.07574L35.6059 0.257359C35.3716 0.0230446 34.9917 0.0230446 34.7574 0.257359C34.523 0.491674 34.523 0.871573 34.7574 1.10589L38.1515 4.5L34.7574 7.89411C34.523 8.12843 34.523 8.50833 34.7574 8.74264C34.9917 8.97696 35.3716 8.97696 35.6059 8.74264L39.4243 4.92426ZM0 5.1H39V3.9H0V5.1Z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+<!-- Other Categories Section -->
+    <div class="container-fluid mx-0 px-0 pt-5" >
+        <div class="container col justify-content-start">
+            <div class="row py-3">
+            <h1 class="h1 ps-md-5">Other Categories</h1>
+            </div>
+        </div>
+        <div class="container col">
+            <div class="row justify-content-evenly mt-1">
+                {% for book in other_cat %}
+                    <div class="d-flex my-4 justify-content-center book-border">
+                        <div class="border-0 justify-content-center">
+                            <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                            {% for contributor in book.contributors.all %}
+                            <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
+                            {% endfor %}
+                        </div>
+
+                            <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
+                    {% if forloop.counter|divisibleby:4 and not forloop.last %}
+                    </div>
+                    <div class="row">
+                {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container-fluid mx-0 bg-white d-flex justify-content-center align-content-center py-5 ">
+            <a class="btn btn-large btn-outline-dark px-4 py-2" href="{% url 'story-books' %}">
+
+                View
+                <svg class="ps-1 svg-arrow" width="40" height="9" viewBox="0 0 40 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M39.4243 4.92426C39.6586 4.68995 39.6586 4.31005 39.4243 4.07574L35.6059 0.257359C35.3716 0.0230446 34.9917 0.0230446 34.7574 0.257359C34.523 0.491674 34.523 0.871573 34.7574 1.10589L38.1515 4.5L34.7574 7.89411C34.523 8.12843 34.523 8.50833 34.7574 8.74264C34.9917 8.97696 35.3716 8.97696 35.6059 8.74264L39.4243 4.92426ZM0 5.1H39V3.9H0V5.1Z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+{% endblock %}

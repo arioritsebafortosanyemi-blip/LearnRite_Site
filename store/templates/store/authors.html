@@ -1,0 +1,52 @@
+{% extends 'store/base3.html' %}
+{% load static %}
+{% block title %} Authors & Events {% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Authors & Events</li>
+{% endblock %}
+{% block content  %}
+<div class="container-fluid overflow-hidden px-0 mx-0 mb-5">
+            <div class="container px-0">
+                <div class="row p-md-0 mb-4">
+                    <div class="col-sm-12 text-center text-md-start">
+                        <h2 class="h2">Author Spotlight</h2>
+                    </div>
+                </div>
+                <div class="row author-text d-flex justify-content-center">
+                    {% for author in authors %}
+                    <div class="col-12 col-md-6 col-lg-4 py-3 px-0 mx-0 border-1 text-center">
+
+                        <div class="px-md-0 mx-2">
+                            <img class="img-fluid h-md-25 author-border" src="{{ author.image.url }}" alt="{{ author.first_names}} {{ author.last_names}}">
+                            <div class="">
+                                <a href="{% url 'author_detail' author.pk %}" class="fs-3 mt-lg-1 text-wrap">{{ author.first_names}} {{ author.last_names}}</a>
+                            </div>
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+</div>
+<div class="container-fluid mx-0 px-0 d-flex align-content-lg-end my-0 py-0">
+        <div class="py-3 ps-3 ps-md-0 mb-0 col-12 col-md-6 ps-md-5 ps-sm-3 d-flex justify-content-center align-items-center">
+         <div>
+            <h2 class="h2 ">Become A Learnrite<br>Author.</h2>
+            <a class="btn btn-dark btn-large mt-md-3 px-4 py-2" href="#">
+
+                        Submit Now
+                        <svg width="40" height="9" viewBox="0 0 40 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M39.4243 4.92426C39.6586 4.68995 39.6586 4.31005 39.4243 4.07574L35.6059 0.257359C35.3716 0.0230446 34.9917 0.0230446 34.7574 0.257359C34.523 0.491674 34.523 0.871573 34.7574 1.10589L38.1515 4.5L34.7574 7.89411C34.523 8.12843 34.523 8.50833 34.7574 8.74264C34.9917 8.97696 35.3716 8.97696 35.6059 8.74264L39.4243 4.92426ZM0 5.1H39V3.9H0V5.1Z" fill="white"/>
+                        </svg>
+
+            </a>
+             <a class="btn btn-large btn-outline-dark mt-md-3 px-4 " href="{% url 'aboutus' %}">
+                Learn More
+             </a>
+         </div>
+        </div>
+        <div class="mb-0 col-md-6 d-none d-md-block">
+            <img src="{% static 'store/author_signup.png'%}" class="img-fluid" alt="">
+        </div>
+</div>
+{% endblock %}

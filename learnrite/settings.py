@@ -157,6 +157,6 @@ class Dev(Configuration):
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-class Prod(Configuration):
+class Prod(Dev):
     DEBUG = values.BooleanValue(False)
     SECRET_KEY =values.SecretValue()

@@ -10,8 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os.path
+
+import whitenoise.middleware
 from configurations import Configuration, values
 from pathlib import Path
+from decouple import config
+
 
 
 class Dev(Configuration):
@@ -23,7 +27,7 @@ class Dev(Configuration):
     # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
     # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = 'django-insecure-eo+5mcx*2o4@&o8o2i43lvbfh=4jl5j428&=s0fr930mxlhk%0'
+    SECRET_KEY = config('SECRET_KEY')
 
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = values.BooleanValue(True)
@@ -48,6 +52,7 @@ class Dev(Configuration):
     ]
 
     MIDDLEWARE = [
+        'whitenoise.middleware.WhiteNoiseMiddleware',
         'debug_toolbar.middleware.DebugToolbarMiddleware',
         'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
@@ -150,6 +155,8 @@ class Dev(Configuration):
     # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+    #django_heroku.settings(locals())
+
 
 class Prod(Configuration):
     DEBUG = values.BooleanValue(False)

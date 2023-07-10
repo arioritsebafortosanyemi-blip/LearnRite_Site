@@ -12,151 +12,154 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os.path
 
 import whitenoise.middleware
-from configurations import Configuration, values
+#from configurations import Configuration, values
 from pathlib import Path
 from decouple import config
 
 
 
-class Dev(Configuration):
-    # Build paths inside the project like this: BASE_DIR / 'subdir'.
-    BASE_DIR = Path(__file__).resolve().parent.parent
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-    # Quick-start development settings - unsuitable for production
-    # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-    # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = config('SECRET_KEY')
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('SECRET_KEY')
 
-    # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = values.BooleanValue(True)
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
-    ALLOWED_HOSTS = values.ListValue([])
+ALLOWED_HOSTS = []
 
 
-    # Application definition
+# Application definition
 
-    INSTALLED_APPS = [
-        'store.apps_admin.StoreAdminConfig',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'compressor',
-        'sass_processor',
-        'store',
-        'blog',
-        'debug_toolbar'
-    ]
+INSTALLED_APPS = [
+    'store.apps_admin.StoreAdminConfig',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'compressor',
+    'sass_processor',
+    'store',
+    'blog',
+    'debug_toolbar'
+]
 
-    MIDDLEWARE = [
-        'whitenoise.middleware.WhiteNoiseMiddleware',
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-        'django.middleware.security.SecurityMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    ]
+MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
-    ROOT_URLCONF = 'learnrite.urls'
+ROOT_URLCONF = 'learnrite.urls'
 
-    INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = ['127.0.0.1']
 
-    TEMPLATES = [
-        {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [os.path.join(BASE_DIR,'templates'),
-                     os.path.join(BASE_DIR,'store/templates')],
-            'APP_DIRS': True,
-            'OPTIONS': {
-                'context_processors': [
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.request',
-                    'django.contrib.auth.context_processors.auth',
-                    'django.contrib.messages.context_processors.messages',
-                    'django.template.context_processors.media'\
-                ],
-            },
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR,'templates'),
+                 os.path.join(BASE_DIR,'store/templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media'\
+            ],
         },
-    ]
+    },
+]
 
-    WSGI_APPLICATION = 'learnrite.wsgi.application'
-
-
-    # Database
-    # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-    DATABASES = values.DatabaseURLValue('sqlite:///{}/db.sqlite3'.format(BASE_DIR), environ_prefix="DJANGO")
+WSGI_APPLICATION = 'learnrite.wsgi.application'
 
 
-    # Password validation
-    # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
+# Database
+# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-    AUTH_PASSWORD_VALIDATORS = [
-        {
-            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-        },
-    ]
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
+# Password validation
+# https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
-    # Internationalization
-    # https://docs.djangoproject.com/en/4.0/topics/i18n/
-
-    LANGUAGE_CODE = 'en-us'
-
-    TIME_ZONE = 'UTC'
-
-    USE_I18N = True
-
-    USE_TZ = True
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 
-    # Static files (CSS, JavaScript, Images)
-    # https://docs.djangoproject.com/en/4.0/howto/static-files/
+# Internationalization
+# https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-    STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
-    STATICFILES_FINDERS = [
-        'django.contrib.staticfiles.finders.FileSystemFinder',
-        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-        'sass_processor.finders.CssFinder',
-        'compressor.finders.CompressorFinder',
-    ]
+LANGUAGE_CODE = 'en-us'
 
-    # Configure the SCSS compiler
-    SASS_PROCESSOR_ENABLED = True
-    SASS_PROCESSOR_ROOT = STATIC_ROOT
-    SASS_PROCESSOR_STATIC_PREFIX = STATIC_URL
-    SASS_PROCESSOR_INCLUDE_DIRS = [
-        # Add any additional SCSS directories here
-    ]
+TIME_ZONE = 'UTC'
 
-    COMPRESS_PRECOMPILERS = (
-        ('text/x-scss', 'django_libsass.SassCompiler'),
-    )
+USE_I18N = True
 
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-    MEDIA_URL = '/media/'
-    # Default primary key field type
-    # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
-    DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+USE_TZ = True
 
 
-class Prod(Dev):
-    DEBUG = values.BooleanValue(False)
-    SECRET_KEY =values.SecretValue()
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.0/howto/static-files/
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'sass_processor.finders.CssFinder',
+    'compressor.finders.CompressorFinder',
+]
+
+# Configure the SCSS compiler
+SASS_PROCESSOR_ENABLED = True
+SASS_PROCESSOR_ROOT = STATIC_ROOT
+SASS_PROCESSOR_STATIC_PREFIX = STATIC_URL
+SASS_PROCESSOR_INCLUDE_DIRS = [
+    # Add any additional SCSS directories here
+]
+
+COMPRESS_PRECOMPILERS = (
+    ('text/x-scss', 'django_libsass.SassCompiler'),
+)
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+ #   class Prod(Dev):
+ #       DEBUG = values.BooleanValue(False)
+ #       SECRET_KEY =values.SecretValue()

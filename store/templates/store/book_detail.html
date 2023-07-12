@@ -5,15 +5,28 @@
 {% endblock %}
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'books' %}">Books</a></li>
-<li class="breadcrumb-item"><a href="#">{{ book.category|title }}</a></li>
+{% if book.category|title == 'Pre-School'%}
+<li class="breadcrumb-item"><a href="{% url 'pre-school' %}">{{ book.category|title }}</a></li>
+{% elif book.category|title == 'Primary School'%}
+<li class="breadcrumb-item"><a href="{% url 'primary-school' %}">{{ book.category|title }}</a></li>
+{% elif book.category|title == 'High School'%}
+<li class="breadcrumb-item"><a href="{% url 'high-school' %}">{{ book.category|title }}</a></li>
+{% elif book.category|title == 'Exam & Study '%}
+<li class="breadcrumb-item"><a href="{% url 'exam-study' %}">{{ book.category|title }}</a></li>
+{% elif book.category|title == 'Story Books'%}
+<li class="breadcrumb-item"><a href="{% url 'story-books' %}">{{ book.category|title }}</a></li>
+{% endif %}
 <li class="breadcrumb-item active" aria-current="page">{{ book.title|title }}</li>
 {% endblock %}
 {% block content %}
+
 <div class="container-fluid ">
     <div class="container d-flex px-0">
         <div class="container px-0 mt-5 position-relative detail-border">
+
             <div class="container mx-0 row d-flex justify-content-center ms-5 ps-lg-5">
-                <div class="col-10 col-md-4 col-lg-4 ms-lg-5 py-5">
+
+                <div class="col-10 col-md-4 col-lg-4 ms-lg-5 py-md-5">
                     <h3 class="h3">{{ book.title }}</h3>
                     <p class="fs-4 py-2">
                         By {% for contributor in book.contributors.all %}
@@ -21,6 +34,7 @@
                         {% endfor %}
                     </p>
                 </div>
+
             </div>
 
             <div class="container mt-5">
@@ -94,11 +108,17 @@
         <div class="container">
             <div class="row justify-content-evenly mt-1">
         {% for book in related_books %}
-            <div class="col-6 col-lg-3 d-flex my-4 justify-content-center book-border">
+            <div class="col-6 col-lg-3 d-flex my-4 justify-content-center book-border plainlinks">
                 <div class="border-0 justify-content-center">
-                    <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">
+                        <a href="{% url 'book_detail' book.pk %}">
+                        {{ book.title }}
+                        </a>
+                    </p>
                     {% for contributor in book.contributors.all %}
-                    <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
+                    <p class="text-center lh-1 pt-1 mt-1">
+                        {{ contributor }}
+                    </p>
                     {% endfor %}
                 </div>
 

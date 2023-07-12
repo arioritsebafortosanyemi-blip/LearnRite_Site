@@ -35,8 +35,12 @@
                     <div class="row justify-content-evenly mt-1 mb-3">
                 {% for book in related_books %}
                     <div class="col-6 col-lg-3 d-flex my-4 justify-content-center book-border">
-                        <div class="border-0 justify-content-center">
-                            <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                        <div class="border-0 justify-content-center plainlinks">
+                            <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">
+                                <a href="{% url 'book_detail' book.pk %}">
+                                {{ book.title }}
+                                </a>
+                            </p>
                             {% for contributor in book.contributors.all %}
                             <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
                             {% endfor %}

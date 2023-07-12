@@ -47,7 +47,7 @@ def faqs(request):
     return render(request, 'store/faqs.html', {'form': form})
 
 def authors(request):
-    authors = Contributor.objects.all()
+    authors = Contributor.objects.first()
     form = SearchForm(request.GET)
 
     context = {'authors':authors,

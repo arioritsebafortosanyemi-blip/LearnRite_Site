@@ -13,18 +13,18 @@
                     </div>
                 </div>
                 <div class="row author-text d-flex justify-content-center">
-                    {% for author in authors %}
+
                     <div class="col-12 col-md-6 col-lg-4 py-3 px-0 mx-0 border-1 text-center">
 
                         <div class="px-md-0 mx-2">
-                            <img class="img-fluid h-md-25 author-border" src="{{ author.image.url }}" alt="{{ author.first_names}} {{ author.last_names}}">
+                            <img class="img-fluid h-md-25 author-border" src="{{ authors.image.url }}" alt="{{ authors.first_names}} {{ authors.last_names}}">
                             <div class="">
-                                <a href="{% url 'author_detail' author.pk %}" class="fs-3 mt-lg-1 text-wrap">{{ author.first_names}} {{ author.last_names}}</a>
+                                <a href="{% url 'author_detail' authors.pk %}" class="fs-3 mt-lg-1 text-wrap">{{ authors.first_names}} {{ authors.last_names}}</a>
                             </div>
                         </div>
 
                     </div>
-                    {% endfor %}
+
                 </div>
             </div>
 </div>

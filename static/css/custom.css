@@ -154,6 +154,10 @@
   height: 20%;
 }
 
+@media (min-width:992px){
+   height: 35%;
+}
+
 /* Push the page content to the right */
 .offcanvas-end {
   transform: translateX(-100%);
@@ -191,6 +195,11 @@
   
 }
 
+.coming-soon{
+    font-size: 8px;
+    left:38px;
+}
+
 /*About Us Navbar Image*/
 .navbar-bg-img {
   background-image: url('../static/store/Mask-group.png');
@@ -207,13 +216,17 @@
     font-size: 15px;
 }
 
-.image-container {
+.image-container{
  position: relative;
- width: 450px;
+ max-height: 190px;
  height: 200px;
  overflow: hidden;
  bottom: 0;
  left: 0;
+}
+
+.image-container img{
+
 }
 
 .pattern-container{
@@ -439,6 +452,13 @@
   border-radius: 1%;
   min-height: 800px;
   width: 1000px;
+  overflow: hidden;
+ }
+
+ @media (min-width: 992px){
+     .detail-border {
+      overflow: visible;
+     }
  }
 
  .detail-img{

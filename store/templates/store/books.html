@@ -13,7 +13,7 @@
 {% endblock %}
 {% block banner %}
 
-    <div class="container d-flex align-content-center mt-5">
+    <div class="container d-none d-md-block d-flex align-content-center mt-5">
         <h2 class="h2">Find The Right <br> Textbooks They Need.</h2>
     </div>
 
@@ -70,9 +70,11 @@
         <div class="container col">
             <div class="row justify-content-evenly mt-1">
         {% for book in pre_school %}
-            <div class="d-flex my-4 justify-content-center book-border">
+            <div class="d-flex my-4 justify-content-center book-border plainlinks">
                 <div class="border-0 justify-content-center">
-                    <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    <a class="fs-4" href="{% url 'book_detail' book.pk %}">
+                        <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    </a>
                     {% for contributor in book.contributors.all %}
                     <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
                     {% endfor %}
@@ -105,9 +107,11 @@
         <div class="container col">
             <div class="row justify-content-evenly mt-1">
         {% for book in p_school %}
-            <div class="d-flex my-4 justify-content-center book-border">
+            <div class="d-flex my-4 justify-content-center book-border plainlinks">
                 <div class="border-0 justify-content-center">
-                    <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    <a class="fs-4" href="{% url 'book_detail' book.pk %}">
+                        <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    </a>
                     {% for contributor in book.contributors.all %}
                     <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
                     {% endfor %}
@@ -141,9 +145,11 @@
             <div class="row justify-content-evenly text-center mt-1">
         {% if h_school %}
         {% for book in h_school %}
-            <div class="d-flex my-4 justify-content-center book-border">
+            <div class="d-flex my-4 justify-content-center book-border plainlinks">
                 <div class="border-0 justify-content-center">
-                    <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    <a class="fs-4" href="{% url 'book_detail' book.pk %}">
+                        <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                    </a>
                     {% for contributor in book.contributors.all %}
                     <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
                     {% endfor %}
@@ -179,9 +185,11 @@
         <div class="container col">
             <div class="row justify-content-evenly mt-1">
                 {% for book in other_cat %}
-                    <div class="d-flex my-4 justify-content-center book-border">
+                    <div class="d-flex my-4 justify-content-center book-border plainlinks">
                         <div class="border-0 justify-content-center">
-                            <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                            <a class="fs-4" href="{% url 'book_detail' book.pk %}">
+                                <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+                            </a>
                             {% for contributor in book.contributors.all %}
                             <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
                             {% endfor %}

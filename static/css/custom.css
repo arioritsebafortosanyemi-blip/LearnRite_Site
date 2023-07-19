@@ -389,7 +389,7 @@
 
 .footer-rights{
   font-family: montserratregular;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   color: #4F4F4F;
   text-decoration: none;
@@ -466,6 +466,14 @@
      .detail-border {
       overflow: visible;
      }
+
+     .footer-rights{
+          font-family: montserratregular;
+          font-size: 10px;
+          font-weight: 600;
+          color: #4F4F4F;
+          text-decoration: none;
+        }
  }
 
  .detail-img{

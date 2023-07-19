@@ -387,6 +387,13 @@
   text-decoration: none;
 }
 
+.footer-rights{
+  font-family: montserratregular;
+  font-size: 10px;
+  font-weight: 600;
+  color: #4F4F4F;
+  text-decoration: none;
+}
 
 .footer h6{
   font-family: montserratextrabold;

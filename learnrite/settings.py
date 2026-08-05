@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os.path
 
+import dj_database_url
 import whitenoise.middleware
-#from configurations import Configuration, values
 from pathlib import Path
-from decouple import config
+from decouple import config, Csv
 
 
 
@@ -22,16 +22,13 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
 
 
 # Application definition
@@ -47,12 +44,10 @@ INSTALLED_APPS = [
     'sass_processor',
     'store',
     'blog',
-    'debug_toolbar'
 ]
 
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,8 +58,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'learnrite.urls'
-
-INTERNAL_IPS = ['127.0.0.1']
 
 TEMPLATES = [
     {
@@ -91,10 +84,9 @@ WSGI_APPLICATION = 'learnrite.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}"
+    )
 }
 
 # Password validation
@@ -158,8 +150,3 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
- #   class Prod(Dev):
- #       DEBUG = values.BooleanValue(False)
- #       SECRET_KEY =values.SecretValue()

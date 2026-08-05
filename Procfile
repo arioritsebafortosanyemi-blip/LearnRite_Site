@@ -1,1 +1,1 @@
-web: gunicorn learnrite.wsgi –log-file -
+web: gunicorn learnrite.wsgi --log-file -

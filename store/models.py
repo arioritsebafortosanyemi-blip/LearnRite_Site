@@ -113,6 +113,33 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+class BookPrice(models.Model):
+    """One of a book's 4 prices: one per (account type x location) combination."""
+    class AccountType(models.TextChoices):
+        INDIVIDUAL = "INDIVIDUAL", "Individual"
+        SCHOOL = "SCHOOL", "School"
+
+    class Location(models.TextChoices):
+        LAGOS = "LAGOS", "Lagos"
+        OUTSIDE_LAGOS = "OUTSIDE_LAGOS", "Outside Lagos"
+
+    book = models.ForeignKey \
+        (Book, related_name="prices", on_delete=models.CASCADE)
+    account_type = models.CharField \
+        (choices=AccountType.choices, max_length=20)
+    location = models.CharField \
+        (choices=Location.choices, max_length=20)
+    price = models.DecimalField \
+        (max_digits=10, decimal_places=2, null=True, blank=True,
+         help_text="Leave blank until real pricing is supplied.")
+
+    class Meta:
+        unique_together = ("book", "account_type", "location")
+        verbose_name_plural = "Book Prices"
+
+    def __str__(self):
+        return f"{self.book.title} ({self.account_type}/{self.location})"
+
 class BookContributor(models.Model):
     class ContributionRole(models.TextChoices):
         AUTHOR = "AUTHOR","Author"

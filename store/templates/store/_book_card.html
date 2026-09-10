@@ -1,0 +1,35 @@
+{% comment %}
+Shared book card, used by the homepage carousel/category tabs, the books
+listing, book detail's related products, and the 5 category pages. Was
+previously copy-pasted with small drift (contributor names sometimes one
+<p> per name, sometimes comma-run-on) across all of those - normalized here
+to one consistent style since the differences were never meaningful.
+
+variant: "compact" (homepage carousel/category tabs) or "grid" (books
+listing, book detail, category pages) - controls whether the link wraps the
+title paragraph or sits inside it, matching each context's original markup.
+wrapper_classes / image_class: the exact classes each call site already used.
+{% endcomment %}
+{% if variant == "compact" %}
+<div class="{{ wrapper_classes }}">
+    <div class="border-0 justify-content-center">
+        <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0"><a href="{% url 'book_detail' book.pk %}">{{ book.title }}</a></p>
+        <p class="text-center lh-1 pt-1 mt-1">
+            {% for contributor in book.contributors.all %}{{ contributor }}<br>{% endfor %}
+        </p>
+    </div>
+    <img class="{{ image_class }}" src="{{ book.book_image.url }}" alt="{{ book.title }}">
+</div>
+{% else %}
+<div class="{{ wrapper_classes }}">
+    <div class="border-0 justify-content-center">
+        <a class="fs-4" href="{% url 'book_detail' book.pk %}">
+            <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
+        </a>
+        <p class="text-center lh-1 pt-1 mt-1">
+            {% for contributor in book.contributors.all %}{{ contributor }}<br>{% endfor %}
+        </p>
+    </div>
+    <img class="book-image" src="{{ book.book_image.url }}" alt="{{ book.title }}">
+</div>
+{% endif %}

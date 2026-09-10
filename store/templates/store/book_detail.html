@@ -108,23 +108,7 @@
         <div class="container">
             <div class="row justify-content-evenly mt-1">
         {% for book in related_books %}
-            <div class="col-6 col-lg-3 d-flex my-4 justify-content-center book-border plainlinks">
-                <div class="border-0 justify-content-center">
-                    <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">
-                        <a href="{% url 'book_detail' book.pk %}">
-                        {{ book.title }}
-                        </a>
-                    </p>
-                    {% for contributor in book.contributors.all %}
-                    <p class="text-center lh-1 pt-1 mt-1">
-                        {{ contributor }}
-                    </p>
-                    {% endfor %}
-                </div>
-
-                    <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
-
-            </div>
+            {% include "store/_book_card.html" with book=book variant="grid" wrapper_classes="col-6 col-lg-3 d-flex my-4 justify-content-center book-border plainlinks" %}
         {% endfor %}
             </div>
         </div>

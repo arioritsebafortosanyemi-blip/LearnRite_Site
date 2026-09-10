@@ -76,19 +76,7 @@
                 <div class="h-100 row row-cols-1 row-cols-md-3 g-3 g-md-4 d-flex align-content-md-center flex-wrap">
 
                     {% for item in items %}
-                    <div class="col d-flex my-5 mx-1 mx-md-3  justify-content-center book-border plainlinks">
-                        <div class="border-0 justify-content-center">
-                            <a class="fs-4" href="{% url 'book_detail' item.pk %}">
-                            <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ item.title }}</p>
-                            </a>
-                                <p class="text-center lh-1 mt-1">
-                            {% for contributor in item.contributors.all %}
-                                {{ contributor }}
-                            {% endfor %}
-                                </p>
-                        </div>
-                        <img class="book-image" src="{{ item.book_image.url }}" alt="{{ item.title }}">
-                    </div>
+                    {% include "store/_book_card.html" with book=item variant="grid" wrapper_classes="col d-flex my-5 mx-1 mx-md-3 justify-content-center book-border plainlinks" %}
                     {% empty %}
                     <div class="border-0 d-flex justify-content-center w-100 h-100">
                         <p class="text-center fs-4 lh-1 mt-5">

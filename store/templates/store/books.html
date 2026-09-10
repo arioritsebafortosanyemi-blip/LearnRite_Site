@@ -33,19 +33,7 @@
         <div class="container col">
             <div class="row justify-content-evenly mt-1">
         {% for book in best_seller %}
-            <div class="d-flex my-4 justify-content-center book-border">
-                <div class="border-0 justify-content-center plainlinks ">
-                    <a class="fs-4" href="{% url 'book_detail' book.pk %}">
-                        <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
-                    </a>
-                    {% for contributor in book.contributors.all %}
-                    <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
-                    {% endfor %}
-                </div>
-
-                    <img class="book-image" src="{{ book.book_image.url }}" alt="{{ book.title }}">
-
-            </div>
+            {% include "store/_book_card.html" with book=book variant="grid" wrapper_classes="d-flex my-4 justify-content-center book-border plainlinks" %}
         {% endfor %}
             </div>
         </div>
@@ -70,19 +58,7 @@
         <div class="container col">
             <div class="row justify-content-evenly mt-1">
         {% for book in pre_school %}
-            <div class="d-flex my-4 justify-content-center book-border plainlinks">
-                <div class="border-0 justify-content-center">
-                    <a class="fs-4" href="{% url 'book_detail' book.pk %}">
-                        <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
-                    </a>
-                    {% for contributor in book.contributors.all %}
-                    <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
-                    {% endfor %}
-                </div>
-
-                    <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
-
-            </div>
+            {% include "store/_book_card.html" with book=book variant="grid" wrapper_classes="d-flex my-4 justify-content-center book-border plainlinks" %}
         {% endfor %}
             </div>
         </div>
@@ -107,19 +83,7 @@
         <div class="container col">
             <div class="row justify-content-evenly mt-1">
         {% for book in p_school %}
-            <div class="d-flex my-4 justify-content-center book-border plainlinks">
-                <div class="border-0 justify-content-center">
-                    <a class="fs-4" href="{% url 'book_detail' book.pk %}">
-                        <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
-                    </a>
-                    {% for contributor in book.contributors.all %}
-                    <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
-                    {% endfor %}
-                </div>
-
-                    <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
-
-            </div>
+            {% include "store/_book_card.html" with book=book variant="grid" wrapper_classes="d-flex my-4 justify-content-center book-border plainlinks" %}
         {% endfor %}
             </div>
         </div>
@@ -145,19 +109,7 @@
             <div class="row justify-content-evenly text-center mt-1">
         {% if h_school %}
         {% for book in h_school %}
-            <div class="d-flex my-4 justify-content-center book-border plainlinks">
-                <div class="border-0 justify-content-center">
-                    <a class="fs-4" href="{% url 'book_detail' book.pk %}">
-                        <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
-                    </a>
-                    {% for contributor in book.contributors.all %}
-                    <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
-                    {% endfor %}
-                </div>
-
-                    <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
-
-            </div>
+            {% include "store/_book_card.html" with book=book variant="grid" wrapper_classes="d-flex my-4 justify-content-center book-border plainlinks" %}
         {% endfor %}
         {% else %}
         <p class="h1 my-5 ">Coming Soon...</p>
@@ -185,22 +137,7 @@
         <div class="container col">
             <div class="row justify-content-evenly mt-1">
                 {% for book in other_cat %}
-                    <div class="d-flex my-4 justify-content-center book-border plainlinks">
-                        <div class="border-0 justify-content-center">
-                            <a class="fs-4" href="{% url 'book_detail' book.pk %}">
-                                <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0">{{ book.title }}</p>
-                            </a>
-                            {% for contributor in book.contributors.all %}
-                            <p class="text-center lh-1 pt-1 mt-1">{{ contributor }}</p>
-                            {% endfor %}
-                        </div>
-
-                            <img class="book-image" src="{{ book.book_image.url}}" alt="{{ book.title }}">
-                    {% if forloop.counter|divisibleby:4 and not forloop.last %}
-                    </div>
-                    <div class="row">
-                {% endif %}
-                    </div>
+                    {% include "store/_book_card.html" with book=book variant="grid" wrapper_classes="d-flex my-4 justify-content-center book-border plainlinks" %}
                 {% endfor %}
             </div>
         </div>

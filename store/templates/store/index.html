@@ -271,19 +271,7 @@
                 <div class="owl-stage owl-height pb-5">
                     {% for book in books %}
                     <div class="owl-item">
-                       
-                        <div class="d-flex justify-content-center carousel-border plainlinks">
-                            <div class="border-0 justify-content-center">
-                                <p class="text-center lh-1 fw-semibold fs-6 pt-4 my-0 pb-0"><a href="{% url 'book_detail' book.pk %}"> {{ book.title}}</a></p>
-                                <p class="text-center lh-1 pt-1 mt-1">
-                                {% for contributor in book.contributors.all %}
-                                {{ contributor}} <br>
-                                {% endfor %}
-                                </p>
-                            </div>
-                            <img class="carousel-image" src="{{ book.book_image.url}}" alt="">
-                        </div>
-                        
+                        {% include "store/_book_card.html" with book=book variant="compact" wrapper_classes="d-flex justify-content-center carousel-border plainlinks" image_class="carousel-image" %}
                     </div>
                     {% endfor %}
                 </div>
@@ -331,34 +319,14 @@
                 <div class="tab-pane fade show active" id="preSchool" role="tabpanel" aria-labelledby="preSchool-tab">
                     <div class="justify-content-center row">
                         {%for book in pre_school %}
-                        <div class="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative">
-                            <div class="justify-content-center">
-                                <p class="text-center lh-1 fw-semibold fs-4 pt-4 my-0 pb-0"><a href="{%url 'book_detail' book.pk%}">{{book.title}}</a></p>
-                                <p class="text-center lh-1 pt-1 mt-1">
-                                {% for contributor in book.contributors.all %}
-                                {{ contributor}}<br>
-                                {% endfor %}
-                                </p>
-                            </div>
-                            <img class="navtab-image" src="{{book.book_image.url}}" alt="">
-                        </div>
+                        {% include "store/_book_card.html" with book=book variant="compact" wrapper_classes="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                    </div>
                 </div>
                 <div class="tab-pane fade" id="primarySchool" role="tabpanel" aria-labelledby="primarySchool-tab">
                    <div class="justify-content-md-center d-md-flex">
                         {%for book in p_school %}
-                        <div class="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative">
-                            <div class="justify-content-center">
-                                <p class="text-center lh-1 fw-semibold fs-4 pt-4 my-0 pb-0"><a href="{%url 'book_detail' book.pk%}">{{book.title}}</a></p>
-                                <p class="text-center lh-1 pt-1 mt-1">
-                                {% for contributor in book.contributors.all %}
-                                {{ contributor}}<br>
-                                {% endfor %}
-                                </p>
-                            </div>
-                            <img class="navtab-image" src="{{book.book_image.url}}" alt="">
-                        </div>
+                        {% include "store/_book_card.html" with book=book variant="compact" wrapper_classes="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                    </div>
                 </div>
@@ -366,17 +334,7 @@
                     <div class="justify-content-md-center d-md-flex">
                         {% if h_school %}
                         {%for book in h_school %}
-                        <div class="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative">
-                            <div class="justify-content-center">
-                                <p class="text-center lh-1 fw-semibold fs-4 pt-4 my-0 pb-0"><a href="{%url 'book_detail' book.pk%}">{{book.title}}</a></p>
-                                <p class="text-center lh-1 pt-1 mt-1">
-                                {% for contributor in book.contributors.all %}
-                                {{ contributor}}<br>
-                                {% endfor %}
-                                </p>
-                            </div>
-                            <img class="navtab-image" src="{{book.book_image.url}}" alt="">
-                        </div>
+                        {% include "store/_book_card.html" with book=book variant="compact" wrapper_classes="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                         {% else %}
                         <div class="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative">
@@ -405,34 +363,14 @@
                 <div class="tab-pane fade " id="examStudy" role="tabpanel" aria-labelledby="examStudy-tab">
                    <div class="justify-content-md-center d-md-flex">
                         {%for book in exam_study %}
-                        <div class="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative">
-                            <div class="justify-content-center">
-                                <p class="text-center lh-1 fw-semibold fs-4 pt-4 my-0 pb-0"><a href="{%url 'book_detail' book.pk%}">{{book.title}}</a></p>
-                                <p class="text-center lh-1 pt-1 mt-1">
-                                {% for contributor in book.contributors.all %}
-                                {{ contributor}}<br>
-                                {% endfor %}
-                                </p>
-                            </div>
-                            <img class="navtab-image" src="{{book.book_image.url}}" alt="">
-                        </div>
+                        {% include "store/_book_card.html" with book=book variant="compact" wrapper_classes="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                    </div>
                 </div>
                 <div class="tab-pane fade" id="extraCurricular" role="tabpanel" aria-labelledby="extraCurricular-tab">
                     <div class="justify-content-md-center d-md-flex">
                          {%for book in story_books %}
-                        <div class="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative">
-                            <div class="justify-content-center">
-                                <p class="text-center lh-1 fw-semibold fs-4 pt-4 my-0 pb-0"><a href="{%url 'book_detail' book.pk%}">{{book.title}}</a></p>
-                                <p class="text-center lh-1 pt-1 mt-1">
-                                {% for contributor in book.contributors.all %}
-                                {{ contributor}}<br>
-                                {% endfor %}
-                                </p>
-                            </div>
-                            <img class="navtab-image" src="{{book.book_image.url}}" alt="">
-                        </div>
+                        {% include "store/_book_card.html" with book=book variant="compact" wrapper_classes="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                    </div>
                 </div>
@@ -556,17 +494,17 @@
 
                         <div class="col lh-1 footer-text">
                             <h6 class="mt-2 mb-3">Order</h6>
-                            <p class="lh-1"><a href="#">Wishlist</a></p>
-                            <p class="lh-1"><a href="#">Payment</a></p>
-                            <p class="lh-1"><a href="#">Order History</a></p>
+                            <p class="lh-1"><span class="text-muted">Wishlist <small>(Coming Soon)</small></span></p>
+                            <p class="lh-1"><span class="text-muted">Payment <small>(Coming Soon)</small></span></p>
+                            <p class="lh-1"><span class="text-muted">Order History <small>(Coming Soon)</small></span></p>
                         </div>
 
                         <div class="col lh-1 footer-text">
                             <h6 class="mt-2 mb-3">Resources</h6>
-                            <p><a href="#">Blog</a></p>
-                            <p><a href="#">Newsletter</a></p>
-                            <p><a href="#">Events</a></p>
-                            <p><a href="#">Support</a></p>
+                            <p><span class="text-muted">Blog <small>(Coming Soon)</small></span></p>
+                            <p><span class="text-muted">Newsletter <small>(Coming Soon)</small></span></p>
+                            <p><span class="text-muted">Events <small>(Coming Soon)</small></span></p>
+                            <p><span class="text-muted">Support <small>(Coming Soon)</small></span></p>
                         </div>
 
                         <div class="col lh-1">
@@ -574,9 +512,9 @@
                             <p><a href="{% url 'aboutus' %}">About Us</a></p>
                             <p><a href="{% url 'services' %}">Our Services</a></p>
                             <p><a href="{% url 'faqs' %}">FAQs</a></p>
-                            <p><a href="#">License & Privacy Policy</a></p>
-                            <p><a href="#">Terms of Use</a></p>
-                            <p><a href="#">Cookies</a></p>
+                            <p><span class="text-muted">License & Privacy Policy <small>(Coming Soon)</small></span></p>
+                            <p><span class="text-muted">Terms of Use <small>(Coming Soon)</small></span></p>
+                            <p><span class="text-muted">Cookies <small>(Coming Soon)</small></span></p>
                         </div>
                     </div>
                   <hr class="footer-hr">

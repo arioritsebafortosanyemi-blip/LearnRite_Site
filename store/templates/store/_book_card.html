@@ -9,9 +9,19 @@ to one consistent style since the differences were never meaningful.
 variant: "compact" (homepage carousel/category tabs) or "grid" (books
 listing, book detail, category pages) - controls whether the link wraps the
 title paragraph or sits inside it, matching each context's original markup.
-wrapper_classes / image_class: the exact classes each call site already used.
+wrapper_classes: the exact classes each call site already used on its fixed-
+size card box (book-border/carousel-border/navtab-border) - that box's cover
+image is deliberately position:absolute, hanging out past the box's own
+bottom edge, so price/cart content can't be nested inside it without being
+covered. It renders in its own sibling block below instead.
+outer_classes: grid/spacing classes (e.g. "col-4 mt-4 mx-4 mb-5") that used
+to live on the same div as wrapper_classes - kept on a separate outer wrapper
+now, since Bootstrap's col-* sizing only works on a row's direct child, and
+that direct child can no longer also be the fixed-size card box.
+image_class: the exact classes each call site already used.
 {% endcomment %}
 {% book_purchase_context book user as purchase %}
+<div class="{{ outer_classes }} d-flex flex-column align-items-center">
 {% if variant == "compact" %}
 <div class="{{ wrapper_classes }}">
     <div class="border-0 justify-content-center">
@@ -19,7 +29,6 @@ wrapper_classes / image_class: the exact classes each call site already used.
         <p class="text-center lh-1 pt-1 mt-1">
             {% for contributor in book.contributors.all %}{{ contributor }}<br>{% endfor %}
         </p>
-        {% include "store/_book_purchase.html" %}
     </div>
     <img class="{{ image_class }}" src="{{ book.book_image.url }}" alt="{{ book.title }}">
 </div>
@@ -32,8 +41,11 @@ wrapper_classes / image_class: the exact classes each call site already used.
         <p class="text-center lh-1 pt-1 mt-1">
             {% for contributor in book.contributors.all %}{{ contributor }}<br>{% endfor %}
         </p>
-        {% include "store/_book_purchase.html" %}
     </div>
     <img class="book-image" src="{{ book.book_image.url }}" alt="{{ book.title }}">
 </div>
 {% endif %}
+<div class="mt-5 pt-2">
+    {% include "store/_book_purchase.html" %}
+</div>
+</div>

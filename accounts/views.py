@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from store.forms import SearchForm
-from accounts.forms import ProfileForm, RegisterForm
+from accounts.forms import AccountSetupForm, ProfileForm, RegisterForm
 
 
 def register(request):
@@ -17,6 +17,24 @@ def register(request):
         form = RegisterForm()
     return render(request, "accounts/register.html", {
         "register_form": form,
+        "form": SearchForm(request.GET),
+    })
+
+
+@login_required
+def confirm_account_setup(request):
+    profile = request.user.profile
+    if profile.profile_confirmed:
+        return redirect("index")
+    if request.method == "POST":
+        setup_form = AccountSetupForm(request.POST, instance=profile)
+        if setup_form.is_valid():
+            setup_form.save()
+            return redirect("index")
+    else:
+        setup_form = AccountSetupForm(instance=profile)
+    return render(request, "accounts/confirm_account_setup.html", {
+        "setup_form": setup_form,
         "form": SearchForm(request.GET),
     })
 

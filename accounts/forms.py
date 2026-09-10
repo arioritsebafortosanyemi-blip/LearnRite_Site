@@ -23,6 +23,7 @@ class RegisterForm(UserCreationForm):
                 defaults={
                     "account_type": self.cleaned_data["account_type"],
                     "location": self.cleaned_data["location"],
+                    "profile_confirmed": True,
                 },
             )
         return user
@@ -32,3 +33,20 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ("account_type", "location", "phone_number")
+
+
+class AccountSetupForm(forms.ModelForm):
+    """Shown once to accounts that never went through RegisterForm (Google
+    sign-ups), so pricing has a real account_type/location instead of the
+    signal-created defaults."""
+
+    class Meta:
+        model = Profile
+        fields = ("account_type", "location")
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        profile.profile_confirmed = True
+        if commit:
+            profile.save()
+        return profile

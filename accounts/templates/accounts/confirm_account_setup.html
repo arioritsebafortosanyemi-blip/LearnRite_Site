@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %} Confirm Your Account {% endblock %}
+{% block style %}
+    <style>
+    .navbar-bg-img {
+        height: auto;
+        background-image: none;
+    }
+    </style>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Confirm Your Account</li>
+{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h3 class="h3 mb-3">One last step, {{ user.username }}</h3>
+            <p class="fs-5">Tell us who's buying so we can show you the right pricing.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                {% for field in setup_form %}
+                <div class="mb-3">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <button class="btn btn-dark btn-large px-4 py-2" type="submit">Continue</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

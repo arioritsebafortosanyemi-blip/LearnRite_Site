@@ -18,6 +18,11 @@ class Profile(models.Model):
          default=BookPrice.Location.LAGOS,
          help_text="Self-declared, used for pricing and delivery.")
     phone_number = models.CharField(max_length=20, blank=True)
+    profile_confirmed = models.BooleanField \
+        (default=False,
+         help_text="Whether the customer has explicitly chosen account_type/location "
+                    "(as opposed to still sitting on the signal-created defaults, e.g. "
+                    "right after a Google sign-up).")
 
     def __str__(self):
         return f"{self.user.username} ({self.account_type}/{self.location})"

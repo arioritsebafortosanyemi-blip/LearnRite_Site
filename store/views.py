@@ -1,19 +1,19 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Book, Contributor
 from django.db.models import Q
-from .utils import average_rating
+from .utils import average_rating, random_books, random_book
 from .forms import SearchForm, PreSchoolBookFilterForm, PrimarySchoolBookFilterForm, HighSchoolBookFilterForm, ExamStudyBookFilterForm, StoryBookFilterForm
 from django.core.paginator import Paginator
 
 
 def index(request):
-    books = Book.objects.order_by('?')[:20]
+    books = random_books(Book.objects.all(), 20)
     author= Contributor.objects.first()
-    pre_school = Book.objects.filter(category__name='PRE-SCHOOL').order_by('?')[:3]
-    p_school = Book.objects.filter(category__name='PRIMARY SCHOOL').order_by('?')[:3]
-    h_school = Book.objects.filter(category__name='HIGH SCHOOL').order_by('?')[:3]
-    exam_study = Book.objects.filter(category__name='EXAM & STUDY').order_by('?')[:3]
-    story_books = Book.objects.filter(category__name='STORY BOOKS').order_by('?')[:3]
+    pre_school = random_books(Book.objects.filter(category__name='PRE-SCHOOL'), 3)
+    p_school = random_books(Book.objects.filter(category__name='PRIMARY SCHOOL'), 3)
+    h_school = random_books(Book.objects.filter(category__name='HIGH SCHOOL'), 3)
+    exam_study = random_books(Book.objects.filter(category__name='EXAM & STUDY'), 3)
+    story_books = random_books(Book.objects.filter(category__name='STORY BOOKS'), 3)
     form = SearchForm(request.GET)
 
     context = {'books': books,
@@ -56,7 +56,7 @@ def authors(request):
 
 def author_detail(request,pk):
     author = get_object_or_404(Contributor, pk=pk)
-    related_books = author.book_set.all().order_by('?')[:3]
+    related_books = random_books(author.book_set.all(), 3)
     form = SearchForm(request.GET)
 
     context = {'author':author,
@@ -65,11 +65,11 @@ def author_detail(request,pk):
     return render(request, 'store/author_detail.html', context)
 
 def books(request):
-    best_seller = Book.objects.order_by('?')[:4]
-    pre_school = Book.objects.filter(category__name='PRE-SCHOOL').order_by('?')[:4]
-    p_school = Book.objects.filter(category__name='PRIMARY SCHOOL').order_by('?')[:4]
-    h_school = Book.objects.filter(category__name='HIGH SCHOOL').order_by('?')[:4]
-    other_cat = Book.objects.filter(Q(category__name ='EXAM & STUDY') | Q(category__name='STORY BOOKS')).order_by('?')[:12]
+    best_seller = random_books(Book.objects.all(), 4)
+    pre_school = random_books(Book.objects.filter(category__name='PRE-SCHOOL'), 4)
+    p_school = random_books(Book.objects.filter(category__name='PRIMARY SCHOOL'), 4)
+    h_school = random_books(Book.objects.filter(category__name='HIGH SCHOOL'), 4)
+    other_cat = random_books(Book.objects.filter(Q(category__name ='EXAM & STUDY') | Q(category__name='STORY BOOKS')), 12)
     form = SearchForm(request.GET)
 
     context = {'best_seller':best_seller,
@@ -83,7 +83,7 @@ def books(request):
 def book_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
     reviews = book.review_set.all()
-    related_books = Book.objects.filter( Q(subcategory=book.subcategory) | Q(contributors__in=book.contributors.all())).exclude(pk=pk)[:4]
+    related_books = Book.objects.filter( Q(subcategory=book.subcategory) | Q(contributors__in=book.contributors.all())).exclude(pk=pk).prefetch_related('contributors').distinct()[:4]
     form = SearchForm(request.GET)
 
     if reviews.exists():
@@ -161,13 +161,13 @@ def pre_school(request):
 
     class_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='PRE-SCHOOL')
+    books = Book.objects.filter(category__name='PRE-SCHOOL').prefetch_related('contributors')
     if len(class_query) == 1:
         books = books.filter(subcategory__name=class_query[0])
     elif len(class_query) > 1:
         books = books.filter(subcategory__name__in=class_query)
 
-    best_seller = Book.objects.filter(category__name='PRE-SCHOOL').order_by('?').first()
+    best_seller = random_book(Book.objects.filter(category__name='PRE-SCHOOL'))
     paginator = Paginator(books, 9)
 
     page = request.GET.get('page')
@@ -182,13 +182,13 @@ def primary_school(request):
 
     class_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='PRIMARY SCHOOL')
+    books = Book.objects.filter(category__name='PRIMARY SCHOOL').prefetch_related('contributors')
     if len(class_query) == 1:
         books = books.filter(subcategory__name=class_query[0])
     elif len(class_query) > 1:
         books = books.filter(subcategory__name__in=class_query)
 
-    best_seller = Book.objects.filter(category__name='PRIMARY SCHOOL').order_by('?').first()
+    best_seller = random_book(Book.objects.filter(category__name='PRIMARY SCHOOL'))
     paginator = Paginator(books, 9)
 
     page = request.GET.get('page')
@@ -202,13 +202,13 @@ def high_school(request):
 
     class_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='HIGH SCHOOL')
+    books = Book.objects.filter(category__name='HIGH SCHOOL').prefetch_related('contributors')
     if len(class_query) == 1:
         books = books.filter(subcategory__name=class_query[0])
     elif len(class_query) > 1:
         books = books.filter(subcategory__name__in=class_query)
 
-    best_seller = Book.objects.filter(category__name='HIGH SCHOOL').order_by('?').first() or []
+    best_seller = random_book(Book.objects.filter(category__name='HIGH SCHOOL'))
     paginator = Paginator(books, 9)
 
     page = request.GET.get('page')
@@ -222,13 +222,13 @@ def exam_study_school(request):
 
     exam_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='EXAM & STUDY')
+    books = Book.objects.filter(category__name='EXAM & STUDY').prefetch_related('contributors')
     if len(exam_query) == 1:
         books = books.filter(subcategory__name=exam_query[0])
     elif len(exam_query) > 1:
         books = books.filter(subcategory__name__in=exam_query)
 
-    best_seller = Book.objects.filter(category__name='EXAM & STUDY').order_by('?').first()
+    best_seller = random_book(Book.objects.filter(category__name='EXAM & STUDY'))
     paginator = Paginator(books, 9)
 
     page = request.GET.get('page')
@@ -245,13 +245,13 @@ def story_books_school(request):
     #retrieving information from
     genre_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='STORY BOOKS')
+    books = Book.objects.filter(category__name='STORY BOOKS').prefetch_related('contributors')
     if len(genre_query) == 1:
         books = books.filter(subcategory__name=genre_query[0])
     elif len(genre_query) > 1:
         books = books.filter(subcategory__name__in=genre_query)
 
-    best_seller = Book.objects.filter(category__name='STORY BOOKS').order_by('?').first()
+    best_seller = random_book(Book.objects.filter(category__name='STORY BOOKS'))
     paginator = Paginator(books, 9)
 
     page = request.GET.get('page')

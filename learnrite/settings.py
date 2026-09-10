@@ -73,6 +73,12 @@ AUTHENTICATION_BACKENDS = [
 
 # Client sets these up in Google Cloud Console once the accounts app is live
 # (see plan doc) - left blank until then so the site keeps working without them.
+# Skip allauth's own unstyled "you're about to sign in with Google, continue?"
+# confirmation page and its separate signup-confirmation form - go straight
+# from the button click to Google, then straight into the site once back.
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {

@@ -261,6 +261,7 @@
  border-radius: 1%;
  height: 280px;
  width: 220px;
+ position: relative;
 }
 
 .carousel-image{

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %} Login {% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Login</li>
+{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <h3 class="h3 mb-4">Login</h3>
+
+            {% if form.errors %}
+            <p class="text-danger">Incorrect username or password.</p>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label" for="id_username">Username</label>
+                    {{ form.username }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="id_password">Password</label>
+                    {{ form.password }}
+                </div>
+                <input type="hidden" name="next" value="{{ next }}">
+                <button class="btn btn-dark btn-large px-4 py-2" type="submit">Login</button>
+            </form>
+
+            <hr class="my-4">
+
+            <a class="btn btn-large btn-outline-dark px-4 py-2 w-100 text-center" href="{% url 'google_login' %}?process=login">
+                Sign in with Google
+            </a>
+
+            <p class="mt-4">Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

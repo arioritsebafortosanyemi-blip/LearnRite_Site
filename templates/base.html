@@ -120,13 +120,9 @@
                        </li>
                    </ul>
                    <ul class="navbar-nav lg-5 me-2 pe-5">
-                       <a class="nav-link pe-4 me-2 position-relative" href="#">
+                       <a class="nav-link pe-4 me-2" href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}">
                             <svg class="nav-svg" width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M20.8618 21V19C20.8618 17.9391 20.4404 16.9217 19.6902 16.1716C18.9401 15.4214 17.9227 15 16.8618 15H8.86182C7.80095 15 6.78353 15.4214 6.03339 16.1716C5.28324 16.9217 4.86182 17.9391 4.86182 19V21M16.8618 7C16.8618 9.20914 15.071 11 12.8618 11C10.6527 11 8.86182 9.20914 8.86182 7C8.86182 4.79086 10.6527 3 12.8618 3C15.071 3 16.8618 4.79086 16.8618 7Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <span class="coming-soon position-absolute translate-middle badge rounded-pill bg-danger">
-                                coming <br> soon
-                                <span class="visually-hidden">coming soon</span>
-                            </span>
                             </svg>
                         </a>
 
@@ -223,7 +219,7 @@
                     <h6 class="mt-2 mb-3">Order</h6>
                     <p class="lh-1"><span class="text-muted">Wishlist <small>(Coming Soon)</small></span></p>
                     <p class="lh-1"><span class="text-muted">Payment <small>(Coming Soon)</small></span></p>
-                    <p class="lh-1"><span class="text-muted">Order History <small>(Coming Soon)</small></span></p>
+                    <p class="lh-1"><a href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}">Order History</a></p>
                 </div>
 
                 <div class="col lh-1 footer-text">

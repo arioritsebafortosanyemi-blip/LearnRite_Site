@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %} Register {% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Register</li>
+{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h3 class="h3 mb-4">Create an Account</h3>
+
+            <a class="btn btn-large btn-outline-dark px-4 py-2 w-100 text-center mb-4" href="{% url 'google_login' %}?process=login">
+                Sign up with Google
+            </a>
+
+            <p class="text-center">or</p>
+
+            <form method="post">
+                {% csrf_token %}
+                {% for field in register_form %}
+                <div class="mb-3">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                <button class="btn btn-dark btn-large px-4 py-2" type="submit">Register</button>
+            </form>
+
+            <p class="mt-4">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

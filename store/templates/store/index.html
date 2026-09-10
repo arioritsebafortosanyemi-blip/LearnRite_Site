@@ -180,14 +180,14 @@
                 <div class="tab-pane fade show active" id="preSchool" role="tabpanel" aria-labelledby="preSchool-tab">
                     <div class="justify-content-center row">
                         {%for book in pre_school %}
-                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-4 mt-4 mx-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
+                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-12 col-md-4 mt-4 mx-md-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                    </div>
                 </div>
                 <div class="tab-pane fade" id="primarySchool" role="tabpanel" aria-labelledby="primarySchool-tab">
                    <div class="justify-content-md-center d-md-flex">
                         {%for book in p_school %}
-                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-4 mt-4 mx-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
+                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-12 col-md-4 mt-4 mx-md-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                    </div>
                 </div>
@@ -195,7 +195,7 @@
                     <div class="justify-content-md-center d-md-flex">
                         {% if h_school %}
                         {%for book in h_school %}
-                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-4 mt-4 mx-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
+                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-12 col-md-4 mt-4 mx-md-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                         {% else %}
                         <div class="col-4 d-flex justify-content-center mt-4 mx-4 mb-5 navtab-border position-relative">
@@ -224,14 +224,14 @@
                 <div class="tab-pane fade " id="examStudy" role="tabpanel" aria-labelledby="examStudy-tab">
                    <div class="justify-content-md-center d-md-flex">
                         {%for book in exam_study %}
-                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-4 mt-4 mx-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
+                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-12 col-md-4 mt-4 mx-md-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                    </div>
                 </div>
                 <div class="tab-pane fade" id="extraCurricular" role="tabpanel" aria-labelledby="extraCurricular-tab">
                     <div class="justify-content-md-center d-md-flex">
                          {%for book in story_books %}
-                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-4 mt-4 mx-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
+                        {% include "store/_book_card.html" with book=book variant="compact" outer_classes="col-12 col-md-4 mt-4 mx-md-4 mb-5" wrapper_classes="d-flex justify-content-center navtab-border position-relative" image_class="navtab-image" %}
                         {% endfor %}
                    </div>
                 </div>

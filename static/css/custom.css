@@ -294,6 +294,8 @@
   border-radius: 1%;
   height: 400px;
   width: 320px;
+  max-width: 100%;
+  box-sizing: border-box;
  }
 
  .journal-border {

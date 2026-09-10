@@ -117,7 +117,7 @@ class BookPrice(models.Model):
     """One of a book's 4 prices: one per (account type x location) combination."""
     class AccountType(models.TextChoices):
         INDIVIDUAL = "INDIVIDUAL", "Individual"
-        SCHOOL = "SCHOOL", "School"
+        SCHOOL = "SCHOOL", "Institution"
 
     class Location(models.TextChoices):
         LAGOS = "LAGOS", "Lagos"

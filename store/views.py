@@ -81,9 +81,9 @@ def books(request):
     return render(request, 'store/books.html', context)
 
 def book_detail(request, pk):
-    book = get_object_or_404(Book, pk=pk)
+    book = get_object_or_404(Book.objects.prefetch_related('contributors', 'prices'), pk=pk)
     reviews = book.review_set.all()
-    related_books = Book.objects.filter( Q(subcategory=book.subcategory) | Q(contributors__in=book.contributors.all())).exclude(pk=pk).prefetch_related('contributors').distinct()[:4]
+    related_books = Book.objects.filter( Q(subcategory=book.subcategory) | Q(contributors__in=book.contributors.all())).exclude(pk=pk).prefetch_related('contributors', 'prices').distinct()[:4]
     form = SearchForm(request.GET)
 
     if reviews.exists():
@@ -161,7 +161,7 @@ def pre_school(request):
 
     class_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='PRE-SCHOOL').prefetch_related('contributors')
+    books = Book.objects.filter(category__name='PRE-SCHOOL').prefetch_related('contributors', 'prices')
     if len(class_query) == 1:
         books = books.filter(subcategory__name=class_query[0])
     elif len(class_query) > 1:
@@ -182,7 +182,7 @@ def primary_school(request):
 
     class_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='PRIMARY SCHOOL').prefetch_related('contributors')
+    books = Book.objects.filter(category__name='PRIMARY SCHOOL').prefetch_related('contributors', 'prices')
     if len(class_query) == 1:
         books = books.filter(subcategory__name=class_query[0])
     elif len(class_query) > 1:
@@ -202,7 +202,7 @@ def high_school(request):
 
     class_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='HIGH SCHOOL').prefetch_related('contributors')
+    books = Book.objects.filter(category__name='HIGH SCHOOL').prefetch_related('contributors', 'prices')
     if len(class_query) == 1:
         books = books.filter(subcategory__name=class_query[0])
     elif len(class_query) > 1:
@@ -222,7 +222,7 @@ def exam_study_school(request):
 
     exam_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='EXAM & STUDY').prefetch_related('contributors')
+    books = Book.objects.filter(category__name='EXAM & STUDY').prefetch_related('contributors', 'prices')
     if len(exam_query) == 1:
         books = books.filter(subcategory__name=exam_query[0])
     elif len(exam_query) > 1:
@@ -245,7 +245,7 @@ def story_books_school(request):
     #retrieving information from
     genre_query = request.GET.getlist('filter_option')
 
-    books = Book.objects.filter(category__name='STORY BOOKS').prefetch_related('contributors')
+    books = Book.objects.filter(category__name='STORY BOOKS').prefetch_related('contributors', 'prices')
     if len(genre_query) == 1:
         books = books.filter(subcategory__name=genre_query[0])
     elif len(genre_query) > 1:

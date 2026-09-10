@@ -1,0 +1,21 @@
+{% comment %}
+Renders whatever `purchase` (a book_purchase_context dict) says: a real
+price + quantity/Add to Cart form for an institution account with pricing
+set, or a short message otherwise (individuals/anonymous visitors always
+see the contact-us message, institutions with no price yet see a distinct
+"pricing coming soon" message).
+{% endcomment %}
+<div class="text-center mt-1 mb-2">
+    {% if purchase.can_buy %}
+    <p class="fw-bold fs-6 mb-2">&#8358;{{ purchase.price }}</p>
+    <form method="post" action="{% url 'add_to_cart' book.pk %}" class="d-flex justify-content-center">
+        {% csrf_token %}
+        <div class="input-group input-group-sm" style="max-width: 10rem;">
+            <input type="number" name="quantity" value="1" min="1" class="form-control text-center" aria-label="Quantity">
+            <button type="submit" class="btn btn-dark">Add to Cart</button>
+        </div>
+    </form>
+    {% else %}
+    <p class="text-muted small mb-0">{{ purchase.message }}</p>
+    {% endif %}
+</div>

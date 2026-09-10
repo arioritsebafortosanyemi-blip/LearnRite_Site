@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'accounts',
+    'orders',
     'store',
     'blog',
 ]
@@ -94,6 +95,11 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
+
+# Bootstrap has no alert-error class - map Django's "error" level to
+# alert-danger so messages.error() renders correctly in _messages.html.
+from django.contrib.messages import constants as message_constants
+MESSAGE_TAGS = {message_constants.ERROR: 'danger'}
 
 ROOT_URLCONF = 'learnrite.urls'
 

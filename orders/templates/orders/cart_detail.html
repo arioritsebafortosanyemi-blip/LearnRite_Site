@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %} My Cart {% endblock %}
+{% block style %}
+    <style>
+    .navbar-bg-img {
+        height: auto;
+        background-image: none;
+    }
+    </style>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">My Cart</li>
+{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h3 class="h3 mb-4">My Cart</h3>
+
+    {% if lines %}
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line in lines %}
+                <tr>
+                    <td>{{ line.item.book.title }}</td>
+                    <td>
+                        {% if line.price is not None %}&#8358;{{ line.price }}
+                        {% else %}<span class="text-muted">Pricing unavailable</span>{% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'update_cart_item' line.item.pk %}" class="d-flex">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" value="{{ line.item.quantity }}" min="1" class="form-control form-control-sm" style="width: 5rem;">
+                            <button type="submit" class="btn btn-sm btn-outline-dark ms-2">Update</button>
+                        </form>
+                    </td>
+                    <td>
+                        {% if line.line_total is not None %}&#8358;{{ line.line_total }}
+                        {% else %}<span class="text-muted">-</span>{% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'remove_cart_item' line.item.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-end">
+        <p class="fs-5 fw-bold">Subtotal: &#8358;{{ subtotal }}</p>
+    </div>
+    {% else %}
+    <p class="fs-5">Your cart is empty.</p>
+    <a href="{% url 'books' %}" class="btn btn-dark px-4 py-2">Browse Books</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,3 +1,4 @@
+{% load accounts_extras %}
 {% comment %}
 Shared book card, used by the homepage carousel/category tabs, the books
 listing, book detail's related products, and the 5 category pages. Was
@@ -10,6 +11,7 @@ listing, book detail, category pages) - controls whether the link wraps the
 title paragraph or sits inside it, matching each context's original markup.
 wrapper_classes / image_class: the exact classes each call site already used.
 {% endcomment %}
+{% book_purchase_context book user as purchase %}
 {% if variant == "compact" %}
 <div class="{{ wrapper_classes }}">
     <div class="border-0 justify-content-center">
@@ -17,6 +19,7 @@ wrapper_classes / image_class: the exact classes each call site already used.
         <p class="text-center lh-1 pt-1 mt-1">
             {% for contributor in book.contributors.all %}{{ contributor }}<br>{% endfor %}
         </p>
+        {% include "store/_book_purchase.html" %}
     </div>
     <img class="{{ image_class }}" src="{{ book.book_image.url }}" alt="{{ book.title }}">
 </div>
@@ -29,6 +32,7 @@ wrapper_classes / image_class: the exact classes each call site already used.
         <p class="text-center lh-1 pt-1 mt-1">
             {% for contributor in book.contributors.all %}{{ contributor }}<br>{% endfor %}
         </p>
+        {% include "store/_book_purchase.html" %}
     </div>
     <img class="book-image" src="{{ book.book_image.url }}" alt="{{ book.title }}">
 </div>

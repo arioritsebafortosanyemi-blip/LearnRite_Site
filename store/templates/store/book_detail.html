@@ -1,5 +1,6 @@
 {% extends 'store/base3.html' %}
 {% load static %}
+{% load accounts_extras %}
 {% block title %}
 {{ book.title|title }}
 {% endblock %}
@@ -33,6 +34,8 @@
                             {{ contributor }}
                         {% endfor %}
                     </p>
+                    {% book_purchase_context book user as purchase %}
+                    {% include "store/_book_purchase.html" %}
                 </div>
 
             </div>

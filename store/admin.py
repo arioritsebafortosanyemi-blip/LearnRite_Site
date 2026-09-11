@@ -15,8 +15,8 @@ class BookPriceInline(admin.TabularInline):
 class BookAdmin(admin.ModelAdmin):
     search_fields = ('title','publisher__name')
     date_hierarchy = 'publication_date'
-    list_display = ('title','category')
-    list_filter = ('publisher', 'publication_date', 'category__name', 'subcategory__name')
+    list_display = ('title','category', 'is_published')
+    list_filter = ('is_published', 'publisher', 'publication_date', 'category__name', 'subcategory__name')
     inlines = [BookPriceInline]
 
 class ContributorAdmin(admin.ModelAdmin):

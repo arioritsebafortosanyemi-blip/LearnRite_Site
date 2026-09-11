@@ -109,6 +109,8 @@ class Book(models.Model):
         (SubCategory, related_name="books", on_delete=models.CASCADE)
     contributors = models.ManyToManyField \
         ("Contributor", through="BookContributor")
+    is_published = models.BooleanField \
+        (default=True, help_text="Uncheck to hide this book from the site without deleting it.")
 
     def __str__(self):
         return self.title

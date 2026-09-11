@@ -164,7 +164,7 @@ class Review(models.Model):
     )
 
     content = models.TextField \
-        (help_text="The review text.")
+        (blank=True, help_text="The review text (optional).")
 
     rating = models.IntegerField \
         (choices=RATINGS,help_text="The ratings the reviewer has given")
@@ -180,3 +180,6 @@ class Review(models.Model):
 
     book = models.ForeignKey \
         (Book, on_delete=models.CASCADE, help_text="The book that this review is for.")
+
+    class Meta:
+        unique_together = ("book", "creator")

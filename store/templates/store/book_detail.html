@@ -1,6 +1,7 @@
 {% extends 'store/base3.html' %}
 {% load static %}
 {% load accounts_extras %}
+{% load form_filter %}
 {% block title %}
 {{ book.title|title }}
 {% endblock %}
@@ -34,6 +35,14 @@
                             {{ contributor }}
                         {% endfor %}
                     </p>
+                    {% if rating %}
+                    <p class="mb-2">
+                        {% for filled in rating|star_range %}
+                        {% if filled %}<i class="bi bi-star-fill text-warning"></i>{% else %}<i class="bi bi-star text-warning"></i>{% endif %}
+                        {% endfor %}
+                        <span class="text-muted small">({{ reviews.count }})</span>
+                    </p>
+                    {% endif %}
                     {% book_purchase_context book user as purchase %}
                     {% include "store/_book_purchase.html" %}
                 </div>
@@ -65,15 +74,16 @@
                        <ul class="list-group">
                             {% for review in reviews %}
                             <li class="list-group-item">
-                                <span class="text-info">Review comment:</span><span>{{ review.content }}</span>
-                                <br>
-                                <span class="text-info">Created on:</span><span>{{ review.date_created }}</span>
-                                <br>
-                                <span class="text-info">Modified on:</span><span>{{ review.date_edited }}</span>
-                                <br>
-                                <span class="text-info">Rating:</span><span class="badge badge-primary badge-pill">{{ review.rating }}</span>
-                                <br>
-                                <span class="text-info">Creator:</span><span>{{ review.creator }}</span>
+                                <span>
+                                {% for filled in review.rating|star_range %}
+                                {% if filled %}<i class="bi bi-star-fill text-warning"></i>{% else %}<i class="bi bi-star text-warning"></i>{% endif %}
+                                {% endfor %}
+                                </span>
+                                <span class="fw-semibold ms-2">{{ review.creator }}</span>
+                                {% if review.content %}
+                                <p class="mb-1 mt-1">{{ review.content }}</p>
+                                {% endif %}
+                                <span class="text-muted small">{{ review.date_created|date:"d M Y" }}{% if review.date_edited %} (edited){% endif %}</span>
                             </li>
                             {% endfor %}
                         </ul>

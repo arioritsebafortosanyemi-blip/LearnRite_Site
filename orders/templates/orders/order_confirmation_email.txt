@@ -6,7 +6,8 @@ Order summary:
 {% for item in order.items.all %}{{ item.quantity }} x {{ item.title }} - N{{ item.unit_price }} each = N{{ item.line_total }}
 {% endfor %}
 Subtotal: N{{ order.subtotal }}
-{% if order.discount_amount %}Discount: -N{{ order.discount_amount }}
+{% if order.discount_amount %}Bulk discount: -N{{ order.discount_amount }}
+{% endif %}{% if order.coupon_discount_amount %}Coupon discount{% if order.coupon %} ({{ order.coupon.code }}){% endif %}: -N{{ order.coupon_discount_amount }}
 {% endif %}Total: N{{ order.total }}
 
 To complete your order, please pay the total above by bank transfer to:

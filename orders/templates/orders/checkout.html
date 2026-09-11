@@ -16,48 +16,63 @@
 <div class="container mt-5 mb-5">
     <h3 class="h3 mb-4">Checkout</h3>
 
-    <div class="row">
-        <div class="col-md-7 mb-4">
-            <h5 class="mb-3">Delivery Details</h5>
-            <form method="post">
-                {% csrf_token %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-7 mb-4">
+                <h5 class="mb-3">Delivery Details</h5>
                 {% for field in checkout_form %}
+                {% if field.name != "coupon_code" %}
                 <div class="mb-3">
                     <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
                 </div>
-                {% endfor %}
-                <button type="submit" class="btn btn-dark px-4 py-2">Place Order</button>
-            </form>
-        </div>
-
-        <div class="col-md-5">
-            <h5 class="mb-3">Order Summary</h5>
-            <ul class="list-group mb-3">
-                {% for line in lines %}
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>{{ line.item.book.title }} &times; {{ line.item.quantity }}</span>
-                    <span>&#8358;{{ line.line_total }}</span>
-                </li>
-                {% endfor %}
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>Subtotal</span>
-                    <span>&#8358;{{ subtotal }}</span>
-                </li>
-                {% if discount_amount %}
-                <li class="list-group-item d-flex justify-content-between text-success">
-                    <span>Bulk discount</span>
-                    <span>-&#8358;{{ discount_amount }}</span>
-                </li>
                 {% endif %}
-                <li class="list-group-item d-flex justify-content-between fw-bold">
-                    <span>Total</span>
-                    <span>&#8358;{{ total }}</span>
-                </li>
-            </ul>
-            <p class="text-muted small">You'll pay by bank transfer after placing your order - details are on the confirmation page and will be emailed to you.</p>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-5">
+                <h5 class="mb-3">Order Summary</h5>
+                <ul class="list-group mb-3">
+                    {% for line in lines %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ line.item.book.title }} &times; {{ line.item.quantity }}</span>
+                        <span>&#8358;{{ line.line_total }}</span>
+                    </li>
+                    {% endfor %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Subtotal</span>
+                        <span>&#8358;{{ subtotal }}</span>
+                    </li>
+                    {% if discount_amount %}
+                    <li class="list-group-item d-flex justify-content-between text-success">
+                        <span>Bulk discount</span>
+                        <span>-&#8358;{{ discount_amount }}</span>
+                    </li>
+                    {% endif %}
+                    {% if coupon_discount_amount %}
+                    <li class="list-group-item d-flex justify-content-between text-success">
+                        <span>Coupon discount</span>
+                        <span>-&#8358;{{ coupon_discount_amount }}</span>
+                    </li>
+                    {% endif %}
+                    <li class="list-group-item d-flex justify-content-between fw-bold">
+                        <span>Total</span>
+                        <span>&#8358;{{ total }}</span>
+                    </li>
+                </ul>
+
+                <div class="mb-3">
+                    <label class="form-label" for="{{ checkout_form.coupon_code.id_for_label }}">Coupon Code</label>
+                    {{ checkout_form.coupon_code }}
+                    {% if checkout_form.coupon_code.errors %}<div class="text-danger small">{{ checkout_form.coupon_code.errors }}</div>{% endif %}
+                </div>
+
+                <p class="text-muted small">You'll pay by bank transfer after placing your order - details are on the confirmation page and will be emailed to you.</p>
+            </div>
         </div>
-    </div>
+        <button type="submit" class="btn btn-dark px-4 py-2">Place Order</button>
+    </form>
 </div>
 {% endblock %}

@@ -37,6 +37,12 @@
                     <span>-&#8358;{{ order.discount_amount }}</span>
                 </li>
                 {% endif %}
+                {% if order.coupon_discount_amount %}
+                <li class="list-group-item d-flex justify-content-between text-success">
+                    <span>Coupon discount{% if order.coupon %} ({{ order.coupon.code }}){% endif %}</span>
+                    <span>-&#8358;{{ order.coupon_discount_amount }}</span>
+                </li>
+                {% endif %}
                 <li class="list-group-item d-flex justify-content-between fw-bold">
                     <span>Total</span>
                     <span>&#8358;{{ order.total }}</span>

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from orders.models import BulkDiscountRule, Cart, CartItem, Order, OrderItem, PaymentAccount
+from orders.models import BulkDiscountRule, Cart, CartItem, Coupon, Order, OrderItem, PaymentAccount
 
 
 class CartItemInline(admin.TabularInline):
@@ -27,7 +27,8 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ("status",)
     search_fields = ("order_reference", "full_name", "email", "phone_number")
     readonly_fields = ("order_reference", "user", "email", "full_name", "phone_number",
-                       "shipping_address", "subtotal", "discount_amount", "total", "created_at")
+                       "shipping_address", "subtotal", "discount_amount", "coupon",
+                       "coupon_discount_amount", "total", "created_at")
     inlines = [OrderItemInline]
 
 
@@ -39,3 +40,12 @@ class BulkDiscountRuleAdmin(admin.ModelAdmin):
 @admin.register(PaymentAccount)
 class PaymentAccountAdmin(admin.ModelAdmin):
     list_display = ("bank_name", "account_name", "account_number", "active")
+
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ("code", "discount_type", "discount_value", "valid_from", "valid_until",
+                     "times_used", "max_uses", "active")
+    list_filter = ("active", "discount_type")
+    search_fields = ("code",)
+    readonly_fields = ("times_used",)

@@ -32,6 +32,27 @@
                 <button class="btn btn-dark btn-large px-4 py-2" type="submit">Save</button>
             </form>
 
+            {% if reviewable_books %}
+            <hr class="my-4">
+            <h4 class="h5 mb-3">Rate Your Books</h4>
+            {% for entry in reviewable_books %}
+            <div class="border rounded p-3 mb-3">
+                <p class="fw-semibold mb-2">{{ entry.book.title }}</p>
+                <form method="post" action="{% url 'review_create' entry.book.pk %}">
+                    {% csrf_token %}
+                    <div class="star-rating-input mb-2">
+                        {% for i in "54321" %}
+                        <input type="radio" name="rating" value="{{ i }}" id="star{{ i }}-{{ entry.book.pk }}" {% if entry.review.rating|stringformat:"s" == i %}checked{% endif %}>
+                        <label for="star{{ i }}-{{ entry.book.pk }}"><i class="bi bi-star-fill"></i></label>
+                        {% endfor %}
+                    </div>
+                    {{ entry.review_form.content }}
+                    <button type="submit" class="btn btn-sm btn-dark mt-2">{% if entry.review %}Update{% else %}Submit{% endif %} Rating</button>
+                </form>
+            </div>
+            {% endfor %}
+            {% endif %}
+
             <hr class="my-4">
             <a href="{% url 'logout' %}">Log out</a>
         </div>

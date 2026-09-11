@@ -12,7 +12,7 @@ from store.utils import get_book_price
 
 from orders.emails import send_order_confirmation
 from orders.forms import CheckoutForm
-from orders.models import BulkDiscountRule, CartItem, Order, OrderItem, PaymentAccount
+from orders.models import BulkDiscountRule, CartItem, Coupon, Order, OrderItem, PaymentAccount
 from orders.utils import get_or_create_cart, price_cart
 
 
@@ -95,12 +95,28 @@ def remove_cart_item(request, pk):
 
 
 def _apply_bulk_discount(subtotal):
-    """Automatic discount for large orders - separate from any future
-    coupon-code system, applied whenever subtotal clears the threshold."""
+    """Automatic discount for large orders - separate from the Coupon
+    system below, applied whenever subtotal clears the threshold."""
     rule = BulkDiscountRule.objects.filter(active=True).first()
     if rule and subtotal >= rule.minimum_order_amount:
         return (subtotal * rule.discount_percentage / Decimal("100")).quantize(Decimal("0.01"))
     return Decimal("0")
+
+
+def _resolve_coupon(code):
+    """(coupon, error_message) for a submitted code - never trust a code
+    just because it was accepted earlier; re-checked on every submission
+    since a coupon can expire or hit max_uses between page loads."""
+    code = (code or "").strip()
+    if not code:
+        return None, None
+    try:
+        coupon = Coupon.objects.get(code__iexact=code)
+    except Coupon.DoesNotExist:
+        return None, "That coupon code isn't valid."
+    if not coupon.is_valid():
+        return None, "That coupon code has expired or is no longer available."
+    return coupon, None
 
 
 @login_required
@@ -122,10 +138,16 @@ def checkout(request):
 
     default_address = request.user.addresses.filter(is_default=True).first() or request.user.addresses.first()
     discount_amount = _apply_bulk_discount(subtotal)
+    coupon_discount_amount = Decimal("0")
 
     if request.method == "POST":
         checkout_form = CheckoutForm(request.POST)
-        if checkout_form.is_valid():
+        form_valid = checkout_form.is_valid()
+        coupon, coupon_error = _resolve_coupon(checkout_form.data.get("coupon_code"))
+        if coupon_error:
+            checkout_form.add_error("coupon_code", coupon_error)
+
+        if form_valid and not coupon_error:
             # Re-price at submission time rather than trusting the GET-time
             # figures above, in case prices or the cart changed in between.
             lines, subtotal = price_cart(cart, profile)
@@ -133,6 +155,8 @@ def checkout(request):
                 messages.error(request, "Your cart changed - please review it and try again.")
                 return redirect("cart_detail")
             discount_amount = _apply_bulk_discount(subtotal)
+            coupon_discount_amount = coupon.calculate_discount(subtotal) if coupon else Decimal("0")
+            total = max(subtotal - discount_amount - coupon_discount_amount, Decimal("0"))
 
             address = checkout_form.save(commit=False)
             address.user = request.user
@@ -146,7 +170,9 @@ def checkout(request):
                 shipping_address=address,
                 subtotal=subtotal,
                 discount_amount=discount_amount,
-                total=subtotal - discount_amount,
+                coupon=coupon,
+                coupon_discount_amount=coupon_discount_amount,
+                total=total,
             )
             OrderItem.objects.bulk_create([
                 OrderItem(
@@ -159,18 +185,25 @@ def checkout(request):
                 for line in lines
             ])
             cart.items.all().delete()
+
+            if coupon:
+                coupon.times_used += 1
+                coupon.save(update_fields=["times_used"])
+
             send_order_confirmation(order)
 
             return redirect("order_detail", pk=order.pk)
     else:
         checkout_form = CheckoutForm(instance=default_address)
 
+    total = max(subtotal - discount_amount - coupon_discount_amount, Decimal("0"))
     return render(request, "orders/checkout.html", {
         "checkout_form": checkout_form,
         "lines": lines,
         "subtotal": subtotal,
         "discount_amount": discount_amount,
-        "total": subtotal - discount_amount,
+        "coupon_discount_amount": coupon_discount_amount,
+        "total": total,
         "form": SearchForm(request.GET),
     })
 

@@ -2,8 +2,11 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from store.forms import SearchForm
+from store.forms import ReviewForm, SearchForm
+from store.models import Book, Review
 from accounts.forms import AccountSetupForm, ProfileForm, RegisterForm
+
+from orders.models import Order, OrderItem
 
 
 def register(request):
@@ -48,7 +51,22 @@ def profile(request):
             return redirect("profile")
     else:
         profile_form = ProfileForm(instance=request.user.profile)
+
+    purchased_book_ids = OrderItem.objects.filter(
+        order__user=request.user,
+        order__status__in=[Order.Status.PAID, Order.Status.FULFILLED],
+    ).values_list("book_id", flat=True).distinct()
+    existing_reviews = {
+        review.book_id: review
+        for review in Review.objects.filter(creator=request.user, book_id__in=purchased_book_ids)
+    }
+    reviewable_books = [
+        {"book": book, "review": existing_reviews.get(book.pk), "review_form": ReviewForm(instance=existing_reviews.get(book.pk))}
+        for book in Book.objects.filter(pk__in=purchased_book_ids)
+    ]
+
     return render(request, "accounts/profile.html", {
         "profile_form": profile_form,
+        "reviewable_books": reviewable_books,
         "form": SearchForm(request.GET),
     })

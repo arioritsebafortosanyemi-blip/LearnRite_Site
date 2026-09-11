@@ -1,5 +1,7 @@
 from django import forms
 
+from store.models import Review
+
 BOOK_DATA=(('all','All Categories'),
            ("title","Title"),
            ("contributor","Contributor"))
@@ -93,3 +95,14 @@ class StoryBookFilterForm(forms.Form):
         required=False,
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check'})
     )
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ("rating", "content")
+        widgets = {
+            "rating": forms.RadioSelect(choices=Review.RATINGS),
+            "content": forms.Textarea(attrs={"rows": 2, "class": "form-control form-control-sm",
+                                              "placeholder": "Optional comment"}),
+        }

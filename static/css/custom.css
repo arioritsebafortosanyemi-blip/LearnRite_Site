@@ -591,3 +591,29 @@ li .bi{
     background-color:#FAFAFA;
     border:none;
 }
+
+/* Pure-CSS star rating input (profile "Rate Your Books"). Inputs are
+   5,4,3,2,1 in DOM order; row-reverse displays them 1-5 left to right,
+   so the ~ sibling selector on :checked/:hover lights up every star
+   at or below the chosen one. */
+.star-rating-input {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  font-size: 1.5rem;
+}
+
+.star-rating-input input {
+  display: none;
+}
+
+.star-rating-input label {
+  color: #ccc;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.star-rating-input input:checked ~ label,
+.star-rating-input label:hover,
+.star-rating-input label:hover ~ label {
+  color: #fe5d26;
+}

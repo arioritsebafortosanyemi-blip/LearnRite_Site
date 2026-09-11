@@ -1,9 +1,15 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Book, Contributor
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
+from django.views.decorators.http import require_POST
+from .models import Book, Contributor, Review
 from django.db.models import Q
 from .utils import average_rating, random_books, random_book
-from .forms import SearchForm, PreSchoolBookFilterForm, PrimarySchoolBookFilterForm, HighSchoolBookFilterForm, ExamStudyBookFilterForm, StoryBookFilterForm
+from .forms import SearchForm, PreSchoolBookFilterForm, PrimarySchoolBookFilterForm, HighSchoolBookFilterForm, ExamStudyBookFilterForm, StoryBookFilterForm, ReviewForm
 from django.core.paginator import Paginator
+
+from orders.models import Order, OrderItem
 
 
 def index(request):
@@ -258,3 +264,36 @@ def story_books_school(request):
     items = paginator.get_page(page)
 
     return render(request, 'store/story-books.html', {"filter_form":filter_form,"form":form, "items":items, "best_seller":best_seller})
+
+
+@login_required
+@require_POST
+def review_create(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    has_purchased = OrderItem.objects.filter(
+        order__user=request.user,
+        order__status__in=[Order.Status.PAID, Order.Status.FULFILLED],
+        book=book,
+    ).exists()
+    if not has_purchased:
+        messages.error(request, "You can only rate books you've purchased.")
+        return redirect('profile')
+
+    review_form = ReviewForm(request.POST)
+    if not review_form.is_valid():
+        messages.error(request, "Please pick a star rating before submitting.")
+        return redirect('profile')
+
+    review, created = Review.objects.update_or_create(
+        book=book, creator=request.user,
+        defaults={
+            'rating': review_form.cleaned_data['rating'],
+            'content': review_form.cleaned_data['content'],
+        },
+    )
+    if not created:
+        review.date_edited = timezone.now()
+        review.save(update_fields=['date_edited'])
+
+    messages.success(request, f'Thanks for rating "{book.title}"!')
+    return redirect('profile')

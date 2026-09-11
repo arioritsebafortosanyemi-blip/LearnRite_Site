@@ -8,4 +8,4 @@ class CheckoutForm(forms.ModelForm):
 
     class Meta:
         model = Address
-        fields = ("full_name", "phone_number", "address_line1", "address_line2", "city", "state")
+        fields = ("full_name", "phone_number", "address_line1", "address_line2", "landmark", "city", "state")

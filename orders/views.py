@@ -2,7 +2,10 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
@@ -10,10 +13,14 @@ from store.forms import SearchForm
 from store.models import Book, BookPrice
 from store.utils import get_book_price
 
-from orders.emails import send_order_confirmation
+from orders.emails import send_order_confirmation, send_payment_claimed_notification
 from orders.forms import CheckoutForm
 from orders.models import BulkDiscountRule, CartItem, Coupon, Order, OrderItem, PaymentAccount
 from orders.utils import get_or_create_cart, price_cart
+
+
+def _is_ajax(request):
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
 
 def _redirect_back(request, fallback):
@@ -34,6 +41,10 @@ def _clean_quantity(raw, default=1):
     return quantity if quantity > 0 else default
 
 
+def _cart_count(user):
+    return CartItem.objects.filter(cart__user=user).aggregate(total=Sum("quantity"))["total"] or 0
+
+
 @login_required
 @require_POST
 def add_to_cart(request, pk):
@@ -41,11 +52,17 @@ def add_to_cart(request, pk):
     profile = request.user.profile
 
     if profile.account_type != BookPrice.AccountType.SCHOOL:
-        messages.error(request, "Only institution accounts can order online - individuals should contact us.")
+        message = "Only institution accounts can order online - individuals should contact us."
+        if _is_ajax(request):
+            return JsonResponse({"success": False, "message": message}, status=400)
+        messages.error(request, message)
         return _redirect_back(request, "books")
 
     if get_book_price(book, profile) is None:
-        messages.error(request, f'Pricing for "{book.title}" isn\'t set up for your account yet - contact us to order.')
+        message = f'Pricing for "{book.title}" isn\'t set up for your account yet - contact us to order.'
+        if _is_ajax(request):
+            return JsonResponse({"success": False, "message": message}, status=400)
+        messages.error(request, message)
         return _redirect_back(request, "books")
 
     quantity = _clean_quantity(request.POST.get("quantity"))
@@ -55,7 +72,10 @@ def add_to_cart(request, pk):
         item.quantity += quantity
         item.save()
 
-    messages.success(request, f'Added "{book.title}" to your cart.')
+    message = f'Added "{book.title}" to your cart.'
+    if _is_ajax(request):
+        return JsonResponse({"success": True, "message": message, "cart_count": _cart_count(request.user)})
+    messages.success(request, message)
     return _redirect_back(request, "books")
 
 
@@ -212,9 +232,16 @@ def checkout(request):
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk, user=request.user)
     payment_accounts = PaymentAccount.objects.filter(active=True)
+    pipeline_index = (
+        Order.PIPELINE_STATUSES.index(order.status)
+        if order.status in Order.PIPELINE_STATUSES
+        else None
+    )
     return render(request, "orders/order_detail.html", {
         "order": order,
         "payment_accounts": payment_accounts,
+        "pipeline_statuses": [(status.value, status.label) for status in Order.PIPELINE_STATUSES],
+        "pipeline_index": pipeline_index,
         "form": SearchForm(request.GET),
     })
 
@@ -226,3 +253,15 @@ def order_history(request):
         "orders": orders,
         "form": SearchForm(request.GET),
     })
+
+
+@login_required
+@require_POST
+def claim_payment(request, pk):
+    order = get_object_or_404(Order, pk=pk, user=request.user)
+    if order.status == Order.Status.PENDING and not order.payment_claimed_at:
+        order.payment_claimed_at = timezone.now()
+        order.save(update_fields=["payment_claimed_at"])
+        send_payment_claimed_notification(order)
+        messages.success(request, "Thanks - we've been notified and will confirm your payment shortly.")
+    return redirect("order_detail", pk=order.pk)

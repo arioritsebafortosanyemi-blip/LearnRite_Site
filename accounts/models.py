@@ -18,11 +18,15 @@ class Profile(models.Model):
          default=BookPrice.Location.LAGOS,
          help_text="Self-declared, used for pricing and delivery.")
     phone_number = models.CharField(max_length=20, blank=True)
+    organization_name = models.CharField \
+        (max_length=150, blank=True,
+         help_text="Required for institution accounts - the school/organization's name.")
     profile_confirmed = models.BooleanField \
         (default=False,
          help_text="Whether the customer has explicitly chosen account_type/location "
                     "(as opposed to still sitting on the signal-created defaults, e.g. "
-                    "right after a Google sign-up).")
+                    "right after a Google sign-up). Once set, account_type/location/"
+                    "organization_name are locked - a customer must email us to change them.")
 
     def __str__(self):
         return f"{self.user.username} ({self.account_type}/{self.location})"
@@ -35,6 +39,7 @@ class Address(models.Model):
     phone_number = models.CharField(max_length=20)
     address_line1 = models.CharField(max_length=255)
     address_line2 = models.CharField(max_length=255, blank=True)
+    landmark = models.CharField(max_length=255, blank=True, help_text="Optional - a nearby landmark to help with delivery.")
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     country = models.CharField(max_length=100, default="Nigeria")

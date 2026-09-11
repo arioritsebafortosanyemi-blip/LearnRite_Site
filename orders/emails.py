@@ -7,6 +7,8 @@ from orders.models import PaymentAccount
 
 logger = logging.getLogger(__name__)
 
+STAFF_NOTIFICATION_EMAIL = "info@learnritepublishers.com"
+
 
 def send_order_confirmation(order):
     """Best-effort - an email outage must never break checkout, so any
@@ -25,3 +27,23 @@ def send_order_confirmation(order):
         )
     except Exception:
         logger.exception("Failed to send order confirmation email for %s", order.order_reference)
+
+
+def send_payment_claimed_notification(order):
+    """Notifies staff that a customer says they've paid - a claim to go
+    verify, not confirmation the payment actually landed."""
+    try:
+        body = (
+            f"{order.full_name} ({order.email}) says they've completed payment for "
+            f"order {order.order_reference} (total N{order.total}).\n\n"
+            f"Please verify the bank transfer and update the order status in admin:\n"
+            f"https://learnritepublishers.com/admin/orders/order/{order.pk}/change/"
+        )
+        send_mail(
+            subject=f"Payment claimed for order {order.order_reference}",
+            message=body,
+            from_email=None,
+            recipient_list=[STAFF_NOTIFICATION_EMAIL],
+        )
+    except Exception:
+        logger.exception("Failed to send payment-claimed notification for %s", order.order_reference)

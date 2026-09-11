@@ -16,6 +16,6 @@ To complete your order, please pay the total above by bank transfer to:
 {{ account.account_name }}
 {{ account.account_number }}
 {% endfor %}
-Once we've confirmed your payment, we'll be in touch to arrange delivery. If you have any questions, contact us at info@learnritepublishers.com or +234-907-776-5490.
+Once we've confirmed your payment, we'll be in touch to arrange delivery - delivery updates will be sent to the phone number or email on this order. If you have any questions, contact us at info@learnritepublishers.com or +234-907-776-5490.
 
 - LearnRite International Publishers

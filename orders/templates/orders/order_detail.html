@@ -15,7 +15,23 @@
 {% block content %}
 <div class="container mt-5 mb-5">
     <h3 class="h3 mb-1">Order {{ order.order_reference }}</h3>
-    <p class="text-muted">Status: <span class="fw-bold">{{ order.get_status_display }}</span></p>
+
+    {% if order.status == "CANCELLED" %}
+    <p class="text-danger fw-bold">Cancelled</p>
+    {% elif order.status == "PENDING" %}
+    <p class="text-muted">Status: <span class="fw-bold">Pending Payment</span></p>
+    {% else %}
+    <div class="d-flex justify-content-between mt-4 mb-4" style="max-width: 600px;">
+        {% for status_value, status_label in pipeline_statuses %}
+        <div class="text-center flex-fill">
+            <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center {% if forloop.counter0 <= pipeline_index %}bg-dark text-white{% else %}bg-light text-muted{% endif %}" style="width: 32px; height: 32px;">
+                {% if forloop.counter0 < pipeline_index %}<i class="bi bi-check"></i>{% else %}{{ forloop.counter }}{% endif %}
+            </div>
+            <p class="small mt-1 mb-0 {% if forloop.counter0 <= pipeline_index %}fw-bold{% else %}text-muted{% endif %}">{{ status_label }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <div class="row mt-4">
         <div class="col-md-7 mb-4">
@@ -54,20 +70,31 @@
             <p class="mb-1">{{ order.phone_number }}</p>
             {% if order.shipping_address %}
             <p class="mb-1">{{ order.shipping_address.address_line1 }}{% if order.shipping_address.address_line2 %}, {{ order.shipping_address.address_line2 }}{% endif %}</p>
+            {% if order.shipping_address.landmark %}<p class="mb-1">Landmark: {{ order.shipping_address.landmark }}</p>{% endif %}
             <p class="mb-1">{{ order.shipping_address.city }}, {{ order.shipping_address.state }}</p>
             {% endif %}
+            <p class="text-muted small mt-2">Delivery updates will be sent to the phone number or email above.</p>
         </div>
 
         <div class="col-md-5">
             {% if order.status == "PENDING" %}
             <div class="border rounded p-3">
                 <h5 class="mb-3">Pay by Bank Transfer</h5>
-                <p class="small text-muted">Pay the total above to complete your order. We'll confirm once payment is received.</p>
+                <p class="small text-muted">Payment is by bank transfer. Details are on confirmation page and will be emailed to you.</p>
                 {% for account in payment_accounts %}
                 <p class="mb-1"><strong>{{ account.bank_name }}</strong></p>
                 <p class="mb-1">{{ account.account_name }}</p>
                 <p class="mb-3">{{ account.account_number }}</p>
                 {% endfor %}
+
+                {% if order.payment_claimed_at %}
+                <p class="text-success small mb-0"><i class="bi bi-check-circle-fill"></i> We've been notified - awaiting confirmation.</p>
+                {% else %}
+                <form method="post" action="{% url 'claim_payment' order.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-dark w-100">I have completed payment</button>
+                </form>
+                {% endif %}
             </div>
             {% endif %}
         </div>

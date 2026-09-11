@@ -16,6 +16,9 @@ Individual (personal) accounts never get self-service pricing or checkout, regar
 direct them to contact us by email for pricing, even for one book. Only institution (school) accounts get \
 online pricing and checkout.
 
+An order's status (from get_order_status) moves through this sequence once payment is confirmed: Order Received, \
+Processing, Out for Delivery, Delivered. Before payment it's Pending Payment, and it can also be Cancelled.
+
 Book categories currently on the site: {categories}
 
 Grounding information:

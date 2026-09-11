@@ -106,9 +106,17 @@ def _generate_order_reference():
 class Order(models.Model):
     class Status(models.TextChoices):
         PENDING = "PENDING", "Pending Payment"
-        PAID = "PAID", "Paid"
-        FULFILLED = "FULFILLED", "Fulfilled"
+        RECEIVED = "RECEIVED", "Order Received"
+        PROCESSING = "PROCESSING", "Processing"
+        OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY", "Out for Delivery"
+        DELIVERED = "DELIVERED", "Delivered"
         CANCELLED = "CANCELLED", "Cancelled"
+
+    # The delivery pipeline shown as a progress tracker on the order detail
+    # page - in order, once payment is confirmed (staff move it out of
+    # PENDING). Reused for the review-eligibility gate too: any status here
+    # means payment was confirmed, regardless of how far delivery has got.
+    PIPELINE_STATUSES = [Status.RECEIVED, Status.PROCESSING, Status.OUT_FOR_DELIVERY, Status.DELIVERED]
 
     user = models.ForeignKey \
         (auth.get_user_model(), null=True, on_delete=models.SET_NULL, related_name="orders")
@@ -126,6 +134,9 @@ class Order(models.Model):
         (Coupon, null=True, blank=True, on_delete=models.SET_NULL, related_name="orders")
     coupon_discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=12, decimal_places=2)
+    payment_claimed_at = models.DateTimeField \
+        (null=True, blank=True,
+         help_text="Set when the customer clicks 'I have completed payment' - a claim, not confirmed payment.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -26,10 +26,12 @@
                 <div class="mb-3">
                     <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {{ field }}
+                    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
                     {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
                 </div>
                 {% endif %}
                 {% endfor %}
+                <p class="text-muted small">We'll send delivery updates to the phone number or email on this order - please make sure they're correct.</p>
             </div>
 
             <div class="col-md-5">
@@ -69,7 +71,7 @@
                     {% if checkout_form.coupon_code.errors %}<div class="text-danger small">{{ checkout_form.coupon_code.errors }}</div>{% endif %}
                 </div>
 
-                <p class="text-muted small">You'll pay by bank transfer after placing your order - details are on the confirmation page and will be emailed to you.</p>
+                <p class="text-muted small">Payment is by bank transfer. Details are on confirmation page and will be emailed to you.</p>
             </div>
         </div>
         <button type="submit" class="btn btn-dark px-4 py-2">Place Order</button>

@@ -100,9 +100,7 @@ class StoryBookFilterForm(forms.Form):
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ("rating", "content")
+        fields = ("rating",)
         widgets = {
             "rating": forms.RadioSelect(choices=Review.RATINGS),
-            "content": forms.Textarea(attrs={"rows": 2, "class": "form-control form-control-sm",
-                                              "placeholder": "Optional comment"}),
         }

@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
@@ -11,6 +12,10 @@ from accounts.forms import AccountSetupForm, ProfileForm, RegisterForm
 from accounts.models import WishlistItem
 
 from orders.models import Order, OrderItem
+
+
+def _is_ajax(request):
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
 
 def _redirect_back(request, fallback):
@@ -68,7 +73,7 @@ def profile(request):
 
     purchased_book_ids = OrderItem.objects.filter(
         order__user=request.user,
-        order__status__in=[Order.Status.PAID, Order.Status.FULFILLED],
+        order__status__in=Order.PIPELINE_STATUSES,
     ).values_list("book_id", flat=True).distinct()
     existing_reviews = {
         review.book_id: review
@@ -93,9 +98,15 @@ def wishlist_toggle(request, pk):
     item, created = WishlistItem.objects.get_or_create(user=request.user, book=book)
     if not created:
         item.delete()
-        messages.success(request, f'Removed "{book.title}" from your wishlist.')
+        wishlisted = False
+        message = f'Removed "{book.title}" from your wishlist.'
     else:
-        messages.success(request, f'Added "{book.title}" to your wishlist.')
+        wishlisted = True
+        message = f'Added "{book.title}" to your wishlist.'
+
+    if _is_ajax(request):
+        return JsonResponse({"success": True, "wishlisted": wishlisted, "message": message})
+    messages.success(request, message)
     return _redirect_back(request, "books")
 
 

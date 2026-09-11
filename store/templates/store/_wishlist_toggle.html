@@ -6,7 +6,7 @@ never get bounced into a broken redirect-after-login onto a POST-only URL.
 {% endcomment %}
 <p class="text-center mb-1">
     {% if user.is_authenticated %}
-    <form method="post" action="{% url 'wishlist_toggle' book.pk %}" class="d-inline">
+    <form method="post" action="{% url 'wishlist_toggle' book.pk %}" class="d-inline" data-ajax="wishlist-toggle">
         {% csrf_token %}
         <button type="submit" class="btn btn-sm btn-link p-0 text-decoration-none">
             {% if wishlisted %}<i class="bi bi-heart-fill text-danger"></i> Saved

@@ -18,6 +18,22 @@
             <h3 class="h3 mb-4">My Profile</h3>
             <p class="fs-5">Signed in as {{ user.username }} ({{ user.email }})</p>
 
+            <div class="mb-3">
+                <label class="form-label">Account Type</label>
+                <p class="mb-0">{{ user.profile.get_account_type_display }}</p>
+            </div>
+            {% if user.profile.organization_name %}
+            <div class="mb-3">
+                <label class="form-label">School/Organization Name</label>
+                <p class="mb-0">{{ user.profile.organization_name }}</p>
+            </div>
+            {% endif %}
+            <div class="mb-3">
+                <label class="form-label">Location</label>
+                <p class="mb-0">{{ user.profile.get_location_display }}</p>
+            </div>
+            <p class="text-muted small">Account type, location, organization name and email can't be changed here - email <a href="mailto:info@learnritepublishers.com">info@learnritepublishers.com</a> if any of these need updating.</p>
+
             <form method="post">
                 {% csrf_token %}
                 {% for field in profile_form %}
@@ -38,7 +54,7 @@
             {% for entry in reviewable_books %}
             <div class="border rounded p-3 mb-3">
                 <p class="fw-semibold mb-2">{{ entry.book.title }}</p>
-                <form method="post" action="{% url 'review_create' entry.book.pk %}">
+                <form method="post" action="{% url 'review_create' entry.book.pk %}" data-ajax="review">
                     {% csrf_token %}
                     <div class="star-rating-input mb-2">
                         {% for i in "54321" %}
@@ -46,7 +62,6 @@
                         <label for="star{{ i }}-{{ entry.book.pk }}"><i class="bi bi-star-fill"></i></label>
                         {% endfor %}
                     </div>
-                    {{ entry.review_form.content }}
                     <button type="submit" class="btn btn-sm btn-dark mt-2">{% if entry.review %}Update{% else %}Submit{% endif %} Rating</button>
                 </form>
             </div>

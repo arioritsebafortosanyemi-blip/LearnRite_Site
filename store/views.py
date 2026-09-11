@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -266,34 +267,44 @@ def story_books_school(request):
     return render(request, 'store/story-books.html', {"filter_form":filter_form,"form":form, "items":items, "best_seller":best_seller})
 
 
+def _is_ajax(request):
+    return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+
 @login_required
 @require_POST
 def review_create(request, pk):
     book = get_object_or_404(Book, pk=pk)
     has_purchased = OrderItem.objects.filter(
         order__user=request.user,
-        order__status__in=[Order.Status.PAID, Order.Status.FULFILLED],
+        order__status__in=Order.PIPELINE_STATUSES,
         book=book,
     ).exists()
     if not has_purchased:
-        messages.error(request, "You can only rate books you've purchased.")
+        message = "You can only rate books you've purchased."
+        if _is_ajax(request):
+            return JsonResponse({'success': False, 'message': message}, status=400)
+        messages.error(request, message)
         return redirect('profile')
 
     review_form = ReviewForm(request.POST)
     if not review_form.is_valid():
-        messages.error(request, "Please pick a star rating before submitting.")
+        message = "Please pick a star rating before submitting."
+        if _is_ajax(request):
+            return JsonResponse({'success': False, 'message': message}, status=400)
+        messages.error(request, message)
         return redirect('profile')
 
     review, created = Review.objects.update_or_create(
         book=book, creator=request.user,
-        defaults={
-            'rating': review_form.cleaned_data['rating'],
-            'content': review_form.cleaned_data['content'],
-        },
+        defaults={'rating': review_form.cleaned_data['rating']},
     )
     if not created:
         review.date_edited = timezone.now()
         review.save(update_fields=['date_edited'])
 
-    messages.success(request, f'Thanks for rating "{book.title}"!')
+    message = f'Thanks for rating "{book.title}"!'
+    if _is_ajax(request):
+        return JsonResponse({'success': True, 'message': message, 'rating': review.rating})
+    messages.success(request, message)
     return redirect('profile')

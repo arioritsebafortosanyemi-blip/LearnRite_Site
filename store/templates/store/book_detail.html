@@ -82,10 +82,7 @@
                                 {% endfor %}
                                 </span>
                                 <span class="fw-semibold ms-2">{{ review.creator }}</span>
-                                {% if review.content %}
-                                <p class="mb-1 mt-1">{{ review.content }}</p>
-                                {% endif %}
-                                <span class="text-muted small">{{ review.date_created|date:"d M Y" }}{% if review.date_edited %} (edited){% endif %}</span>
+                                <span class="text-muted small ms-2">{{ review.date_created|date:"d M Y" }}{% if review.date_edited %} (edited){% endif %}</span>
                             </li>
                             {% endfor %}
                         </ul>

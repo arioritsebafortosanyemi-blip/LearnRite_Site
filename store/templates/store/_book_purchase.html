@@ -8,7 +8,7 @@ see the contact-us message, institutions with no price yet see a distinct
 <div class="text-center mt-1 mb-2">
     {% if purchase.can_buy %}
     <p class="fw-bold fs-6 mb-2">&#8358;{{ purchase.price }}</p>
-    <form method="post" action="{% url 'add_to_cart' book.pk %}" class="d-flex justify-content-center">
+    <form method="post" action="{% url 'add_to_cart' book.pk %}" class="d-flex justify-content-center" data-ajax="add-to-cart">
         {% csrf_token %}
         <div class="input-group input-group-sm" style="max-width: 10rem;">
             <input type="number" name="quantity" value="1" min="1" class="form-control text-center" aria-label="Quantity">

@@ -724,3 +724,44 @@ li .bi{
   padding: 0 16px;
   cursor: pointer;
 }
+
+/* Keep the nav (and its cart icon/badge) reachable while scrolling, so
+   customers can jump to checkout without scrolling back up. */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  background-color: #FFF9D1;
+}
+
+/* Brief pop-up confirmation for AJAX actions (add to cart, wishlist,
+   ratings) that no longer reload the page - see static/js/site-ajax.js. */
+#site-toast-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.site-toast {
+  background-color: #212529;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  max-width: 280px;
+  animation: site-toast-in 0.2s ease-out;
+}
+
+.site-toast-error {
+  background-color: #dc3545;
+}
+
+@keyframes site-toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

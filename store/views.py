@@ -53,6 +53,21 @@ def faqs(request):
 
     return render(request, 'store/faqs.html', {'form': form})
 
+def license_privacy(request):
+    form = SearchForm(request.GET)
+
+    return render(request, 'store/license_privacy.html', {'form': form})
+
+def terms_of_use(request):
+    form = SearchForm(request.GET)
+
+    return render(request, 'store/terms_of_use.html', {'form': form})
+
+def cookies(request):
+    form = SearchForm(request.GET)
+
+    return render(request, 'store/cookies.html', {'form': form})
+
 def authors(request):
     authors = Contributor.objects.first()
     form = SearchForm(request.GET)

@@ -1,0 +1,67 @@
+{% extends 'store/base1.html' %}
+{% load static %}
+{% block title %}Cookies Policy{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Cookies</li>
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="container">
+        <h2 class="h2 mb-1">Cookies Policy</h2>
+        <p class="text-muted small mb-4">Last updated: 11 September 2026</p>
+
+        <h4 class="h4 mt-4">What Are Cookies?</h4>
+        <p class="fs-6">
+            Cookies are small text files stored on your device when you visit a website. They help the site remember
+            who you are and how you're using it between page loads.
+        </p>
+
+        <h4 class="h4 mt-4">Cookies We Use</h4>
+        <p class="fs-6">
+            We only use cookies that are essential for the Site to work. We do not use third-party advertising or
+            analytics cookies.
+        </p>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Cookie</th>
+                        <th>Purpose</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>sessionid</code></td>
+                        <td>Keeps you signed in and remembers your cart between pages.</td>
+                        <td>Ends when your session expires or you log out.</td>
+                    </tr>
+                    <tr>
+                        <td><code>csrftoken</code></td>
+                        <td>Protects your account and forms from cross-site request forgery attacks.</td>
+                        <td>About 1 year, or until cleared.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 class="h4 mt-4">Managing Cookies</h4>
+        <p class="fs-6">
+            Because these cookies are essential to signing in, keeping your cart, and keeping the Site secure,
+            blocking them in your browser will prevent parts of the Site (like checkout) from working correctly. You
+            can still clear or block cookies at any time through your browser's settings.
+        </p>
+
+        <h4 class="h4 mt-4">Changes to This Policy</h4>
+        <p class="fs-6">
+            If we ever introduce analytics or advertising cookies, we will update this page first. The "Last
+            updated" date above reflects the most recent revision.
+        </p>
+
+        <h4 class="h4 mt-4">Contact Us</h4>
+        <p class="fs-6 mb-5">
+            Questions about our use of cookies? Email <a href="mailto:info@learnritepublishers.com">info@learnritepublishers.com</a>.
+        </p>
+    </div>
+</div>
+{% endblock %}

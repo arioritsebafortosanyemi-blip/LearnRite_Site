@@ -1,0 +1,123 @@
+{% extends 'store/base1.html' %}
+{% load static %}
+{% block title %}License &amp; Privacy Policy{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">License &amp; Privacy Policy</li>
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="container">
+        <h2 class="h2 mb-1">License &amp; Privacy Policy</h2>
+        <p class="text-muted small mb-4">Last updated: 11 September 2026</p>
+
+        <h4 class="h4 mt-4">1. About This Policy</h4>
+        <p class="fs-6">
+            This policy explains how LearnRite International Publishers ("LearnRite", "we", "us") licenses the
+            content on this website and handles personal data collected through
+            <a href="https://learnritepublishers.com">learnritepublishers.com</a> (the "Site"), in line with the
+            Nigeria Data Protection Act 2023 ("NDPA"). By using the Site, you agree to the practices described here.
+        </p>
+    </div>
+
+    <div class="container-fluid py-3 my-4 shaded-bg">
+        <div class="container">
+            <h4 class="h4">2. Copyright &amp; License</h4>
+            <p class="fs-6">
+                All book content, cover artwork, descriptions, logos and text on this Site are the property of
+                LearnRite International Publishers or its contributors and are protected by Nigerian and
+                international copyright law. Our books are sold exclusively through LearnRite directly to verified
+                schools and individual customers - resale, redistribution, or stocking of our titles in bookshops or
+                other outlets without our written permission is prohibited.
+            </p>
+            <p class="fs-6">
+                You may browse the Site and view its content for personal, non-commercial use. You may not copy,
+                reproduce, republish, or create derivative works from any book content, images, or text on this Site
+                without our prior written consent.
+            </p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h4 class="h4 mt-4">3. Information We Collect</h4>
+        <p class="fs-6">Depending on how you use the Site, we collect:</p>
+        <ul class="fs-6">
+            <li><strong>Account information:</strong> username, email address, password (stored securely, never in plain text), account type (individual or school), location (Lagos or outside Lagos), and organization name for school accounts.</li>
+            <li><strong>Delivery details:</strong> full name, phone number, delivery address, and an optional landmark, used to fulfil and deliver your orders.</li>
+            <li><strong>Order information:</strong> books purchased, quantities, prices, order status, and payment-claim confirmations.</li>
+            <li><strong>Reviews and ratings:</strong> star ratings you submit on books you've purchased, linked to your username.</li>
+            <li><strong>Wishlist activity:</strong> books you've saved for later.</li>
+            <li><strong>Chatbot conversations:</strong> messages you send to our AI support assistant, so it can respond to your question.</li>
+            <li><strong>Google account information</strong> (name, email, profile picture) if you choose to sign in with Google, provided to us by Google with your consent.</li>
+        </ul>
+
+        <h4 class="h4 mt-4">4. How We Use Your Information</h4>
+        <p class="fs-6">We use your information to:</p>
+        <ul class="fs-6">
+            <li>Create and manage your account, and show you the correct pricing for your account type and location.</li>
+            <li>Process, fulfil, and deliver your orders, and send you delivery updates by phone or email.</li>
+            <li>Verify bank transfer payments and confirm your order.</li>
+            <li>Display your book ratings and manage your wishlist.</li>
+            <li>Respond to questions through our AI chatbot, including looking up your real order status or book pricing when you ask - the chatbot never invents this information, it is always pulled from our records.</li>
+            <li>Prevent fraud, such as an account switching type to obtain incorrect pricing.</li>
+            <li>Send you newsletter updates, if you've subscribed.</li>
+            <li>Comply with our legal obligations.</li>
+        </ul>
+
+        <h4 class="h4 mt-4">5. Who We Share Information With</h4>
+        <p class="fs-6">We do not sell your personal data. We share limited information with:</p>
+        <ul class="fs-6">
+            <li><strong>Google</strong> - only if you choose "Sign in with Google", to authenticate your account.</li>
+            <li><strong>Anthropic</strong> (our AI provider) - chatbot messages are processed to generate a response to your question.</li>
+            <li><strong>Our hosting provider</strong> - to securely store and run the Site and its database.</li>
+            <li><strong>Our staff</strong> - to verify payments, process orders, and respond to support requests.</li>
+        </ul>
+        <p class="fs-6">
+            We do not collect or store your card or bank login details on this Site - orders are paid for by direct
+            bank transfer, arranged between you and your own bank.
+        </p>
+
+        <h4 class="h4 mt-4">6. Your Rights Under the NDPA</h4>
+        <p class="fs-6">You have the right to:</p>
+        <ul class="fs-6">
+            <li>Access the personal data we hold about you.</li>
+            <li>Request correction of inaccurate information (account type, location, organization name, and email
+                are locked once set to prevent pricing fraud - email us at
+                <a href="mailto:info@learnritepublishers.com">info@learnritepublishers.com</a> if any of these need updating).</li>
+            <li>Request deletion of your account and personal data, subject to our need to keep order records for legal and accounting purposes.</li>
+            <li>Object to or restrict certain uses of your data.</li>
+            <li>Request a copy of your data in a portable format.</li>
+            <li>Lodge a complaint with the Nigeria Data Protection Commission (NDPC) if you believe your rights have been violated.</li>
+        </ul>
+        <p class="fs-6">To exercise any of these rights, email us at <a href="mailto:info@learnritepublishers.com">info@learnritepublishers.com</a>.</p>
+
+        <h4 class="h4 mt-4">7. Data Retention &amp; Security</h4>
+        <p class="fs-6">
+            We keep your account and order information for as long as your account is active, and afterward for as
+            long as necessary to meet our legal, accounting, and dispute-resolution obligations. Passwords are
+            stored using industry-standard hashing, and access to customer data is restricted to authorized staff.
+        </p>
+
+        <h4 class="h4 mt-4">8. Children's Data</h4>
+        <p class="fs-6">
+            This Site is intended for use by schools and adult individuals placing orders, not by children directly.
+            School accounts are managed by the institution, not by pupils.
+        </p>
+
+        <h4 class="h4 mt-4">9. Cookies</h4>
+        <p class="fs-6">
+            The Site uses a small number of essential cookies. See our <a href="{% url 'cookies' %}">Cookies Policy</a> for details.
+        </p>
+
+        <h4 class="h4 mt-4">10. Changes to This Policy</h4>
+        <p class="fs-6">
+            We may update this policy from time to time. The "Last updated" date at the top will reflect the most recent revision.
+        </p>
+
+        <h4 class="h4 mt-4">11. Contact Us</h4>
+        <p class="fs-6 mb-5">
+            Questions about this policy? Email <a href="mailto:info@learnritepublishers.com">info@learnritepublishers.com</a>
+            or call +234-907-776-5490.
+        </p>
+    </div>
+</div>
+{% endblock %}

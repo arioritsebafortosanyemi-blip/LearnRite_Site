@@ -62,6 +62,9 @@
                      </a>
 
                      {% if user.is_authenticated %}
+                     <a class="nav-link pe-4 me-2" href="{% url 'wishlist' %}" title="My Wishlist">
+                         <i class="bi bi-heart nav-svg" style="font-size: 1.3rem;"></i>
+                     </a>
                      <a class="nav-link pe-4 me-2" href="{% url 'order_history' %}" title="My Orders">
                          <i class="bi bi-receipt nav-svg" style="font-size: 1.3rem;"></i>
                      </a>

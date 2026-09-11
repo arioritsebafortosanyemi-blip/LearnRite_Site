@@ -181,6 +181,20 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+# Content-hashed filenames so a browser that cached an old CSS/JS file
+# before a deploy always fetches the new one under its new hashed name,
+# rather than serving a stale cached copy until the cache naturally
+# expires. Requires `collectstatic` to run on every deploy (it already
+# does, per the Render build command).
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',

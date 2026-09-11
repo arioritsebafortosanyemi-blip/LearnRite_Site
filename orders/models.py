@@ -112,11 +112,24 @@ class Order(models.Model):
         DELIVERED = "DELIVERED", "Delivered"
         CANCELLED = "CANCELLED", "Cancelled"
 
+    class DeliveryMethod(models.TextChoices):
+        DELIVERY = "DELIVERY", "Delivery"
+        PICKUP = "PICKUP", "Store Pickup"
+
     # The delivery pipeline shown as a progress tracker on the order detail
     # page - in order, once payment is confirmed (staff move it out of
     # PENDING). Reused for the review-eligibility gate too: any status here
     # means payment was confirmed, regardless of how far delivery has got.
     PIPELINE_STATUSES = [Status.RECEIVED, Status.PROCESSING, Status.OUT_FOR_DELIVERY, Status.DELIVERED]
+
+    # PICKUP orders reuse the same underlying status values as DELIVERY
+    # orders (so the review-eligibility gate and admin filtering stay
+    # simple) but read oddly worded ("Out for Delivery" for a pickup order)
+    # - these labels are swapped in for display only.
+    PICKUP_STATUS_LABELS = {
+        Status.OUT_FOR_DELIVERY: "Ready for Pickup",
+        Status.DELIVERED: "Picked Up",
+    }
 
     user = models.ForeignKey \
         (auth.get_user_model(), null=True, on_delete=models.SET_NULL, related_name="orders")
@@ -124,6 +137,8 @@ class Order(models.Model):
     email = models.EmailField()
     full_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20)
+    delivery_method = models.CharField \
+        (choices=DeliveryMethod.choices, max_length=20, default=DeliveryMethod.DELIVERY)
     shipping_address = models.ForeignKey \
         (Address, null=True, on_delete=models.SET_NULL, related_name="orders")
     status = models.CharField(choices=Status.choices, max_length=20, default=Status.PENDING)
@@ -137,11 +152,25 @@ class Order(models.Model):
     payment_claimed_at = models.DateTimeField \
         (null=True, blank=True,
          help_text="Set when the customer clicks 'I have completed payment' - a claim, not confirmed payment.")
+    pickup_ready_notified_at = models.DateTimeField \
+        (null=True, blank=True,
+         help_text="Set once the 'ready for pickup' email has been sent, so it's never sent twice.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Order {self.order_reference} ({self.status})"
+
+    @property
+    def status_display(self):
+        if self.delivery_method == self.DeliveryMethod.PICKUP and self.status in self.PICKUP_STATUS_LABELS:
+            return self.PICKUP_STATUS_LABELS[self.status]
+        return self.get_status_display()
+
+    def pipeline_status_choices(self):
+        if self.delivery_method == self.DeliveryMethod.PICKUP:
+            return [(s.value, self.PICKUP_STATUS_LABELS.get(s, s.label)) for s in self.PIPELINE_STATUSES]
+        return [(s.value, s.label) for s in self.PIPELINE_STATUSES]
 
 
 class OrderItem(models.Model):

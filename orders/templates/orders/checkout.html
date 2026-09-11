@@ -21,9 +21,23 @@
         <div class="row">
             <div class="col-md-7 mb-4">
                 <h5 class="mb-3">Delivery Details</h5>
-                {% for field in checkout_form %}
-                {% if field.name != "coupon_code" %}
+
                 <div class="mb-3">
+                    <label class="form-label d-block">{{ checkout_form.delivery_method.label }}</label>
+                    <div class="d-flex gap-4">
+                        {% for radio in checkout_form.delivery_method %}
+                        <div class="form-check">
+                            {{ radio.tag }}
+                            <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if checkout_form.delivery_method.errors %}<div class="text-danger small">{{ checkout_form.delivery_method.errors }}</div>{% endif %}
+                </div>
+
+                {% for field in checkout_form %}
+                {% if field.name != "coupon_code" and field.name != "delivery_method" %}
+                <div class="mb-3{% if field.name != 'full_name' and field.name != 'phone_number' %} delivery-address-field{% endif %}">
                     <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {{ field }}
                     {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
@@ -31,7 +45,9 @@
                 </div>
                 {% endif %}
                 {% endfor %}
-                <p class="text-muted small">We'll send delivery updates to the phone number or email on this order - please make sure they're correct.</p>
+
+                <p class="purchase-note purchase-note-pending small" id="pickup-note" hidden><i class="bi bi-shop"></i> We'll email you when your order is ready for pickup - no delivery address needed.</p>
+                <p class="text-muted small" id="delivery-note">We'll send delivery updates to the phone number or email on this order - please make sure they're correct.</p>
             </div>
 
             <div class="col-md-5">
@@ -77,4 +93,21 @@
         <button type="submit" class="btn btn-dark px-4 py-2">Place Order</button>
     </form>
 </div>
+<script>
+(function () {
+    var radios = document.querySelectorAll('input[name="delivery_method"]');
+    var addressFields = document.querySelectorAll('.delivery-address-field');
+    var pickupNote = document.getElementById('pickup-note');
+    var deliveryNote = document.getElementById('delivery-note');
+    function update() {
+        var checked = document.querySelector('input[name="delivery_method"]:checked');
+        var isPickup = !!checked && checked.value === 'PICKUP';
+        addressFields.forEach(function (field) { field.hidden = isPickup; });
+        pickupNote.hidden = !isPickup;
+        deliveryNote.hidden = isPickup;
+    }
+    radios.forEach(function (radio) { radio.addEventListener('change', update); });
+    update();
+})();
+</script>
 {% endblock %}

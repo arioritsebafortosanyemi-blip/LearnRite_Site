@@ -63,7 +63,8 @@ def _execute_tool(tool_name, tool_input, user):
             return {"error": "No order with that reference was found on this customer's account."}
         return {
             "order_reference": order.order_reference,
-            "status": order.get_status_display(),
+            "status": order.status_display,
+            "delivery_method": order.get_delivery_method_display(),
             "total": str(order.total),
         }
 

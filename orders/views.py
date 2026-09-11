@@ -178,16 +178,20 @@ def checkout(request):
             coupon_discount_amount = coupon.calculate_discount(subtotal) if coupon else Decimal("0")
             total = max(subtotal - discount_amount - coupon_discount_amount, Decimal("0"))
 
-            address = checkout_form.save(commit=False)
-            address.user = request.user
-            address.save()
+            delivery_method = checkout_form.cleaned_data["delivery_method"]
+            shipping_address = None
+            if delivery_method == Order.DeliveryMethod.DELIVERY:
+                shipping_address = checkout_form.save(commit=False)
+                shipping_address.user = request.user
+                shipping_address.save()
 
             order = Order.objects.create(
                 user=request.user,
                 email=request.user.email,
-                full_name=address.full_name,
-                phone_number=address.phone_number,
-                shipping_address=address,
+                full_name=checkout_form.cleaned_data["full_name"],
+                phone_number=checkout_form.cleaned_data["phone_number"],
+                delivery_method=delivery_method,
+                shipping_address=shipping_address,
                 subtotal=subtotal,
                 discount_amount=discount_amount,
                 coupon=coupon,
@@ -240,7 +244,7 @@ def order_detail(request, pk):
     return render(request, "orders/order_detail.html", {
         "order": order,
         "payment_accounts": payment_accounts,
-        "pipeline_statuses": [(status.value, status.label) for status in Order.PIPELINE_STATUSES],
+        "pipeline_statuses": order.pipeline_status_choices(),
         "pipeline_index": pipeline_index,
         "form": SearchForm(request.GET),
     })

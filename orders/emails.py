@@ -29,6 +29,22 @@ def send_order_confirmation(order):
         logger.exception("Failed to send order confirmation email for %s", order.order_reference)
 
 
+def send_pickup_ready_notification(order):
+    """Tells a store-pickup customer their order is ready to collect -
+    triggered when staff move a PICKUP order's status to the "ready" stage
+    in admin (see orders.admin.OrderAdmin.save_model)."""
+    try:
+        body = render_to_string("orders/pickup_ready_email.txt", {"order": order})
+        send_mail(
+            subject=f"Your LearnRite order {order.order_reference} is ready for pickup",
+            message=body,
+            from_email=None,
+            recipient_list=[order.email],
+        )
+    except Exception:
+        logger.exception("Failed to send pickup-ready email for %s", order.order_reference)
+
+
 def send_payment_claimed_notification(order):
     """Notifies staff that a customer says they've paid - a claim to go
     verify, not confirmation the payment actually landed."""

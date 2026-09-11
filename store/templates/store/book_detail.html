@@ -44,6 +44,8 @@
                     </p>
                     {% endif %}
                     {% book_purchase_context book user as purchase %}
+                    {% is_wishlisted book user as wishlisted %}
+                    {% include "store/_wishlist_toggle.html" %}
                     {% include "store/_book_purchase.html" %}
                 </div>
 

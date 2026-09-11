@@ -1,7 +1,7 @@
 from django.contrib import auth
 from django.db import models
 
-from store.models import BookPrice
+from store.models import Book, BookPrice
 
 
 class Profile(models.Model):
@@ -42,3 +42,18 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.full_name}, {self.city}, {self.state}"
+
+
+class WishlistItem(models.Model):
+    """A saved-for-later book. Open to any logged-in account, unlike cart/
+    checkout - individuals can't buy but can still save books to ask about."""
+    user = models.ForeignKey \
+        (auth.get_user_model(), related_name="wishlist_items", on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "book")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.book.title}"

@@ -31,3 +31,17 @@ def book_rating_summary(book):
     if not ratings:
         return {"average": None, "count": 0}
     return {"average": average_rating(ratings), "count": len(ratings)}
+
+@register.simple_tag
+def is_wishlisted(book, user):
+    """Whether `user` has wishlisted `book`. Caches the user's whole
+    wishlisted-book-id set on the user object on first call, so a page
+    with 20 cards costs one query total instead of one per card."""
+    if not user.is_authenticated:
+        return False
+    if not hasattr(user, "_wishlisted_book_ids_cache"):
+        from accounts.models import WishlistItem
+        user._wishlisted_book_ids_cache = set(
+            WishlistItem.objects.filter(user=user).values_list("book_id", flat=True)
+        )
+    return book.pk in user._wishlisted_book_ids_cache

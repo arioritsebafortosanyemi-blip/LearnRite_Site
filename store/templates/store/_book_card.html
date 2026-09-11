@@ -23,6 +23,7 @@ image_class: the exact classes each call site already used.
 {% endcomment %}
 {% book_purchase_context book user as purchase %}
 {% book_rating_summary book as rating_summary %}
+{% is_wishlisted book user as wishlisted %}
 <div class="{{ outer_classes }} d-flex flex-column align-items-center">
 {% if variant == "compact" %}
 <div class="{{ wrapper_classes }}">
@@ -56,6 +57,7 @@ image_class: the exact classes each call site already used.
         <span class="text-muted small">({{ rating_summary.count }})</span>
     </p>
     {% endif %}
+    {% include "store/_wishlist_toggle.html" %}
     {% include "store/_book_purchase.html" %}
 </div>
 </div>

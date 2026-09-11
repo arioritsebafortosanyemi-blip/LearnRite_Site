@@ -9,4 +9,6 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('setup/', views.confirm_account_setup, name='account_setup'),
     path('profile/', views.profile, name='profile'),
+    path('wishlist/', views.wishlist_view, name='wishlist'),
+    path('wishlist/toggle/<int:pk>/', views.wishlist_toggle, name='wishlist_toggle'),
 ]

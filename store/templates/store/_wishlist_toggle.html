@@ -1,0 +1,21 @@
+{% comment %}
+Save/Saved toggle for `book`. Open to any logged-in account regardless of
+purchase eligibility - individuals can't buy but can still save books.
+Anonymous visitors get a plain login link (not the POST form) so they
+never get bounced into a broken redirect-after-login onto a POST-only URL.
+{% endcomment %}
+<p class="text-center mb-1">
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'wishlist_toggle' book.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-link p-0 text-decoration-none">
+            {% if wishlisted %}<i class="bi bi-heart-fill text-danger"></i> Saved
+            {% else %}<i class="bi bi-heart"></i> Save{% endif %}
+        </button>
+    </form>
+    {% else %}
+    <a href="{% url 'login' %}?next={{ request.path }}" class="small text-decoration-none">
+        <i class="bi bi-heart"></i> Save
+    </a>
+    {% endif %}
+</p>

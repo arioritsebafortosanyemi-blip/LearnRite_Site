@@ -1,5 +1,7 @@
 from django import template
 
+from store.utils import average_rating
+
 register = template.Library()
 
 @register.filter
@@ -18,3 +20,14 @@ def star_range(rating):
     bi-star-fill/bi-star icons without a numeric score on the page."""
     rating = round(rating or 0)
     return [i <= rating for i in range(1, 6)]
+
+@register.simple_tag
+def book_rating_summary(book):
+    """{'average': int or None, 'count': int} for a book's reviews - reads
+    book.review_set.all() rather than aggregating in SQL so it benefits
+    from prefetch_related('review_set') the same way contributors/prices
+    already do, instead of a query per card."""
+    ratings = [review.rating for review in book.review_set.all()]
+    if not ratings:
+        return {"average": None, "count": 0}
+    return {"average": average_rating(ratings), "count": len(ratings)}

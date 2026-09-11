@@ -1,4 +1,5 @@
 {% load accounts_extras %}
+{% load form_filter %}
 {% comment %}
 Shared book card, used by the homepage carousel/category tabs, the books
 listing, book detail's related products, and the 5 category pages. Was
@@ -21,6 +22,7 @@ that direct child can no longer also be the fixed-size card box.
 image_class: the exact classes each call site already used.
 {% endcomment %}
 {% book_purchase_context book user as purchase %}
+{% book_rating_summary book as rating_summary %}
 <div class="{{ outer_classes }} d-flex flex-column align-items-center">
 {% if variant == "compact" %}
 <div class="{{ wrapper_classes }}">
@@ -46,6 +48,14 @@ image_class: the exact classes each call site already used.
 </div>
 {% endif %}
 <div class="mt-5 pt-2">
+    {% if rating_summary.average %}
+    <p class="text-center mb-1">
+        {% for filled in rating_summary.average|star_range %}
+        {% if filled %}<i class="bi bi-star-fill text-warning small"></i>{% else %}<i class="bi bi-star text-warning small"></i>{% endif %}
+        {% endfor %}
+        <span class="text-muted small">({{ rating_summary.count }})</span>
+    </p>
+    {% endif %}
     {% include "store/_book_purchase.html" %}
 </div>
 </div>

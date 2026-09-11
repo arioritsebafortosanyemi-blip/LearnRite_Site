@@ -2,13 +2,14 @@ import random
 
 
 def random_books(queryset, count):
-    """Cheap random sample of `count` books from `queryset`, with contributors
-    and prices prefetched. `queryset.order_by('?')` sorts the whole matching
-    table by a random value on every request; this instead samples PKs in
-    Python (a single cheap index-only query) and fetches only those rows."""
+    """Cheap random sample of `count` books from `queryset`, with contributors,
+    prices and reviews prefetched. `queryset.order_by('?')` sorts the whole
+    matching table by a random value on every request; this instead samples
+    PKs in Python (a single cheap index-only query) and fetches only those
+    rows."""
     pks = list(queryset.values_list('pk', flat=True))
     sample_pks = random.sample(pks, min(count, len(pks)))
-    return list(queryset.model.objects.filter(pk__in=sample_pks).prefetch_related('contributors', 'prices'))
+    return list(queryset.model.objects.filter(pk__in=sample_pks).prefetch_related('contributors', 'prices', 'review_set'))
 
 
 def random_book(queryset):

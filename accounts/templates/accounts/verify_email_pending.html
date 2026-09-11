@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %} Verify Your Email {% endblock %}
+{% block style %}
+    <style>
+    .navbar-bg-img {
+        height: auto;
+        background-image: none;
+    }
+    </style>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Verify Your Email</li>
+{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <i class="bi bi-envelope-paper-fill" style="font-size: 3rem; color: #fe5d26;"></i>
+            <h3 class="h3 mt-3 mb-2">Check your email</h3>
+            <p class="fs-6">We've sent a verification link to <strong>{{ user.email }}</strong>. Click it to activate your account and continue setting up your profile.</p>
+
+            <form method="post" action="{% url 'resend_verification_email' %}" class="mt-4">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-dark px-4 py-2">Resend Verification Email</button>
+            </form>
+
+            <p class="mt-4"><a href="{% url 'logout' %}">Log out</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -23,12 +23,10 @@
     }
 
     function updateCartBadge(count) {
-        const badge = document.getElementById("cart-count-badge");
-        if (!badge) {
-            return;
-        }
-        badge.textContent = count;
-        badge.hidden = !count;
+        document.querySelectorAll(".cart-count-badge").forEach(function (badge) {
+            badge.textContent = count;
+            badge.hidden = !count;
+        });
     }
 
     function postForm(form) {

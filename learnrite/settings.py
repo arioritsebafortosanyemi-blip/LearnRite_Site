@@ -70,6 +70,7 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
@@ -153,6 +154,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME': 'accounts.validators.UppercaseStartValidator',
+    },
+    {
+        'NAME': 'accounts.validators.SymbolValidator',
     },
 ]
 

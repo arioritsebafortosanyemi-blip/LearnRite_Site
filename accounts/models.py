@@ -27,9 +27,19 @@ class Profile(models.Model):
                     "(as opposed to still sitting on the signal-created defaults, e.g. "
                     "right after a Google sign-up). Once set, account_type/location/"
                     "organization_name are locked - a customer must email us to change them.")
+    email_verified = models.BooleanField \
+        (default=False,
+         help_text="Set once the customer clicks the link in their verification email. "
+                    "Google sign-ups are treated as already verified.")
 
     def __str__(self):
         return f"{self.user.username} ({self.account_type}/{self.location})"
+
+    @property
+    def is_verified(self):
+        """Google sign-ups arrive with an email Google already verified -
+        never make them click a second confirmation link of ours."""
+        return self.email_verified or self.user.socialaccount_set.exists()
 
 
 class Address(models.Model):
@@ -37,7 +47,7 @@ class Address(models.Model):
         (auth.get_user_model(), related_name="addresses", on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20)
-    address_line1 = models.CharField(max_length=255)
+    address_line1 = models.CharField(max_length=255, verbose_name="Address")
     address_line2 = models.CharField(max_length=255, blank=True)
     landmark = models.CharField(max_length=255, blank=True, help_text="Optional - a nearby landmark to help with delivery.")
     city = models.CharField(max_length=100)

@@ -3,15 +3,19 @@ from django.urls import Resolver404, resolve
 
 from accounts.models import Profile
 
-EXEMPT_URL_NAMES = {"account_setup", "logout"}
+EXEMPT_URL_NAMES = {
+    "account_setup", "logout",
+    "verify_email", "verify_email_pending", "resend_verification_email",
+}
 EXEMPT_PATH_PREFIXES = ("/admin/", "/static/", "/media/", "/auth/")
 
 
 class RequireAccountSetupMiddleware:
-    """Send an authenticated customer with an unconfirmed Profile (e.g. a
-    fresh Google sign-up, which never goes through RegisterForm) to the
-    account type/location confirmation step before anything else, since
-    every price on the site is looked up from that profile."""
+    """Send an authenticated customer through two gates before anything
+    else: verifying their email, then confirming account type/location/
+    phone/address (e.g. a fresh Google sign-up, which never goes through
+    RegisterForm) - since every price and every checkout on the site
+    depends on that profile being real."""
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -29,6 +33,8 @@ class RequireAccountSetupMiddleware:
                 url_name = None
             if url_name not in EXEMPT_URL_NAMES:
                 profile, _ = Profile.objects.get_or_create(user=user)
+                if not profile.is_verified:
+                    return redirect("verify_email_pending")
                 if not profile.profile_confirmed:
                     return redirect("account_setup")
         return self.get_response(request)

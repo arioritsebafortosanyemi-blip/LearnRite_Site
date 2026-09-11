@@ -1,0 +1,9 @@
+Hi {{ user.first_name|default:user.username }},
+
+Welcome to LearnRite International Publishers. Please confirm your email address by clicking the link below:
+
+{{ link }}
+
+If you didn't create this account, you can ignore this email.
+
+- LearnRite International Publishers

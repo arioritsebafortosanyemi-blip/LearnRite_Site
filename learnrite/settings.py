@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'accounts',
     'orders',
+    'chatbot',
     'store',
     'blog',
 ]
@@ -100,6 +101,9 @@ LOGOUT_REDIRECT_URL = 'index'
 # alert-danger so messages.error() renders correctly in _messages.html.
 from django.contrib.messages import constants as message_constants
 MESSAGE_TAGS = {message_constants.ERROR: 'danger'}
+
+ANTHROPIC_API_KEY = config('ANTHROPIC_API_KEY', default='')
+CHATBOT_MODEL = config('CHATBOT_MODEL', default='claude-haiku-4-5-20251001')
 
 ROOT_URLCONF = 'learnrite.urls'
 

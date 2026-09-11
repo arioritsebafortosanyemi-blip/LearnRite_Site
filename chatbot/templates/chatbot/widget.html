@@ -1,0 +1,19 @@
+{% load static %}
+<div id="chatbot-widget">
+    <button id="chatbot-toggle" type="button" aria-label="Open chat">
+        <i class="bi bi-chat-dots-fill"></i>
+    </button>
+    <div id="chatbot-panel" hidden>
+        <div id="chatbot-header">
+            <span>LearnRite Support</span>
+            <button id="chatbot-close" type="button" aria-label="Close chat">&times;</button>
+        </div>
+        <div id="chatbot-messages"></div>
+        <form id="chatbot-form">
+            <input id="chatbot-input" type="text" placeholder="Ask a question..." autocomplete="off">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</div>
+<script>window.CHATBOT_CHAT_URL = "{% url 'chatbot_chat' %}";</script>
+<script src="{% static 'chatbot/chatbot.js' %}"></script>

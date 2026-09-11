@@ -18,21 +18,29 @@
             <h3 class="h3 mb-4">My Profile</h3>
             <p class="fs-5">Signed in as {{ user.username }} ({{ user.email }})</p>
 
-            <div class="mb-3">
-                <label class="form-label">Account Type</label>
-                <p class="mb-0">{{ user.profile.get_account_type_display }}</p>
+            <div class="account-info-card mb-4">
+                <div class="mb-2">
+                    <label class="form-label text-muted small mb-1">Account Type</label>
+                    <div>
+                        <span class="account-badge account-badge-type"><i class="bi bi-mortarboard-fill"></i> {{ user.profile.get_account_type_display }}</span>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label text-muted small mb-1">Location</label>
+                    <div>
+                        <span class="account-badge account-badge-location"><i class="bi bi-geo-alt-fill"></i> {{ user.profile.get_location_display }}</span>
+                    </div>
+                </div>
+                {% if user.profile.organization_name %}
+                <div class="mb-2">
+                    <label class="form-label text-muted small mb-1">School/Organization Name</label>
+                    <div>
+                        <span class="account-badge account-badge-org"><i class="bi bi-building"></i> {{ user.profile.organization_name }}</span>
+                    </div>
+                </div>
+                {% endif %}
+                <p class="locked-field-note mb-0 mt-3"><i class="bi bi-lock-fill"></i> Account type, location, organization name and email can't be changed here - email <a href="mailto:info@learnritepublishers.com">info@learnritepublishers.com</a> if any of these need updating.</p>
             </div>
-            {% if user.profile.organization_name %}
-            <div class="mb-3">
-                <label class="form-label">School/Organization Name</label>
-                <p class="mb-0">{{ user.profile.organization_name }}</p>
-            </div>
-            {% endif %}
-            <div class="mb-3">
-                <label class="form-label">Location</label>
-                <p class="mb-0">{{ user.profile.get_location_display }}</p>
-            </div>
-            <p class="text-muted small">Account type, location, organization name and email can't be changed here - email <a href="mailto:info@learnritepublishers.com">info@learnritepublishers.com</a> if any of these need updating.</p>
 
             <form method="post">
                 {% csrf_token %}

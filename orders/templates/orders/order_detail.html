@@ -17,15 +17,15 @@
     <h3 class="h3 mb-1">Order {{ order.order_reference }}</h3>
 
     {% if order.status == "CANCELLED" %}
-    <p class="text-danger fw-bold">Cancelled</p>
+    <span class="status-badge status-cancelled"><i class="bi bi-x-circle-fill"></i> Cancelled</span>
     {% elif order.status == "PENDING" %}
-    <p class="text-muted">Status: <span class="fw-bold">Pending Payment</span></p>
+    <span class="status-badge status-pending"><i class="bi bi-hourglass-split"></i> Pending Payment</span>
     {% else %}
     <div class="d-flex justify-content-between mt-4 mb-4" style="max-width: 600px;">
         {% for status_value, status_label in pipeline_statuses %}
         <div class="text-center flex-fill">
-            <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center {% if forloop.counter0 <= pipeline_index %}bg-dark text-white{% else %}bg-light text-muted{% endif %}" style="width: 32px; height: 32px;">
-                {% if forloop.counter0 < pipeline_index %}<i class="bi bi-check"></i>{% else %}{{ forloop.counter }}{% endif %}
+            <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center {% if forloop.counter0 < pipeline_index %}status-step-complete text-white{% elif forloop.counter0 == pipeline_index %}status-step-current text-white{% else %}bg-light text-muted{% endif %}" style="width: 32px; height: 32px;">
+                {% if forloop.counter0 < pipeline_index %}<i class="bi bi-check-lg"></i>{% else %}{{ forloop.counter }}{% endif %}
             </div>
             <p class="small mt-1 mb-0 {% if forloop.counter0 <= pipeline_index %}fw-bold{% else %}text-muted{% endif %}">{{ status_label }}</p>
         </div>

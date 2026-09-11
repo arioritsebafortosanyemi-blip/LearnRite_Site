@@ -16,10 +16,10 @@ def book_purchase_context(book, user):
     real per-unit price from BookPrice (same one used everywhere else),
     or a distinct "pricing coming soon" message if that tier is unpriced."""
     if not user.is_authenticated or user.profile.account_type != BookPrice.AccountType.SCHOOL:
-        return {"can_buy": False, "price": None, "message": CONTACT_MESSAGE}
+        return {"can_buy": False, "price": None, "message": CONTACT_MESSAGE, "variant": "contact"}
 
     price = get_book_price(book, user.profile)
     if price is None:
-        return {"can_buy": False, "price": None, "message": PRICING_PENDING_MESSAGE}
+        return {"can_buy": False, "price": None, "message": PRICING_PENDING_MESSAGE, "variant": "pending"}
 
-    return {"can_buy": True, "price": price, "message": None}
+    return {"can_buy": True, "price": price, "message": None, "variant": None}

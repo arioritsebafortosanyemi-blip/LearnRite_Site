@@ -765,3 +765,105 @@ li .bi{
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Profile page - account info card. Read-only account/pricing fields get
+   colored badges instead of plain black text so they read as distinct,
+   locked settings rather than blending into the editable form below. */
+.account-info-card {
+  background-color: #FAFAFA;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+.account-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.account-badge-type {
+  background-color: #fe5d26;
+}
+
+.account-badge-location {
+  background-color: #2a9d8f;
+}
+
+.account-badge-org {
+  background-color: #4F4F4F;
+}
+
+.locked-field-note {
+  background-color: #FFF9D1;
+  border-left: 4px solid #fe5d26;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: #4F4F4F;
+}
+
+.locked-field-note a {
+  color: #fe5d26;
+  font-weight: 600;
+}
+
+/* Order status - one color per pipeline stage, reusing the same accent
+   colors already used for the category dropdown swatches so the palette
+   stays consistent site-wide rather than introducing new ones. Shared
+   between the status pill (order list/detail) and the stepper circles
+   (order_detail.html) so both always agree on a stage's color. */
+.status-pending { background-color: #adb5bd; }
+.status-received { background-color: #2a9d8f; }
+.status-processing { background-color: #fe5d26; }
+.status-out_for_delivery { background-color: #9d75cb; }
+.status-delivered { background-color: #59cd90; }
+.status-cancelled { background-color: #dc3545; }
+
+/* Order-detail stepper: a completed step always reads as a green
+   checkmark (not tied to a specific pipeline stage's own color), the
+   current step gets the brand accent so it stands out, upcoming steps
+   stay a plain gray circle. */
+.status-step-complete { background-color: #59cd90; }
+.status-step-current { background-color: #fe5d26; }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Book price/purchase - a bold price tag and color-coded callouts so
+   "contact us" and "pricing coming soon" read as distinct states rather
+   than identical muted text. */
+.price-tag {
+  display: inline-block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fe5d26;
+}
+
+.purchase-note {
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.purchase-note-contact {
+  background-color: #FAFAFA;
+  color: #4F4F4F;
+}
+
+.purchase-note-pending {
+  background-color: #FFF9D1;
+  color: #4F4F4F;
+}

@@ -7,7 +7,7 @@ see the contact-us message, institutions with no price yet see a distinct
 {% endcomment %}
 <div class="text-center mt-1 mb-2">
     {% if purchase.can_buy %}
-    <p class="fw-bold fs-6 mb-2">&#8358;{{ purchase.price }}</p>
+    <p class="price-tag mb-2">&#8358;{{ purchase.price }}</p>
     <form method="post" action="{% url 'add_to_cart' book.pk %}" class="d-flex justify-content-center" data-ajax="add-to-cart">
         {% csrf_token %}
         <div class="input-group input-group-sm" style="max-width: 10rem;">
@@ -15,7 +15,9 @@ see the contact-us message, institutions with no price yet see a distinct
             <button type="submit" class="btn btn-dark">Add to Cart</button>
         </div>
     </form>
+    {% elif purchase.variant == "pending" %}
+    <p class="purchase-note purchase-note-pending small mb-0"><i class="bi bi-hourglass-split"></i> {{ purchase.message }}</p>
     {% else %}
-    <p class="text-muted small mb-0">{{ purchase.message }}</p>
+    <p class="purchase-note purchase-note-contact small mb-0"><i class="bi bi-envelope-fill"></i> {{ purchase.message }}</p>
     {% endif %}
 </div>

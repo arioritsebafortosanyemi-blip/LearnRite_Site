@@ -33,7 +33,7 @@
                    <h6 class="mt-2 mb-3">Order</h6>
                    <p class="lh-1"><span class="text-muted">Wishlist</span></p>
                    <p class="lh-1"><span class="text-muted">Payment</span></p>
-                   <p class="lh-1"><a href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}">Order History</a></p>
+                   <p class="lh-1"><a href="{% if user.is_authenticated %}{% url 'order_history' %}{% else %}{% url 'login' %}{% endif %}">Order History</a></p>
                </div>
 
                <div class="col lh-1 footer-text">

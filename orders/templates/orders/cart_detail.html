@@ -59,6 +59,11 @@
     </div>
     <div class="text-end">
         <p class="fs-5 fw-bold">Subtotal: &#8358;{{ subtotal }}</p>
+        {% if unavailable_lines %}
+        <p class="text-muted small">Remove items with unavailable pricing before checking out.</p>
+        {% else %}
+        <a href="{% url 'checkout' %}" class="btn btn-dark px-4 py-2">Proceed to Checkout</a>
+        {% endif %}
     </div>
     {% else %}
     <p class="fs-5">Your cart is empty.</p>

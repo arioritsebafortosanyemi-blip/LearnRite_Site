@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %} My Orders {% endblock %}
+{% block style %}
+    <style>
+    .navbar-bg-img {
+        height: auto;
+        background-image: none;
+    }
+    </style>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">My Orders</li>
+{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h3 class="h3 mb-4">My Orders</h3>
+
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.order_reference }}</td>
+                    <td>{{ order.created_at|date:"d M Y" }}</td>
+                    <td>{{ order.get_status_display }}</td>
+                    <td>&#8358;{{ order.total }}</td>
+                    <td><a href="{% url 'order_detail' order.pk %}" class="btn btn-sm btn-outline-dark">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="fs-5">You haven't placed any orders yet.</p>
+    <a href="{% url 'books' %}" class="btn btn-dark px-4 py-2">Browse Books</a>
+    {% endif %}
+</div>
+{% endblock %}

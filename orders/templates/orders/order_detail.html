@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %} Order {{ order.order_reference }} {% endblock %}
+{% block style %}
+    <style>
+    .navbar-bg-img {
+        height: auto;
+        background-image: none;
+    }
+    </style>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'order_history' %}">My Orders</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ order.order_reference }}</li>
+{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h3 class="h3 mb-1">Order {{ order.order_reference }}</h3>
+    <p class="text-muted">Status: <span class="fw-bold">{{ order.get_status_display }}</span></p>
+
+    <div class="row mt-4">
+        <div class="col-md-7 mb-4">
+            <h5 class="mb-3">Items</h5>
+            <ul class="list-group mb-3">
+                {% for item in order.items.all %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ item.title }} &times; {{ item.quantity }}</span>
+                    <span>&#8358;{{ item.line_total }}</span>
+                </li>
+                {% endfor %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Subtotal</span>
+                    <span>&#8358;{{ order.subtotal }}</span>
+                </li>
+                {% if order.discount_amount %}
+                <li class="list-group-item d-flex justify-content-between text-success">
+                    <span>Bulk discount</span>
+                    <span>-&#8358;{{ order.discount_amount }}</span>
+                </li>
+                {% endif %}
+                <li class="list-group-item d-flex justify-content-between fw-bold">
+                    <span>Total</span>
+                    <span>&#8358;{{ order.total }}</span>
+                </li>
+            </ul>
+
+            <h5 class="mb-3">Delivery Details</h5>
+            <p class="mb-1">{{ order.full_name }}</p>
+            <p class="mb-1">{{ order.phone_number }}</p>
+            {% if order.shipping_address %}
+            <p class="mb-1">{{ order.shipping_address.address_line1 }}{% if order.shipping_address.address_line2 %}, {{ order.shipping_address.address_line2 }}{% endif %}</p>
+            <p class="mb-1">{{ order.shipping_address.city }}, {{ order.shipping_address.state }}</p>
+            {% endif %}
+        </div>
+
+        <div class="col-md-5">
+            {% if order.status == "PENDING" %}
+            <div class="border rounded p-3">
+                <h5 class="mb-3">Pay by Bank Transfer</h5>
+                <p class="small text-muted">Pay the total above to complete your order. We'll confirm once payment is received.</p>
+                {% for account in payment_accounts %}
+                <p class="mb-1"><strong>{{ account.bank_name }}</strong></p>
+                <p class="mb-1">{{ account.account_name }}</p>
+                <p class="mb-3">{{ account.account_number }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

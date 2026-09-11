@@ -1,0 +1,20 @@
+Hi {{ order.full_name }},
+
+Thanks for your order with LearnRite International Publishers. Your order reference is {{ order.order_reference }}.
+
+Order summary:
+{% for item in order.items.all %}{{ item.quantity }} x {{ item.title }} - N{{ item.unit_price }} each = N{{ item.line_total }}
+{% endfor %}
+Subtotal: N{{ order.subtotal }}
+{% if order.discount_amount %}Discount: -N{{ order.discount_amount }}
+{% endif %}Total: N{{ order.total }}
+
+To complete your order, please pay the total above by bank transfer to:
+{% for account in payment_accounts %}
+{{ account.bank_name }}
+{{ account.account_name }}
+{{ account.account_number }}
+{% endfor %}
+Once we've confirmed your payment, we'll be in touch to arrange delivery. If you have any questions, contact us at info@learnritepublishers.com or +234-907-776-5490.
+
+- LearnRite International Publishers

@@ -10,8 +10,10 @@ from store.forms import SearchForm
 from store.models import Book, BookPrice
 from store.utils import get_book_price
 
-from orders.models import CartItem
-from orders.utils import get_or_create_cart
+from orders.emails import send_order_confirmation
+from orders.forms import CheckoutForm
+from orders.models import BulkDiscountRule, CartItem, Order, OrderItem, PaymentAccount
+from orders.utils import get_or_create_cart, price_cart
 
 
 def _redirect_back(request, fallback):
@@ -60,21 +62,12 @@ def add_to_cart(request, pk):
 @login_required
 def cart_detail(request):
     cart = get_or_create_cart(request.user)
-    profile = request.user.profile
-    items = cart.items.select_related("book").prefetch_related("book__prices")
-
-    lines = []
-    subtotal = Decimal("0")
-    for item in items:
-        price = get_book_price(item.book, profile)
-        line_total = price * item.quantity if price is not None else None
-        if line_total is not None:
-            subtotal += line_total
-        lines.append({"item": item, "price": price, "line_total": line_total})
+    lines, subtotal = price_cart(cart, request.user.profile)
 
     return render(request, "orders/cart_detail.html", {
         "lines": lines,
         "subtotal": subtotal,
+        "unavailable_lines": any(line["price"] is None for line in lines),
         "form": SearchForm(request.GET),
     })
 
@@ -99,3 +92,104 @@ def remove_cart_item(request, pk):
     cart = get_or_create_cart(request.user)
     get_object_or_404(CartItem, pk=pk, cart=cart).delete()
     return redirect("cart_detail")
+
+
+def _apply_bulk_discount(subtotal):
+    """Automatic discount for large orders - separate from any future
+    coupon-code system, applied whenever subtotal clears the threshold."""
+    rule = BulkDiscountRule.objects.filter(active=True).first()
+    if rule and subtotal >= rule.minimum_order_amount:
+        return (subtotal * rule.discount_percentage / Decimal("100")).quantize(Decimal("0.01"))
+    return Decimal("0")
+
+
+@login_required
+def checkout(request):
+    profile = request.user.profile
+    cart = get_or_create_cart(request.user)
+
+    if profile.account_type != BookPrice.AccountType.SCHOOL:
+        messages.error(request, "Only institution accounts can order online - individuals should contact us.")
+        return redirect("cart_detail")
+
+    lines, subtotal = price_cart(cart, profile)
+    if not lines:
+        messages.error(request, "Your cart is empty.")
+        return redirect("cart_detail")
+    if any(line["price"] is None for line in lines):
+        messages.error(request, "Some items in your cart don't have pricing set up yet - remove them or contact us to order.")
+        return redirect("cart_detail")
+
+    default_address = request.user.addresses.filter(is_default=True).first() or request.user.addresses.first()
+    discount_amount = _apply_bulk_discount(subtotal)
+
+    if request.method == "POST":
+        checkout_form = CheckoutForm(request.POST)
+        if checkout_form.is_valid():
+            # Re-price at submission time rather than trusting the GET-time
+            # figures above, in case prices or the cart changed in between.
+            lines, subtotal = price_cart(cart, profile)
+            if not lines or any(line["price"] is None for line in lines):
+                messages.error(request, "Your cart changed - please review it and try again.")
+                return redirect("cart_detail")
+            discount_amount = _apply_bulk_discount(subtotal)
+
+            address = checkout_form.save(commit=False)
+            address.user = request.user
+            address.save()
+
+            order = Order.objects.create(
+                user=request.user,
+                email=request.user.email,
+                full_name=address.full_name,
+                phone_number=address.phone_number,
+                shipping_address=address,
+                subtotal=subtotal,
+                discount_amount=discount_amount,
+                total=subtotal - discount_amount,
+            )
+            OrderItem.objects.bulk_create([
+                OrderItem(
+                    order=order,
+                    book=line["item"].book,
+                    title=line["item"].book.title,
+                    unit_price=line["price"],
+                    quantity=line["item"].quantity,
+                )
+                for line in lines
+            ])
+            cart.items.all().delete()
+            send_order_confirmation(order)
+
+            return redirect("order_detail", pk=order.pk)
+    else:
+        checkout_form = CheckoutForm(instance=default_address)
+
+    return render(request, "orders/checkout.html", {
+        "checkout_form": checkout_form,
+        "lines": lines,
+        "subtotal": subtotal,
+        "discount_amount": discount_amount,
+        "total": subtotal - discount_amount,
+        "form": SearchForm(request.GET),
+    })
+
+
+@login_required
+def order_detail(request, pk):
+    order = get_object_or_404(Order, pk=pk, user=request.user)
+    payment_accounts = PaymentAccount.objects.filter(active=True)
+    return render(request, "orders/order_detail.html", {
+        "order": order,
+        "payment_accounts": payment_accounts,
+        "form": SearchForm(request.GET),
+    })
+
+
+@login_required
+def order_history(request):
+    orders = request.user.orders.order_by("-created_at")
+    return render(request, "orders/order_history.html", {
+        "orders": orders,
+        "form": SearchForm(request.GET),
+    })

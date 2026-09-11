@@ -5,6 +5,6 @@ Good news - your order {{ order.order_reference }} is ready for pickup.
 Order summary:
 {% for item in order.items.all %}{{ item.quantity }} x {{ item.title }}
 {% endfor %}
-Please bring a valid ID and quote your order reference when you come to collect it. If you have any questions, or need to confirm our pickup location and opening hours, contact us at info@learnritepublishers.com or +234-907-776-5490.
+Please bring a valid ID and quote your order reference when you come to collect it. If you have any questions, or need to confirm our pickup location and opening hours, contact us at learninsideout@yahoo.com or +234-907-776-5490.
 
 - LearnRite International Publishers

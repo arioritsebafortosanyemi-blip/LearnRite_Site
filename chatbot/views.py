@@ -154,7 +154,7 @@ def chat(request):
             return JsonResponse({"error": "The chatbot is temporarily unavailable. Please try again shortly."}, status=503)
 
     if response.stop_reason == "tool_use":
-        final_text = "Sorry, I'm having trouble looking that up right now - please contact us directly at info@learnritepublishers.com."
+        final_text = "Sorry, I'm having trouble looking that up right now - please contact us directly at learninsideout@yahoo.com."
     else:
         final_text = "".join(block.text for block in response.content if block.type == "text")
     messages.append({"role": "assistant", "content": final_text})

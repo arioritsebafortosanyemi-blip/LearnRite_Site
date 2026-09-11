@@ -17,7 +17,7 @@ INITIAL_SECTIONS = {
         "online card payment yet."
     ),
     "CONTACT": (
-        "Phone: +234-907-776-5490. Email: info@learnritepublishers.com."
+        "Phone: +234-907-776-5490. Email: learninsideout@yahoo.com."
     ),
 }
 

@@ -5,7 +5,7 @@ from store.utils import get_book_price
 
 register = template.Library()
 
-CONTACT_MESSAGE = "Contact us at info@learnritepublishers.com for pricing."
+CONTACT_MESSAGE = "Contact us at learninsideout@yahoo.com for pricing."
 PRICING_PENDING_MESSAGE = "Pricing for your account isn't set up yet - contact us to order."
 
 

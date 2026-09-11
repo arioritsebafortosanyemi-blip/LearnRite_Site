@@ -7,7 +7,7 @@ from orders.models import PaymentAccount
 
 logger = logging.getLogger(__name__)
 
-STAFF_NOTIFICATION_EMAIL = "info@learnritepublishers.com"
+STAFF_NOTIFICATION_EMAIL = "learninsideout@yahoo.com"
 
 
 def send_order_confirmation(order):

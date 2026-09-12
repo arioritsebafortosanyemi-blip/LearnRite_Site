@@ -30,6 +30,24 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
 
+# Production-only hardening (flagged by `manage.py check --deploy`) - gated
+# on DEBUG rather than a new env var, so local http://localhost dev is
+# unaffected (a Secure-flagged cookie or a forced HTTPS redirect would
+# otherwise break every local test against plain http://).
+# Render terminates TLS at its edge and forwards over plain HTTP internally,
+# telling us the original scheme via X-Forwarded-Proto - SECURE_SSL_REDIRECT
+# needs SECURE_PROXY_SSL_HEADER set correctly or it loops forever trying to
+# "fix" a request Django can't see was already HTTPS.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+# Starts conservative (1 hour) rather than the commonly-recommended 1 year -
+# HSTS forces the browser to refuse plain HTTP for this domain for the
+# whole duration, with no server-side way to undo it early if something's
+# wrong. Raise it once the above is confirmed solid in production.
+SECURE_HSTS_SECONDS = 3600 if not DEBUG else 0
+
 
 # Application definition
 

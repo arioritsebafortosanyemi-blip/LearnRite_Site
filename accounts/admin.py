@@ -41,10 +41,15 @@ class SchoolVerificationAdmin(admin.ModelAdmin):
             return "-"
         mandate = reverse("school_verification_pdf", args=[obj.pk, "mandate"])
         consent = reverse("school_verification_pdf", args=[obj.pk, "consent"])
+        # Inline-styled rather than using admin's "button" class, which the
+        # Unfold theme doesn't define - these need to look like buttons in
+        # both its light and dark modes.
+        style = ("display:inline-block;padding:6px 14px;margin-right:8px;border-radius:6px;"
+                 "background:#fe5d26;color:#fff;font-weight:600;text-decoration:none;")
         return format_html(
-            '<a class="button" href="{}" target="_blank">Mandate form (PDF)</a>&nbsp;'
-            '<a class="button" href="{}" target="_blank">Consent form (PDF)</a>',
-            mandate, consent)
+            '<a style="{}" href="{}" target="_blank">Mandate form (PDF)</a>'
+            '<a style="{}" href="{}" target="_blank">Consent form (PDF)</a>',
+            style, mandate, style, consent)
 
     @admin.display(description="Passport photograph")
     def photo(self, obj):

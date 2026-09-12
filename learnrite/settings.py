@@ -52,6 +52,12 @@ SECURE_HSTS_SECONDS = 3600 if not DEBUG else 0
 # Application definition
 
 INSTALLED_APPS = [
+    # Unfold themes the admin and must come before the admin app itself
+    # (which here is StoreAdminConfig, since the site uses a custom
+    # AdminSite - see learnrite/admin.py).
+    'unfold',
+    'unfold.contrib.forms',
+    'unfold.contrib.filters',
     'store.apps_admin.StoreAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -115,6 +121,71 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
+
+# Admin theming (django-unfold). Sidebar is grouped by what staff actually
+# do - orders, schools, catalogue - rather than the default alphabetical
+# list of every model.
+from django.urls import reverse_lazy
+
+UNFOLD = {
+    "SITE_TITLE": "LearnRite Admin",
+    "SITE_HEADER": "LearnRite",
+    "SITE_SUBHEADER": "International Publishers",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "COLORS": {
+        # The site's own accent, so admin reads as the same product.
+        "primary": {
+            "50": "255 240 234", "100": "255 224 212", "200": "255 193 169",
+            "300": "255 160 126", "400": "254 126 82", "500": "254 93 38",
+            "600": "224 74 24", "700": "186 57 16", "800": "148 44 12",
+            "900": "117 35 10", "950": "64 18 5",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "navigation": [
+            {
+                "title": "Orders",
+                "separator": True,
+                "items": [
+                    {"title": "Orders", "link": reverse_lazy("admin:orders_order_changelist")},
+                    {"title": "Coupons", "link": reverse_lazy("admin:orders_coupon_changelist")},
+                    {"title": "Bulk discount", "link": reverse_lazy("admin:orders_bulkdiscountrule_changelist")},
+                    {"title": "Payment accounts", "link": reverse_lazy("admin:orders_paymentaccount_changelist")},
+                    {"title": "Carts", "link": reverse_lazy("admin:orders_cart_changelist")},
+                ],
+            },
+            {
+                "title": "Schools & customers",
+                "separator": True,
+                "items": [
+                    {"title": "School verifications",
+                     "link": reverse_lazy("admin:accounts_schoolverification_changelist")},
+                    {"title": "Profiles", "link": reverse_lazy("admin:accounts_profile_changelist")},
+                    {"title": "Addresses", "link": reverse_lazy("admin:accounts_address_changelist")},
+                    {"title": "Users", "link": reverse_lazy("admin:auth_user_changelist")},
+                ],
+            },
+            {
+                "title": "Catalogue",
+                "separator": True,
+                "items": [
+                    {"title": "Books", "link": reverse_lazy("admin:store_book_changelist")},
+                    {"title": "Reviews", "link": reverse_lazy("admin:store_review_changelist")},
+                ],
+            },
+            {
+                "title": "Chatbot",
+                "separator": True,
+                "items": [
+                    {"title": "Knowledge sections",
+                     "link": reverse_lazy("admin:chatbot_knowledgesection_changelist")},
+                ],
+            },
+        ],
+    },
+}
 
 # Bootstrap has no alert-error class - map Django's "error" level to
 # alert-danger so messages.error() renders correctly in _messages.html.

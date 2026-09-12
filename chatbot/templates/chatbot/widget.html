@@ -10,6 +10,12 @@
         </div>
         <div id="chatbot-messages"></div>
         <form id="chatbot-form">
+            {% comment %}Not submitted with the form - chatbot.js posts via fetch
+            and reads the token from the cookie. It's here because rendering the
+            tag is what makes Django set that cookie at all: without it, a page
+            with no other POST form (e.g. the homepage for a logged-out visitor)
+            leaves the widget with no token to send, and every message 403s.{% endcomment %}
+            {% csrf_token %}
             <input id="chatbot-input" type="text" placeholder="Ask a question..." autocomplete="off">
             <button type="submit">Send</button>
         </form>

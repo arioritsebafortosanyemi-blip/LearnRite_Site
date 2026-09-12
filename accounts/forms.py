@@ -22,6 +22,14 @@ class RegisterForm(UserCreationForm):
         model = get_user_model()
         fields = ("full_name", "email", "password1", "password2")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Django auto-generates a bulleted list of every validator's help
+        # text here - dropped in favour of the single summarised callout the
+        # template renders, rather than showing the same rules twice.
+        self.fields["password1"].help_text = ""
+        self.fields["password2"].help_text = ""
+
     def clean_email(self):
         email = self.cleaned_data["email"]
         if get_user_model().objects.filter(email__iexact=email).exists():

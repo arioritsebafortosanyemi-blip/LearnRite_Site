@@ -148,6 +148,16 @@ def checkout(request):
         messages.error(request, "Only institution accounts can order online - individuals should contact us.")
         return redirect("cart_detail")
 
+    # The client requires a signed mandate and stamping consent from every
+    # school before it can order, so checkout waits on staff approval.
+    verification = getattr(profile, "school_verification", None)
+    if verification is None:
+        messages.error(request, "Please complete your school's mandate and consent forms before checking out.")
+        return redirect("school_verification")
+    if not verification.is_approved:
+        messages.error(request, "Your school's forms are still being reviewed - we'll email you once they're approved.")
+        return redirect("school_verification_status")
+
     lines, subtotal = price_cart(cart, profile)
     if not lines:
         messages.error(request, "Your cart is empty.")

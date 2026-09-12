@@ -12,6 +12,10 @@ urlpatterns = [
     path('verify-email/pending/', views.verify_email_pending, name='verify_email_pending'),
     path('setup/', views.confirm_account_setup, name='account_setup'),
     path('profile/', views.profile, name='profile'),
+    path('school-verification/', views.school_verification, name='school_verification'),
+    path('school-verification/status/', views.school_verification_status, name='school_verification_status'),
+    path('school-verification/<int:pk>/photo/', views.school_verification_photo, name='school_verification_photo'),
+    path('school-verification/<int:pk>/<str:which>.pdf', views.school_verification_pdf, name='school_verification_pdf'),
     path('wishlist/', views.wishlist_view, name='wishlist'),
     path('wishlist/toggle/<int:pk>/', views.wishlist_toggle, name='wishlist_toggle'),
 

@@ -1,20 +1,25 @@
 import logging
 
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordResetView as BasePasswordResetView
-from django.http import JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.encoding import force_str
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
+from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
 from store.forms import ReviewForm, SearchForm
-from store.models import Book, Review
+from store.models import Book, BookPrice, Review
+
+from accounts.pdf_forms import build_consent_pdf, build_mandate_pdf
 from accounts.emails import send_verification_email
-from accounts.forms import AccountSetupForm, AddressSetupForm, ProfileForm, RegisterForm
-from accounts.models import Profile, WishlistItem
+from accounts.forms import (AccountSetupForm, AddressSetupForm, ProfileForm, RegisterForm,
+                            SchoolVerificationForm)
+from accounts.models import Profile, SchoolVerification, WishlistItem
 from accounts.tokens import email_verification_token
 
 from orders.models import Order, OrderItem
@@ -149,6 +154,87 @@ def profile(request):
         "reviewable_books": reviewable_books,
         "form": SearchForm(request.GET),
     })
+
+
+@login_required
+def school_verification(request):
+    """The mandate + consent forms. Institution accounts only - an individual
+    account has no school to verify, and never gets self-service checkout
+    anyway."""
+    profile = request.user.profile
+    if profile.account_type != BookPrice.AccountType.SCHOOL:
+        messages.error(request, "Only institution accounts need to complete these forms.")
+        return redirect("profile")
+
+    existing = SchoolVerification.objects.filter(profile=profile).first()
+    if existing and existing.status != SchoolVerification.Status.REJECTED:
+        return redirect("school_verification_status")
+
+    if request.method == "POST":
+        # A rejected submission is replaced rather than edited, so the school
+        # resubmits cleanly and staff review a fresh record.
+        form = SchoolVerificationForm(request.POST, request.FILES, instance=existing)
+        if form.is_valid():
+            verification = form.save(commit=False)
+            verification.profile = profile
+            verification.status = SchoolVerification.Status.PENDING
+            verification.reviewed_at = None
+            verification.review_notes = ""
+            form.save()
+            messages.success(request, "Thanks - your forms are with our team for review.")
+            return redirect("school_verification_status")
+    else:
+        initial = {
+            "school_name": profile.organization_name,
+            "staff_name": request.user.first_name,
+            "owner_phone": profile.phone_number,
+        }
+        form = SchoolVerificationForm(instance=existing, initial=initial)
+
+    return render(request, "accounts/school_verification.html", {
+        "verification_form": form,
+        "rejected": existing,
+        "form": SearchForm(request.GET),
+    })
+
+
+@login_required
+def school_verification_status(request):
+    verification = SchoolVerification.objects.filter(profile=request.user.profile).first()
+    if not verification:
+        return redirect("school_verification")
+    return render(request, "accounts/school_verification_status.html", {
+        "verification": verification,
+        "form": SearchForm(request.GET),
+    })
+
+
+@login_required
+def school_verification_photo(request, pk):
+    """Serves the passport photo out of the database. Staff can see any;
+    a customer can only see their own."""
+    verification = get_object_or_404(SchoolVerification, pk=pk)
+    if not request.user.is_staff and verification.profile.user_id != request.user.id:
+        raise Http404
+    if not verification.passport_photo:
+        raise Http404
+    return HttpResponse(bytes(verification.passport_photo),
+                        content_type=verification.passport_photo_content_type or "image/jpeg")
+
+
+@staff_member_required
+def school_verification_pdf(request, pk, which):
+    verification = get_object_or_404(SchoolVerification, pk=pk)
+    if which == "mandate":
+        content = build_mandate_pdf(verification)
+    elif which == "consent":
+        content = build_consent_pdf(verification)
+    else:
+        raise Http404
+    response = HttpResponse(content, content_type="application/pdf")
+    slug = slugify(verification.school_name) or "school"
+    response["Content-Disposition"] = f'inline; filename="{which}-{slug}.pdf"'
+    return response
 
 
 @login_required

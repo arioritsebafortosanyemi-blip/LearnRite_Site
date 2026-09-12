@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %} School Verification {% endblock %}
+{% block style %}
+    <style>
+    .navbar-bg-img {
+        height: auto;
+        background-image: none;
+    }
+    </style>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">School Verification</li>
+{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h3 class="h3 mb-1" style="color: #fe5d26;">School Verification</h3>
+            <p class="text-muted">Two short forms we need before your school can order - the mandate form and your consent to have your school's name stamped on every copy. Our team reviews them, then checkout opens up.</p>
+
+            {% if rejected %}
+            <p class="purchase-note purchase-note-contact small"><i class="bi bi-exclamation-circle-fill text-danger"></i>
+                Your previous submission wasn't approved{% if rejected.review_notes %}: {{ rejected.review_notes }}{% endif %}. Please review the details below and submit again.</p>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% if verification_form.non_field_errors %}
+                <div class="text-danger small mb-3">{{ verification_form.non_field_errors }}</div>
+                {% endif %}
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Part A - About your school</h6>
+                    {% for field in verification_form %}
+                    {% if field.name in "school_name,school_address,first_time_buyer,years_as_customer,number_of_branches" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+
+                    <label class="form-label fw-semibold mt-2">Average number of books per class</label>
+                    <div class="row">
+                        {% for field in verification_form %}
+                        {% if "books_" in field.name %}
+                        <div class="col-6 col-md-4 mb-3">
+                            <label class="form-label small mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Part B - School owner</h6>
+                    {% for field in verification_form %}
+                    {% if field.name in "owner_name,owner_phone" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Part C - Authorized staff</h6>
+                    <p class="text-muted small">The person who will place and collect orders on the school's behalf.</p>
+                    {% for field in verification_form %}
+                    {% if field.name in "staff_name,staff_post,passport_photo" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Part D - Mandate declaration</h6>
+                    <p class="locked-field-note small">I hereby affirm that every piece of information my staff and I provided in this form is true and consistent. I also affirm that I will not infringe on the copyright of LearnRite's authors in any way, shape, form or manner. I hereby promise that my school, my staff or any person(s) associated with me will not resell LearnRite's books to other schools or bookshops, make photocopies of any LearnRite's books or add more than 10% to the prices fixed by the company. I promise to take full responsibility arising from any action by my school or its representative(s) that is contrary to the foregoing.</p>
+                    {% for field in verification_form %}
+                    {% if field.name in "mandate_declaration_name,mandate_agreed" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Consent to stamp textbooks</h6>
+                    <p class="locked-field-note small">Some sales representatives have been diverting textbooks bought in a school's name to other schools and unauthorized places. To stop this, we stamp your school's name on every copy of your order. Your orders are customized and delivered to your school, and no copy bearing your school's name will be sold to anyone else. We need your authorization to do this.</p>
+                    {% for field in verification_form %}
+                    {% if field.name in "consent_declaration_name,consent_agreed" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <p class="text-muted small mb-0">Your school's stamp is still required on the invoice or letterhead that accompanies each order.</p>
+                </div>
+
+                <button class="btn btn-dark btn-large px-4 py-2 w-100" type="submit">Submit for Review</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -172,7 +172,7 @@ def wishlist_toggle(request, pk):
 
 @login_required
 def wishlist_view(request):
-    items = WishlistItem.objects.filter(user=request.user).select_related("book").prefetch_related(
+    items = WishlistItem.objects.filter(user=request.user, book__is_published=True).select_related("book").prefetch_related(
         "book__contributors", "book__prices", "book__review_set"
     )
     books = [item.book for item in items]

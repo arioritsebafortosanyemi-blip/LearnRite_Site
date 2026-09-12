@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import Q, Sum
 
 from orders.models import Cart
 
@@ -10,5 +10,7 @@ def cart_count(request):
     other nav items already rely on."""
     if not request.user.is_authenticated:
         return {"cart_count": 0}
-    total = Cart.objects.filter(user=request.user).aggregate(total=Sum("items__quantity"))["total"]
+    total = Cart.objects.filter(user=request.user).aggregate(
+        total=Sum("items__quantity", filter=Q(items__book__is_published=True))
+    )["total"]
     return {"cart_count": total or 0}

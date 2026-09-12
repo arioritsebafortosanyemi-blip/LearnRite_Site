@@ -14,7 +14,7 @@ def price_cart(cart, profile):
     """Live-priced cart lines plus the subtotal. Never trusts a cached
     price - always looks up the current BookPrice for this profile, since
     admin-set prices and the customer's own tier can both change."""
-    items = cart.items.select_related("book").prefetch_related("book__prices")
+    items = cart.items.filter(book__is_published=True).select_related("book").prefetch_related("book__prices")
     lines = []
     subtotal = Decimal("0")
     for item in items:

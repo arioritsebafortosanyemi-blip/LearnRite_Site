@@ -42,7 +42,7 @@ def _clean_quantity(raw, default=1):
 
 
 def _cart_count(user):
-    return CartItem.objects.filter(cart__user=user).aggregate(total=Sum("quantity"))["total"] or 0
+    return CartItem.objects.filter(cart__user=user, book__is_published=True).aggregate(total=Sum("quantity"))["total"] or 0
 
 
 @login_required

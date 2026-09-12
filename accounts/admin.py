@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
+from accounts.emails import send_school_verification_decision
 from accounts.models import Address, Profile, SchoolVerification
 
 
@@ -53,8 +54,17 @@ class SchoolVerificationAdmin(admin.ModelAdmin):
                            reverse("school_verification_photo", args=[obj.pk]))
 
     def _set_status(self, request, queryset, status):
-        updated = queryset.update(status=status, reviewed_at=timezone.now())
-        self.message_user(request, f"{updated} school(s) marked {status.lower()}.", messages.SUCCESS)
+        # Iterated rather than queryset.update() so each school gets the
+        # decision email - these are reviewed in small batches.
+        count = 0
+        for verification in queryset:
+            verification.status = status
+            verification.reviewed_at = timezone.now()
+            verification.save(update_fields=["status", "reviewed_at"])
+            send_school_verification_decision(verification)
+            count += 1
+        self.message_user(
+            request, f"{count} school(s) marked {status.lower()} and notified by email.", messages.SUCCESS)
 
     @admin.action(description="Approve selected schools (allows checkout)")
     def approve_selected(self, request, queryset):
@@ -65,9 +75,14 @@ class SchoolVerificationAdmin(admin.ModelAdmin):
         self._set_status(request, queryset, SchoolVerification.Status.REJECTED)
 
     def save_model(self, request, obj, form, change):
-        if change and "status" in form.changed_data:
+        decided = change and "status" in form.changed_data and obj.status in (
+            SchoolVerification.Status.APPROVED, SchoolVerification.Status.REJECTED)
+        if decided:
             obj.reviewed_at = timezone.now()
         super().save_model(request, obj, form, change)
+        if decided:
+            send_school_verification_decision(obj)
+            self.message_user(request, f"{obj.school_name} has been notified by email.", messages.INFO)
 
 
 admin.site.register(Profile, ProfileAdmin)

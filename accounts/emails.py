@@ -26,3 +26,20 @@ def send_verification_email(request, user):
         )
     except Exception:
         logger.exception("Failed to send verification email to %s", user.email)
+
+
+def send_school_verification_decision(verification):
+    """Tells a school its mandate/consent forms were approved or rejected.
+    Best-effort like every other send here - a mail outage must never break
+    a staff member's approval in admin."""
+    recipient = verification.profile.user.email
+    approved = verification.is_approved
+    try:
+        template = ("accounts/school_verification_approved_email.txt" if approved
+                    else "accounts/school_verification_rejected_email.txt")
+        body = render_to_string(template, {"verification": verification})
+        subject = (f"{verification.school_name} is approved to order from LearnRite" if approved
+                   else f"We need a few corrections for {verification.school_name}")
+        send_mail(subject=subject, message=body, from_email=None, recipient_list=[recipient])
+    except Exception:
+        logger.exception("Failed to send school verification decision to %s", recipient)

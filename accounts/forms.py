@@ -107,6 +107,15 @@ class SchoolVerificationForm(forms.ModelForm):
     passport_photo = forms.ImageField(
         label="Passport photograph of authorized staff",
         help_text="A clear head-and-shoulders photo. JPEG or PNG, up to 5MB.")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Resubmitting after a rejection keeps the photo already on file, so
+        # only ask for one again when there isn't one.
+        if self.instance.pk and self.instance.passport_photo:
+            self.fields["passport_photo"].required = False
+            self.fields["passport_photo"].help_text = (
+                "Leave empty to keep the photo already on file, or upload a new one to replace it.")
     mandate_agreed = forms.BooleanField(
         label="I affirm the declaration above on behalf of the school.")
     consent_agreed = forms.BooleanField(
@@ -134,25 +143,28 @@ class SchoolVerificationForm(forms.ModelForm):
         return cleaned_data
 
     def clean_passport_photo(self):
-        photo = self.cleaned_data["passport_photo"]
-        if photo.size > MAX_PHOTO_BYTES:
+        photo = self.cleaned_data.get("passport_photo")
+        if photo and photo.size > MAX_PHOTO_BYTES:
             raise forms.ValidationError("That photo is larger than 5MB - please upload a smaller one.")
         return photo
 
     def save(self, commit=True):
         verification = super().save(commit=False)
-        # Downscaled and re-encoded rather than stored as uploaded: these live
-        # in the database, and a phone camera original would bloat every row.
-        from PIL import Image
+        photo = self.cleaned_data.get("passport_photo")
+        if photo:
+            # Downscaled and re-encoded rather than stored as uploaded: these
+            # live in the database, and a phone camera original would bloat
+            # every row.
+            from PIL import Image
 
-        image = Image.open(self.cleaned_data["passport_photo"])
-        if image.mode not in ("RGB", "L"):
-            image = image.convert("RGB")
-        image.thumbnail((PHOTO_MAX_EDGE, PHOTO_MAX_EDGE))
-        buffer = BytesIO()
-        image.save(buffer, format="JPEG", quality=85)
-        verification.passport_photo = buffer.getvalue()
-        verification.passport_photo_content_type = "image/jpeg"
+            image = Image.open(photo)
+            if image.mode not in ("RGB", "L"):
+                image = image.convert("RGB")
+            image.thumbnail((PHOTO_MAX_EDGE, PHOTO_MAX_EDGE))
+            buffer = BytesIO()
+            image.save(buffer, format="JPEG", quality=85)
+            verification.passport_photo = buffer.getvalue()
+            verification.passport_photo_content_type = "image/jpeg"
         if commit:
             verification.save()
         return verification

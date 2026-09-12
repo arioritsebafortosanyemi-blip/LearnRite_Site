@@ -1,0 +1,11 @@
+Hi {{ verification.staff_name }},
+
+Good news - {{ verification.school_name }} has been approved to order from LearnRite International Publishers.
+
+You can now sign in, browse the catalogue and place orders online. Prices and checkout are available on your account straight away.
+
+A reminder from the mandate form: your school's stamp is still required on the invoice or letterhead accompanying each order, and your authorized staff should bring a signed, dated copy when collecting.
+
+If you have any questions, contact us at learninsideout@yahoo.com or +234-907-776-5490.
+
+- LearnRite International Publishers

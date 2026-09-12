@@ -867,3 +867,13 @@ li .bi{
   background-color: #FFF9D1;
   color: #4F4F4F;
 }
+
+.purchase-note-login {
+  background-color: #e6f5f3;
+  color: #4F4F4F;
+}
+
+.purchase-note-login a {
+  color: #2a9d8f;
+  font-weight: 600;
+}

@@ -17,6 +17,8 @@ see the contact-us message, institutions with no price yet see a distinct
     </form>
     {% elif purchase.variant == "pending" %}
     <p class="purchase-note purchase-note-pending small mb-0"><i class="bi bi-hourglass-split"></i> {{ purchase.message }}</p>
+    {% elif purchase.variant == "login" %}
+    <p class="purchase-note purchase-note-login small mb-0"><i class="bi bi-box-arrow-in-right"></i> <a href="{% url 'login' %}?next={{ request.path }}">Log in</a> or <a href="{% url 'register' %}">sign up</a> to see pricing.</p>
     {% else %}
     <p class="purchase-note purchase-note-contact small mb-0"><i class="bi bi-envelope-fill"></i> {{ purchase.message }}</p>
     {% endif %}

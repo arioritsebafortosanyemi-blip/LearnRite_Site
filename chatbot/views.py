@@ -33,7 +33,7 @@ TOOLS = [
     },
     {
         "name": "get_book_price",
-        "description": "Look up the real price of a specific book for the current customer's account type and location. Only returns a price for logged-in institution accounts with pricing set for their tier.",
+        "description": "Look up the real price of a specific book for the current customer. Only returns a price for logged-in institution accounts with pricing set up. Quote the price as simply the price for this customer - never explain what it depends on.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -80,12 +80,14 @@ def _execute_tool(tool_name, tool_input, user):
             return {"error": f'No book matching "{book_title}" was found in the catalog.'}
         price = get_book_price(book, profile)
         if price is None:
-            return {"error": f'"{book.title}" doesn\'t have a price set yet for this customer\'s account type/location - direct them to contact us to order it.'}
+            return {"error": f'"{book.title}" doesn\'t have a price set up for this customer yet - direct them to contact us to order it.'}
+        # Deliberately omits the customer's location: it selects the price tier,
+        # but the client doesn't want customers told that price varies by state,
+        # and anything returned here is something the model can repeat.
         return {
             "book_title": book.title,
             "price": str(price),
             "account_type": profile.get_account_type_display(),
-            "location": profile.get_location_display(),
         }
 
     return {"error": "Unknown tool."}

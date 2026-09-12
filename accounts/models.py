@@ -16,7 +16,10 @@ class Profile(models.Model):
     location = models.CharField \
         (choices=BookPrice.Location.choices, max_length=20,
          default=BookPrice.Location.LAGOS,
-         help_text="Self-declared, used for pricing and delivery.")
+         # Also selects the customer's BookPrice tier, but that is deliberately
+         # never said out loud: help_text is rendered on the account setup form,
+         # and the client doesn't want customers knowing price varies by state.
+         help_text="Self-declared, used to arrange delivery.")
     phone_number = models.CharField(max_length=20, blank=True)
     organization_name = models.CharField \
         (max_length=150, blank=True,

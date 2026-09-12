@@ -8,6 +8,7 @@ class KnowledgeSection(models.Model):
     client without a deploy."""
     class Section(models.TextChoices):
         PRICING = "PRICING", "Pricing & Account Types"
+        SIGNUP = "SIGNUP", "Signing Up & Accounts"
         SHIPPING = "SHIPPING", "Shipping & Delivery"
         PAYMENT = "PAYMENT", "Payment Methods"
         RETURNS = "RETURNS", "Returns & Refunds"

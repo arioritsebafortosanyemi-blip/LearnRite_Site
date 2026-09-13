@@ -884,8 +884,13 @@ li .bi{
   right: 0;
   bottom: 0;
   z-index: 1050;
-  background: #fff;
-  border-top: 1px solid #e9ecef;
+  background: #fe5d26;
+  color: #fff;
   padding: 1rem 0;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cookie-consent-banner a {
+  color: #fff;
+  font-weight: 600;
 }

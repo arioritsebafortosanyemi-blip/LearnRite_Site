@@ -2,7 +2,10 @@
 <div id="cookie-consent-banner" class="cookie-consent-banner" hidden>
     <div class="container d-flex flex-wrap align-items-center justify-content-between gap-3">
         <p class="mb-0 small">We use cookies to keep you signed in, remember your cart, and make the site work the way it should. <a href="https://learnritepublishers.com/cookies/" class="text-decoration-underline">Learn more</a></p>
-        <button type="button" id="cookie-consent-accept" class="btn btn-dark btn-sm px-4 flex-shrink-0">Got it</button>
+        <div class="d-flex gap-2 flex-shrink-0">
+            <button type="button" id="cookie-consent-decline" class="btn btn-outline-light btn-sm px-4">Decline</button>
+            <button type="button" id="cookie-consent-accept" class="btn btn-light btn-sm px-4 fw-semibold">Accept</button>
+        </div>
     </div>
 </div>
 <script src="{% static 'js/cookie-consent.js' %}"></script>

@@ -14,6 +14,7 @@ from reps.emails import send_employment_verification_decision
 from reps.forms import EmploymentVerificationForm, GuarantorForm, InvoiceForm, InvoiceItemFormSet, RepRegisterForm
 from reps.models import EmploymentVerification, Guarantor, Invoice, Receipt, SalesRep
 from reps.pdf_forms import build_invoice_pdf, build_receipt_pdf
+from store.models import BookPrice
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,18 @@ reps_login_required = functools.partial(login_required, login_url="reps:login")
 
 def _get_sales_rep(request):
     return get_object_or_404(SalesRep, user=request.user)
+
+
+def _school_book_prices():
+    """Institution-tier book prices keyed by book id then location - lets
+    the invoice form auto-fill a unit price once a rep picks a book and the
+    customer's location, instead of the rep needing to know it by memory."""
+    prices = {}
+    for price in BookPrice.objects.filter(
+        account_type=BookPrice.AccountType.SCHOOL, price__isnull=False, book__is_published=True
+    ):
+        prices.setdefault(str(price.book_id), {})[price.location] = str(price.price)
+    return prices
 
 
 def register(request):
@@ -155,7 +168,9 @@ def invoice_create(request):
         form = InvoiceForm()
         formset = InvoiceItemFormSet(instance=Invoice())
 
-    return render(request, "reps/invoice_form.html", {"form": form, "formset": formset})
+    return render(request, "reps/invoice_form.html", {
+        "form": form, "formset": formset, "book_prices": _school_book_prices(),
+    })
 
 
 @reps_login_required

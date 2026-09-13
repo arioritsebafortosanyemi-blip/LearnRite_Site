@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.contrib import auth
 from django.db import models
 
-from store.models import Book
+from store.models import Book, BookPrice
 
 
 class SalesRep(models.Model):
@@ -189,6 +189,11 @@ class Invoice(models.Model):
     customer_name = models.CharField(max_length=200, help_text="School or institution name.")
     customer_address = models.TextField(blank=True)
     customer_phone = models.CharField(max_length=20, blank=True)
+    # Institution pricing has a Lagos/outside-Lagos tier like everywhere
+    # else on the site - needed to know which BookPrice to show/charge.
+    location = models.CharField(
+        choices=BookPrice.Location.choices, max_length=20,
+        verbose_name="Customer's location", help_text="Determines the institution price for each book.")
     status = models.CharField(choices=Status.choices, max_length=20, default=Status.PENDING_PAYMENT)
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

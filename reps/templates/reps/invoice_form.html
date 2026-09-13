@@ -54,4 +54,30 @@
         </div>
     </div>
 </div>
+{{ book_prices|json_script:"book-prices-data" }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var prices = JSON.parse(document.getElementById('book-prices-data').textContent);
+    var locationSelect = document.getElementById('id_location');
+
+    function updateRow(bookSelect) {
+        var row = bookSelect.closest('.row');
+        var priceInput = row.querySelector('input[name$="-unit_price"]');
+        var location = locationSelect ? locationSelect.value : '';
+        var bookPrices = prices[bookSelect.value];
+        if (priceInput && location && bookPrices && bookPrices[location]) {
+            priceInput.value = bookPrices[location];
+        }
+    }
+
+    document.querySelectorAll('select[name$="-book"]').forEach(function (select) {
+        select.addEventListener('change', function () { updateRow(select); });
+    });
+    if (locationSelect) {
+        locationSelect.addEventListener('change', function () {
+            document.querySelectorAll('select[name$="-book"]').forEach(updateRow);
+        });
+    }
+});
+</script>
 {% endblock %}

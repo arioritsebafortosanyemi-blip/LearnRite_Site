@@ -37,8 +37,8 @@ class InvoiceInline(admin.TabularInline):
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ("invoice_number", "customer_name", "sales_rep", "status", "created_at", "paid_at")
-    list_filter = ("status", "sales_rep")
+    list_display = ("invoice_number", "customer_name", "location", "sales_rep", "status", "created_at", "paid_at")
+    list_filter = ("status", "location", "sales_rep")
     search_fields = ("invoice_number", "customer_name", "sales_rep__user__email")
     readonly_fields = ("invoice_number", "sales_rep", "created_at", "paid_at")
     inlines = (InvoiceItemInline, ReceiptInline)

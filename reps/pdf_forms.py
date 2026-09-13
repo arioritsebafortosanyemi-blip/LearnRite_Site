@@ -2,6 +2,8 @@
 written to disk, keeping it clear of Render's ephemeral filesystem (see
 accounts.pdf_forms, which does the same for the mandate/consent forms).
 """
+from django.contrib.staticfiles.finders import find as find_static
+
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
@@ -13,10 +15,16 @@ RULE = (200, 200, 200)
 COMPANY = "LEARNRITE INTERNATIONAL PUBLISHERS LTD."
 STRAPLINE = "(International Standard Book Publishers)"
 HEAD_OFFICE = "HEAD OFFICE: 5, Adegbola Street, Lawanson, Surulere, Lagos."
+LOGO_SIZE = 18
 
 
 class _DocPDF(FPDF):
     def header_block(self, title):
+        logo_path = find_static("store/apple-touch-icon.png")
+        if logo_path:
+            self.image(logo_path, x=(self.w - LOGO_SIZE) / 2, y=self.get_y(), w=LOGO_SIZE)
+            self.ln(LOGO_SIZE + 2)
+
         self.set_x(self.l_margin)
         self.set_font("Helvetica", "B", 15)
         self.set_text_color(*DARK)
@@ -95,6 +103,7 @@ def build_invoice_pdf(invoice):
         pdf.field("Address", invoice.customer_address)
     if invoice.customer_phone:
         pdf.field("Phone", invoice.customer_phone)
+    pdf.field("Location", invoice.get_location_display())
     pdf.field("Status", invoice.get_status_display())
     pdf.ln(3)
     _items_table(pdf, invoice)

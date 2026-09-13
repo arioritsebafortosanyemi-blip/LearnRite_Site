@@ -1,3 +1,4 @@
+import functools
 import logging
 
 from django.contrib import messages
@@ -15,6 +16,12 @@ from reps.models import EmploymentVerification, Guarantor, Invoice, Receipt, Sal
 from reps.pdf_forms import build_invoice_pdf, build_receipt_pdf
 
 logger = logging.getLogger(__name__)
+
+# Plain @login_required redirects to settings.LOGIN_URL ("login"), which
+# doesn't exist under reps.subdomain_urls - that urlconf only knows
+# "reps:login". Without this, every one of these views 500s for a logged-out
+# visitor instead of redirecting to the rep login page.
+reps_login_required = functools.partial(login_required, login_url="reps:login")
 
 
 def _get_sales_rep(request):
@@ -34,7 +41,7 @@ def register(request):
     return render(request, "reps/register.html", {"register_form": form})
 
 
-@login_required
+@reps_login_required
 def employment_verification(request):
     sales_rep = _get_sales_rep(request)
     existing = EmploymentVerification.objects.filter(sales_rep=sales_rep).first()
@@ -78,7 +85,7 @@ def employment_verification(request):
     })
 
 
-@login_required
+@reps_login_required
 def employment_verification_status(request):
     sales_rep = _get_sales_rep(request)
     verification = EmploymentVerification.objects.filter(sales_rep=sales_rep).first()
@@ -87,7 +94,7 @@ def employment_verification_status(request):
     return render(request, "reps/employment_verification_status.html", {"verification": verification})
 
 
-@login_required
+@reps_login_required
 def employment_verification_photo(request, pk):
     """Serves the applicant's passport photo out of the database. Staff can
     see any; a rep can only see their own."""
@@ -100,7 +107,7 @@ def employment_verification_photo(request, pk):
                         content_type=verification.passport_photo_content_type or "image/jpeg")
 
 
-@login_required
+@reps_login_required
 def guarantor_photo(request, pk):
     """Serves the guarantor's passport photo out of the database. Staff can
     see any; a rep can only see their own guarantor's."""
@@ -113,7 +120,7 @@ def guarantor_photo(request, pk):
                         content_type=guarantor.passport_photo_content_type or "image/jpeg")
 
 
-@login_required
+@reps_login_required
 def dashboard(request):
     sales_rep = _get_sales_rep(request)
     if not sales_rep.is_approved:
@@ -122,7 +129,7 @@ def dashboard(request):
     return render(request, "reps/dashboard.html", {"invoices": invoices, "sales_rep": sales_rep})
 
 
-@login_required
+@reps_login_required
 def invoice_create(request):
     sales_rep = _get_sales_rep(request)
     if not sales_rep.is_approved:
@@ -147,7 +154,7 @@ def invoice_create(request):
     return render(request, "reps/invoice_form.html", {"form": form, "formset": formset})
 
 
-@login_required
+@reps_login_required
 def invoice_detail(request, pk):
     sales_rep = _get_sales_rep(request)
     invoice = get_object_or_404(Invoice, pk=pk)
@@ -156,7 +163,7 @@ def invoice_detail(request, pk):
     return render(request, "reps/invoice_detail.html", {"invoice": invoice})
 
 
-@login_required
+@reps_login_required
 @require_POST
 def invoice_mark_paid(request, pk):
     sales_rep = _get_sales_rep(request)
@@ -170,7 +177,7 @@ def invoice_mark_paid(request, pk):
     return redirect("reps:invoice_detail", pk=invoice.pk)
 
 
-@login_required
+@reps_login_required
 def invoice_pdf(request, pk):
     sales_rep = _get_sales_rep(request)
     invoice = get_object_or_404(Invoice, pk=pk)
@@ -182,7 +189,7 @@ def invoice_pdf(request, pk):
     return response
 
 
-@login_required
+@reps_login_required
 def receipt_pdf(request, pk):
     sales_rep = _get_sales_rep(request)
     invoice = get_object_or_404(Invoice, pk=pk)

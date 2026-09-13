@@ -1,0 +1,115 @@
+{% extends 'reps/base_reps.html' %}
+{% block title %} Employment Verification {% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h3 class="h3 mb-1" style="color: #fe5d26;">Employment &amp; Guarantor's Forms</h3>
+            <p class="text-muted">Two short forms we need before you can start logging invoices - your employment form and a guarantor who vouches for you. Our team reviews them, then your dashboard opens up.</p>
+
+            {% if rejected %}
+            <p class="purchase-note purchase-note-contact small"><i class="bi bi-exclamation-circle-fill text-danger"></i>
+                Your previous submission wasn't approved{% if rejected.review_notes %}: {{ rejected.review_notes }}{% endif %}. Please review the details below and submit again.</p>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% if verification_form.non_field_errors %}
+                <div class="text-danger small mb-3">{{ verification_form.non_field_errors }}</div>
+                {% endif %}
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Employment Form - Your details</h6>
+                    {% for field in verification_form %}
+                    {% if field.name in "full_name,date_of_birth,gender,marital_status,state_of_origin,local_government_area,home_address,phone_number,id_type,id_number,passport_photo" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Bank details</h6>
+                    <p class="text-muted small">Used for commission payment and to verify your identity - standard for a field sales role.</p>
+                    {% for field in verification_form %}
+                    {% if field.name in "bank_verification_number,bank_name,bank_account_number,bank_account_name" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Next of kin</h6>
+                    {% for field in verification_form %}
+                    {% if "next_of_kin" in field.name %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Indemnity declaration</h6>
+                    <p class="locked-field-note small">I confirm that everything I have provided in this form is true and accurate, and I understand that any loss, damage or misconduct arising from my work as a sales representative of LearnRite International Publishers Ltd. is my responsibility. I agree to represent the company honestly in all dealings with schools and customers.</p>
+                    {% for field in verification_form %}
+                    {% if field.name in "declaration_name,agreed" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if guarantor_form.non_field_errors %}
+                <div class="text-danger small mb-3">{{ guarantor_form.non_field_errors }}</div>
+                {% endif %}
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Guarantor's Form</h6>
+                    <p class="text-muted small">Someone who has known you for a while and can vouch for your character - not a relative you live with. They'll be contacted to confirm these details.</p>
+                    {% for field in guarantor_form %}
+                    {% if field.name in "full_name,occupation,employer_name,office_address,home_address,phone_number,email,relationship_to_applicant,years_known,id_type,id_number,passport_photo" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Guarantor's undertaking</h6>
+                    <p class="locked-field-note small">I hereby stand as guarantor for the applicant named in this form in respect of their employment as a Sales Representative with LearnRite International Publishers Ltd. I confirm that I have known the applicant for the period stated above and believe them to be of good character. I undertake to make good any loss, financial or otherwise, arising from any act of dishonesty, negligence or default committed by the applicant in the course of their duties, including failure to return or account for company goods, stock or funds entrusted to them. I understand that this undertaking remains binding until any such loss is fully recovered or the company releases me from this obligation in writing.</p>
+                    {% for field in guarantor_form %}
+                    {% if field.name in "declaration_name,agreed" %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <button class="btn btn-dark btn-large px-4 py-2 w-100" type="submit">Submit for Review</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

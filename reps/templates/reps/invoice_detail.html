@@ -1,0 +1,58 @@
+{% extends 'reps/base_reps.html' %}
+{% block title %} Invoice {{ invoice.invoice_number }} {% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h3 class="h3 mb-1" style="color: #fe5d26;">{{ invoice.invoice_number }}</h3>
+                    <p class="text-muted mb-0">{{ invoice.customer_name }}</p>
+                </div>
+                {% if invoice.status == "PAID" %}
+                <span class="badge" style="background:#59cd90;">Paid</span>
+                {% elif invoice.status == "CANCELLED" %}
+                <span class="badge bg-secondary">Cancelled</span>
+                {% else %}
+                <span class="badge" style="background:#fe5d26;">Pending Payment</span>
+                {% endif %}
+            </div>
+
+            <div class="account-info-card mb-4">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr><th>Book</th><th>Qty</th><th>Unit Price</th><th>Line Total</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for item in invoice.items.all %}
+                        <tr>
+                            <td>{{ item.title }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>NGN {{ item.unit_price|floatformat:2 }}</td>
+                            <td>NGN {{ item.line_total|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold"><td colspan="3" class="text-end">Total</td><td>NGN {{ invoice.total|floatformat:2 }}</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-outline-dark px-4 py-2" href="{% url 'reps:invoice_pdf' invoice.pk %}" target="_blank">Download Invoice (PDF)</a>
+                {% if invoice.status == "PENDING_PAYMENT" %}
+                <form method="post" action="{% url 'reps:invoice_mark_paid' invoice.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-dark px-4 py-2" type="submit">Confirm Payment Received</button>
+                </form>
+                {% elif invoice.status == "PAID" %}
+                <a class="btn btn-dark px-4 py-2" href="{% url 'reps:receipt_pdf' invoice.pk %}" target="_blank">Download Receipt (PDF)</a>
+                {% endif %}
+            </div>
+
+            <p class="mt-4"><a href="{% url 'reps:dashboard' %}">Back to Dashboard</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

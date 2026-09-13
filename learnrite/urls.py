@@ -25,6 +25,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),\
     path('orders/', include('orders.urls')),\
     path('chatbot/', include('chatbot.urls')),\
+    path('reps/', include('reps.urls')),\
     path('auth/', include('allauth.urls')),\
     path('', include('store.urls')),\
 ]

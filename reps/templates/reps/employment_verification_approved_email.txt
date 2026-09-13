@@ -1,0 +1,9 @@
+Hi {{ verification.full_name }},
+
+Good news - your employment and indemnity form has been approved. You're cleared to start representing LearnRite International Publishers as a sales rep.
+
+You can now sign in to your dashboard, log invoices for physical sales, and generate receipts once payment is confirmed.
+
+If you have any questions, contact us at learninsideout@yahoo.com or +234-907-776-5490.
+
+- LearnRite International Publishers

@@ -1,0 +1,12 @@
+Hi {{ verification.full_name }},
+
+Thanks for submitting your employment and indemnity form. We weren't able to approve it as submitted.
+{% if verification.review_notes %}
+What needs correcting:
+{{ verification.review_notes }}
+{% endif %}
+You can submit the form again from your account - sign in and go to Employment Verification. Everything you entered before is still there, so you only need to change what's affected.
+
+If anything is unclear, contact us at learninsideout@yahoo.com or +234-907-776-5490 and we'll walk you through it.
+
+- LearnRite International Publishers

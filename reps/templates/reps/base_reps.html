@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>LearnRite Sales Reps | {% block title %}{% endblock %}</title>
+ <link rel="stylesheet" href="{% static 'css/main.css' %}">
+ <link rel="stylesheet" href="{% static 'node_modules/bootstrap-icons/font/bootstrap-icons.css' %}">
+ <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+ <link rel="stylesheet" href="{% static 'font/comfortaa.css' %}">
+ <link rel="apple-touch-icon" sizes="180x180" href="{% static 'store/apple-touch-icon.png' %}">
+ <link rel="icon" type="image/png" sizes="32x32" href="{% static 'store/favicon-32x32.png' %}">
+ <link rel="icon" type="image/png" sizes="16x16" href="{% static 'store/favicon-16x16.png' %}">
+ {% block style %}{% endblock %}
+</head>
+<body>
+<nav class="navbar py-3" style="background:#fff;border-bottom:1px solid #e9ecef;">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand d-flex align-items-center"
+           href="{% if user.is_authenticated %}{% url 'reps:dashboard' %}{% else %}{% url 'reps:login' %}{% endif %}">
+            <img src="{% static 'store/logo_green.svg' %}" alt="" style="height:44px;">
+        </a>
+        {% if user.is_authenticated %}
+        <div class="d-flex align-items-center">
+            <span class="text-muted small me-3 d-none d-sm-inline">{{ user.first_name|default:user.email }}</span>
+            <a class="btn btn-outline-dark btn-sm" href="{% url 'reps:logout' %}">Log out</a>
+        </div>
+        {% endif %}
+    </div>
+</nav>
+
+{% include "_messages.html" %}
+
+{% block content %}{% endblock %}
+
+<footer class="text-center text-muted small py-4 mt-5">
+    LearnRite International Publishers &middot; Sales Rep Portal &middot; &copy;{% now "Y" %}
+</footer>
+
+<script src="{% static 'node_modules/@popperjs/core/dist/umd/popper.min.js' %}"></script>
+<script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.js' %}"></script>
+</body>
+</html>

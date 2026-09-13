@@ -1,0 +1,57 @@
+{% extends 'reps/base_reps.html' %}
+{% block title %} Log New Invoice {% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h3 class="h3 mb-1" style="color: #fe5d26;">Log New Invoice</h3>
+            <p class="text-muted">Enter the sale the customer has already confirmed in person. The invoice number is generated automatically.</p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Customer</h6>
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Books sold</h6>
+                    {{ formset.management_form }}
+                    {% if formset.non_form_errors %}
+                    <div class="text-danger small mb-2">{{ formset.non_form_errors }}</div>
+                    {% endif %}
+                    {% for item_form in formset %}
+                    <div class="row align-items-end mb-2">
+                        <div class="col-6">
+                            {% if forloop.first %}<label class="form-label small fw-semibold">Book</label>{% endif %}
+                            {{ item_form.book }}
+                            {% for error in item_form.book.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-3">
+                            {% if forloop.first %}<label class="form-label small fw-semibold">Quantity</label>{% endif %}
+                            {{ item_form.quantity }}
+                        </div>
+                        <div class="col-3">
+                            {% if forloop.first %}<label class="form-label small fw-semibold">Unit Price</label>{% endif %}
+                            {{ item_form.unit_price }}
+                        </div>
+                        {% for hidden in item_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        {% if item_form.instance.pk %}{{ item_form.DELETE }}{% endif %}
+                    </div>
+                    {% endfor %}
+                    <p class="text-muted small mb-0">Leave rows blank to skip them, or reload the page and use "Log New Invoice" again for more than {{ formset|length }} books.</p>
+                </div>
+
+                <button class="btn btn-dark btn-large px-4 py-2 w-100" type="submit">Create Invoice</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'reps/base_reps.html' %}
+{% block title %} Sales Rep Registration {% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h3 class="h3 mb-1" style="color: #fe5d26;">Sales Rep Registration</h3>
+            <p class="text-muted mb-4">Create your account, then complete the employment and indemnity form. Staff review and approve it before you can start issuing invoices.</p>
+
+            <div class="account-info-card mb-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in register_form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    <p class="locked-field-note small"><i class="bi bi-shield-lock-fill"></i> Use at least 8 characters, starting with a capital letter and including a symbol (e.g. !, @, #, $). Avoid common passwords or anything close to your name or email.</p>
+                    <button class="btn btn-dark btn-large px-4 py-2 w-100" type="submit">Create Account</button>
+                </form>
+            </div>
+
+            <p class="mt-4">Already have an account? <a href="{% url 'reps:login' %}">Login</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

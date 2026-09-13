@@ -1,0 +1,27 @@
+{% extends 'reps/base_reps.html' %}
+{% block title %} Employment Verification {% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            {% if verification.status == "APPROVED" %}
+            <i class="bi bi-patch-check-fill" style="font-size: 3rem; color: #59cd90;"></i>
+            <h3 class="h3 mt-3 mb-2">You're Approved</h3>
+            <p class="fs-6">Welcome aboard, {{ verification.full_name }}. You can now log invoices and track your sales.</p>
+            <a class="btn btn-dark px-4 py-2 mt-2" href="{% url 'reps:dashboard' %}">Go to Dashboard</a>
+            {% elif verification.status == "REJECTED" %}
+            <i class="bi bi-x-circle-fill" style="font-size: 3rem; color: #dc3545;"></i>
+            <h3 class="h3 mt-3 mb-2">Not Approved</h3>
+            <p class="fs-6">We couldn't approve your form as submitted{% if verification.review_notes %}: {{ verification.review_notes }}{% endif %}.</p>
+            <a class="btn btn-dark px-4 py-2 mt-2" href="{% url 'reps:employment_verification' %}">Submit Again</a>
+            {% else %}
+            <i class="bi bi-hourglass-split" style="font-size: 3rem; color: #fe5d26;"></i>
+            <h3 class="h3 mt-3 mb-2">Under Review</h3>
+            <p class="fs-6">We've received your employment and indemnity form. Our team is reviewing it and we'll be in touch once you're approved to start work.</p>
+            {% endif %}
+
+            <p class="mt-4 text-muted small">Questions? Email <a href="mailto:learninsideout@yahoo.com">learninsideout@yahoo.com</a> or call +234-907-776-5490.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

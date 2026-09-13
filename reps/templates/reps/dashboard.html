@@ -1,0 +1,58 @@
+{% extends 'reps/base_reps.html' %}
+{% block title %} Sales Rep Dashboard {% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="d-flex align-items-center mb-4">
+        {% if sales_rep.employment_verification.passport_photo %}
+        <img src="{% url 'reps:employment_verification_photo' sales_rep.employment_verification.pk %}"
+             alt="" class="rounded-circle me-3" style="width:56px;height:56px;object-fit:cover;">
+        {% endif %}
+        <div>
+            <p class="text-muted small mb-0">Welcome back,</p>
+            <h3 class="h3 mb-0" style="color: #fe5d26;">{{ sales_rep }}</h3>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="mb-0">Your Invoices</h5>
+        <a class="btn btn-dark px-4 py-2" href="{% url 'reps:invoice_create' %}">Log New Invoice</a>
+    </div>
+
+    {% if invoices %}
+    <div class="table-responsive account-info-card">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Invoice #</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.invoice_number }}</td>
+                    <td>{{ invoice.customer_name }}</td>
+                    <td>
+                        {% if invoice.status == "PAID" %}
+                        <span class="badge" style="background:#59cd90;">Paid</span>
+                        {% elif invoice.status == "CANCELLED" %}
+                        <span class="badge bg-secondary">Cancelled</span>
+                        {% else %}
+                        <span class="badge" style="background:#fe5d26;">Pending Payment</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ invoice.created_at|date:"d M Y" }}</td>
+                    <td><a href="{% url 'reps:invoice_detail' invoice.pk %}">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted">You haven't logged any invoices yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

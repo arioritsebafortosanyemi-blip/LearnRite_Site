@@ -76,12 +76,17 @@ INSTALLED_APPS = [
     'chatbot',
     'store',
     'blog',
+    'reps',
 ]
 
 SITE_ID = 1
 
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    # Must run before CommonMiddleware (which reads request.urlconf for its
+    # own slash-redirect resolution) and everything else downstream that
+    # cares which urlconf is active for this request.
+    'reps.middleware.SubdomainRoutingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -125,12 +130,19 @@ LOGOUT_REDIRECT_URL = 'index'
 # Admin theming (django-unfold). Sidebar is grouped by what staff actually
 # do - orders, schools, catalogue - rather than the default alphabetical
 # list of every model.
+from django.templatetags.static import static
 from django.urls import reverse_lazy
 
 UNFOLD = {
     "SITE_TITLE": "LearnRite Admin",
     "SITE_HEADER": "LearnRite",
     "SITE_SUBHEADER": "International Publishers",
+    # The orange badge (matching the primary colour scale below) marks admin
+    # as its own area, distinct from the mint badge on the storefront and
+    # the green one on the sales rep portal - see templates/_nav.html and
+    # reps/context_processors.py for those.
+    "SITE_ICON": lambda request: static("store/logo_orange.svg"),
+    "SITE_LOGO": lambda request: static("store/logo_orange.svg"),
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "COLORS": {
@@ -183,6 +195,16 @@ UNFOLD = {
                      "link": reverse_lazy("admin:chatbot_knowledgesection_changelist")},
                 ],
             },
+            {
+                "title": "Sales Reps",
+                "separator": True,
+                "items": [
+                    {"title": "Sales reps", "link": reverse_lazy("admin:reps_salesrep_changelist")},
+                    {"title": "Employment verifications",
+                     "link": reverse_lazy("admin:reps_employmentverification_changelist")},
+                    {"title": "Invoices", "link": reverse_lazy("admin:reps_invoice_changelist")},
+                ],
+            },
         ],
     },
 }
@@ -210,7 +232,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
-                'orders.context_processors.cart_count'\
+                'orders.context_processors.cart_count',\
+                'reps.context_processors.rep_branding'\
             ],
         },
     },

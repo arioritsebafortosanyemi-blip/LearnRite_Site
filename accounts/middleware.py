@@ -7,7 +7,7 @@ EXEMPT_URL_NAMES = {
     "account_setup", "logout",
     "verify_email", "verify_email_pending", "resend_verification_email",
 }
-EXEMPT_PATH_PREFIXES = ("/admin/", "/static/", "/media/", "/auth/")
+EXEMPT_PATH_PREFIXES = ("/admin/", "/static/", "/media/", "/auth/", "/reps/")
 
 
 class RequireAccountSetupMiddleware:
@@ -22,8 +22,15 @@ class RequireAccountSetupMiddleware:
 
     def __call__(self, request):
         user = request.user
+        # The reps subdomain runs its own urlconf at the request's own path
+        # root (e.g. "/login/") - checked directly rather than via path
+        # prefix, since request.urlconf doesn't affect resolve()/get_urlconf()
+        # until later in the request cycle, so a plain path-prefix check
+        # would see "/login/" and wrongly treat it as a customer route.
+        on_reps_subdomain = getattr(request, "urlconf", None) == "reps.subdomain_urls"
         if (
-            user.is_authenticated
+            not on_reps_subdomain
+            and user.is_authenticated
             and not user.is_staff
             and not request.path.startswith(EXEMPT_PATH_PREFIXES)
         ):

@@ -8,10 +8,12 @@ def backfill_sales_rep_name(apps, schema_editor):
     # Existing invoices predate the snapshot - stamp them now while their
     # sales_rep FK is still live, so a rep deleted later doesn't leave old
     # invoices with a blank "Issued By".
+    # apps.get_model() returns a historical model with only fields, not
+    # custom methods - get_full_name() isn't available here.
     Invoice = apps.get_model('reps', 'Invoice')
     for invoice in Invoice.objects.select_related('sales_rep__user').filter(sales_rep__isnull=False):
         user = invoice.sales_rep.user
-        invoice.sales_rep_name = user.get_full_name() or user.email
+        invoice.sales_rep_name = f"{user.first_name} {user.last_name}".strip() or user.email
         invoice.save(update_fields=['sales_rep_name'])
 
 

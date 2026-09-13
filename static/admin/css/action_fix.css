@@ -1,0 +1,9 @@
+/* Django 4.2's default admin action <select> carries no Alpine binding
+   (no x-model), so Unfold's own actions.html template - which only shows
+   its "Run" button via x-show="action" - never sees that state change and
+   keeps the button hidden even once a real action is chosen. The select's
+   value is set correctly regardless; this just makes the existing button
+   visible so it can actually be clicked. */
+#changelist-form .actions button[type="submit"] {
+    display: flex !important;
+}

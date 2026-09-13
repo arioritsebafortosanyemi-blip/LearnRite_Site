@@ -133,16 +133,27 @@ LOGOUT_REDIRECT_URL = 'index'
 from django.templatetags.static import static
 from django.urls import reverse_lazy
 
+from store.logos import random_logo_path
+
+
+def _admin_logo_path(request):
+    # Unfold asks for SITE_ICON and SITE_LOGO separately - cached on the
+    # request so both show the same random color on a given page load
+    # instead of two different logos next to each other.
+    if not hasattr(request, "_admin_logo_path"):
+        request._admin_logo_path = random_logo_path()
+    return request._admin_logo_path
+
+
 UNFOLD = {
     "SITE_TITLE": "LearnRite Admin",
     "SITE_HEADER": "LearnRite",
     "SITE_SUBHEADER": "International Publishers",
-    # The orange badge (matching the primary colour scale below) marks admin
-    # as its own area, distinct from the mint badge on the storefront and
-    # the green one on the sales rep portal - see templates/_nav.html and
-    # reps/context_processors.py for those.
-    "SITE_ICON": lambda request: static("store/logo_orange.svg"),
-    "SITE_LOGO": lambda request: static("store/logo_orange.svg"),
+    # A fresh random color every page load, same as the storefront and reps
+    # portal (see store/context_processors.py) - the client wants genuine
+    # variety, not one fixed color per area.
+    "SITE_ICON": lambda request: static(_admin_logo_path(request)),
+    "SITE_LOGO": lambda request: static(_admin_logo_path(request)),
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "COLORS": {
@@ -233,7 +244,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
                 'orders.context_processors.cart_count',\
-                'reps.context_processors.rep_branding'\
+                'store.context_processors.random_logo'\
             ],
         },
     },

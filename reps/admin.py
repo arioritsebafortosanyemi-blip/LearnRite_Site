@@ -13,12 +13,18 @@ class InvoiceItemInline(admin.TabularInline):
     readonly_fields = ("book", "title", "unit_price", "quantity")
     can_delete = False
 
+    def has_add_permission(self, request, obj=None):
+        return False
+
 
 class ReceiptInline(admin.StackedInline):
     model = Receipt
     extra = 0
     readonly_fields = ("receipt_number", "issued_at")
     can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 class InvoiceInline(admin.TabularInline):
@@ -37,11 +43,41 @@ class InvoiceInline(admin.TabularInline):
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
+    """View-only - staff can see exactly what a rep sold and track it here,
+    but can't edit or delete an invoice/receipt after the fact. Anything
+    that needs to change (payment confirmed, cancelled) happens through the
+    rep's own portal, so there's always a straight record of who did what
+    rather than a figure quietly changed in admin."""
     list_display = ("invoice_number", "customer_name", "location", "sales_rep", "status", "created_at", "paid_at")
     list_filter = ("status", "location", "sales_rep")
     search_fields = ("invoice_number", "customer_name", "sales_rep__user__email")
-    readonly_fields = ("invoice_number", "sales_rep", "created_at", "paid_at")
+    readonly_fields = ("invoice_number", "sales_rep", "customer_name", "customer_address", "customer_phone",
+                       "location", "status", "notes", "created_at", "paid_at", "pdf_links")
     inlines = (InvoiceItemInline, ReceiptInline)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="Documents")
+    def pdf_links(self, obj):
+        if not obj.pk:
+            return "-"
+        style = ("display:inline-block;padding:6px 14px;margin-right:8px;border-radius:6px;"
+                 "background:#fe5d26;color:#fff;font-weight:600;text-decoration:none;")
+        invoice_url = reverse("reps:invoice_pdf", args=[obj.pk])
+        if hasattr(obj, "receipt"):
+            receipt_url = reverse("reps:receipt_pdf", args=[obj.pk])
+            return format_html(
+                '<a style="{}" href="{}" target="_blank">Invoice (PDF)</a>'
+                '<a style="{}" href="{}" target="_blank">Receipt (PDF)</a>',
+                style, invoice_url, style, receipt_url)
+        return format_html('<a style="{}" href="{}" target="_blank">Invoice (PDF)</a>', style, invoice_url)
 
 
 @admin.register(SalesRep)

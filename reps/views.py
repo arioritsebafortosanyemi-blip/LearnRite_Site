@@ -175,10 +175,11 @@ def invoice_create(request):
 
 @reps_login_required
 def invoice_detail(request, pk):
-    sales_rep = _get_sales_rep(request)
     invoice = get_object_or_404(Invoice, pk=pk)
-    if not request.user.is_staff and invoice.sales_rep_id != sales_rep.id:
-        raise Http404
+    if not request.user.is_staff:
+        sales_rep = _get_sales_rep(request)
+        if invoice.sales_rep_id != sales_rep.id:
+            raise Http404
     return render(request, "reps/invoice_detail.html", {"invoice": invoice})
 
 
@@ -198,10 +199,11 @@ def invoice_mark_paid(request, pk):
 
 @reps_login_required
 def invoice_pdf(request, pk):
-    sales_rep = _get_sales_rep(request)
     invoice = get_object_or_404(Invoice, pk=pk)
-    if not request.user.is_staff and invoice.sales_rep_id != sales_rep.id:
-        raise Http404
+    if not request.user.is_staff:
+        sales_rep = _get_sales_rep(request)
+        if invoice.sales_rep_id != sales_rep.id:
+            raise Http404
     content = build_invoice_pdf(invoice)
     response = HttpResponse(content, content_type="application/pdf")
     response["Content-Disposition"] = f'inline; filename="{invoice.invoice_number}.pdf"'
@@ -210,10 +212,11 @@ def invoice_pdf(request, pk):
 
 @reps_login_required
 def receipt_pdf(request, pk):
-    sales_rep = _get_sales_rep(request)
     invoice = get_object_or_404(Invoice, pk=pk)
-    if not request.user.is_staff and invoice.sales_rep_id != sales_rep.id:
-        raise Http404
+    if not request.user.is_staff:
+        sales_rep = _get_sales_rep(request)
+        if invoice.sales_rep_id != sales_rep.id:
+            raise Http404
     if not hasattr(invoice, "receipt"):
         raise Http404
     content = build_receipt_pdf(invoice)

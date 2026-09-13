@@ -44,11 +44,13 @@ class InvoiceInline(admin.TabularInline):
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
-    """View-only - staff can see exactly what a rep sold and track it here,
-    but can't edit or delete an invoice/receipt after the fact. Anything
-    that needs to change (payment confirmed, cancelled) happens through the
-    rep's own portal, so there's always a straight record of who did what
-    rather than a figure quietly changed in admin."""
+    """View-only for regular staff - nobody can edit an invoice/receipt
+    after the fact. Anything that needs to change (payment confirmed,
+    cancelled) happens through the rep's own portal, so there's always a
+    straight record of who did what rather than a figure quietly changed in
+    admin. Deleting an old invoice/receipt is reserved for superusers -
+    is_staff alone isn't enough, so a compromised or careless staff account
+    can't erase a sales record."""
     list_display = ("invoice_number", "customer_name", "location", "issued_by", "status", "created_at", "paid_at")
     list_filter = ("status", "location", "sales_rep")
     search_fields = ("invoice_number", "customer_name", "sales_rep_name", "sales_rep__user__email")
@@ -63,7 +65,7 @@ class InvoiceAdmin(admin.ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return request.user.is_superuser
 
     @admin.display(description="Issued By", ordering="sales_rep_name")
     def issued_by(self, obj):

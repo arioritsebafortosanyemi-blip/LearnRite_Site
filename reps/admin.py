@@ -82,8 +82,9 @@ class InvoiceAdmin(admin.ModelAdmin):
 
 @admin.register(SalesRep)
 class SalesRepAdmin(admin.ModelAdmin):
-    list_display = ("photo_thumb", "user", "phone_number", "verification_status", "invoice_count", "created_at")
-    search_fields = ("user__username", "user__email", "phone_number")
+    list_display = ("photo_thumb", "rep_name", "phone", "verification_status", "invoice_count", "created_at")
+    search_fields = ("user__first_name", "user__last_name", "user__email",
+                     "phone_number", "employment_verification__phone_number")
     readonly_fields = ("user", "created_at", "photo_thumb")
     inlines = (InvoiceInline,)
 
@@ -94,6 +95,21 @@ class SalesRepAdmin(admin.ModelAdmin):
         return format_html('<img src="{}" style="height:40px;width:40px;object-fit:cover;'
                            'border-radius:50%;border:1px solid #ccc;">',
                            reverse("reps:employment_verification_photo", args=[obj.employment_verification.pk]))
+
+    @admin.display(description="Sales Rep", ordering="user__first_name")
+    def rep_name(self, obj):
+        # list_display's "user" column would otherwise render as
+        # User.__str__(), which is the random internal username
+        # (e.g. "rep_81ba4f9f86af"), not the rep's actual name.
+        return obj.user.get_full_name() or obj.user.email
+
+    @admin.display(description="Phone Number")
+    def phone(self, obj):
+        # SalesRep.phone_number is never actually collected anywhere (only
+        # read as an initial value on the employment form) - the real
+        # number a rep provided lives on their EmploymentVerification.
+        verification = getattr(obj, "employment_verification", None)
+        return (verification.phone_number if verification else "") or obj.phone_number or "-"
 
     @admin.display(description="Employment status")
     def verification_status(self, obj):

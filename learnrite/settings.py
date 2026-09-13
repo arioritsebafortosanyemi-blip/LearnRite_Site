@@ -133,15 +133,17 @@ LOGOUT_REDIRECT_URL = 'index'
 from django.templatetags.static import static
 from django.urls import reverse_lazy
 
-from store.logos import random_logo_path
+from store.logos import random_admin_logo_path
 
 
 def _admin_logo_path(request):
     # Unfold asks for SITE_ICON and SITE_LOGO separately - cached on the
     # request so both show the same random color on a given page load
-    # instead of two different logos next to each other.
+    # instead of two different logos next to each other. Uses the
+    # white-text admin variants (see store/logos.py) - the storefront ones
+    # have black text, unreadable on the admin's dark sidebar/header.
     if not hasattr(request, "_admin_logo_path"):
-        request._admin_logo_path = random_logo_path()
+        request._admin_logo_path = random_admin_logo_path()
     return request._admin_logo_path
 
 

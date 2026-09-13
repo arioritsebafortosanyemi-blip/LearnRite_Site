@@ -138,7 +138,7 @@ class Guarantor(models.Model):
     office_address = models.TextField()
     home_address = models.TextField(verbose_name="Residential address")
     phone_number = models.CharField(max_length=20)
-    email = models.EmailField(blank=True)
+    email = models.EmailField()
     relationship_to_applicant = models.CharField(max_length=100)
     years_known = models.PositiveIntegerField(verbose_name="Number of years known")
 

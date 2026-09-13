@@ -1,0 +1,26 @@
+/* Color-codes each section heading in the admin's left sidebar (Orders,
+   Schools & customers, Catalogue, Chatbot, Sales Reps) so they're easier to
+   tell apart at a glance. Unfold gives no per-group color option in
+   UNFOLD["SIDEBAR"], and the group heading itself carries no class or id
+   tying it back to its group - only the hrefs of the links inside it do -
+   so each rule keys off a link href that's unique to that group and reaches
+   up to the shared wrapper with :has() to color the heading inside it. */
+div:has(> ol li a[href*="/admin/orders/order/"]) h2 {
+    color: #3b82f6 !important;
+}
+
+div:has(> ol li a[href*="/admin/accounts/schoolverification/"]) h2 {
+    color: #a855f7 !important;
+}
+
+div:has(> ol li a[href*="/admin/store/book/"]) h2 {
+    color: #10b981 !important;
+}
+
+div:has(> ol li a[href*="/admin/chatbot/knowledgesection/"]) h2 {
+    color: #06b6d4 !important;
+}
+
+div:has(> ol li a[href*="/admin/reps/salesrep/"]) h2 {
+    color: #fe5d26 !important;
+}

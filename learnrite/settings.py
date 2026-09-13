@@ -154,9 +154,13 @@ UNFOLD = {
     # variety, not one fixed color per area.
     "SITE_ICON": lambda request: static(_admin_logo_path(request)),
     "SITE_LOGO": lambda request: static(_admin_logo_path(request)),
-    # Fixes the bulk-actions "Run" button staying hidden - see the CSS
-    # file's own comment for why.
-    "STYLES": [lambda request: static("admin/css/action_fix.css")],
+    # action_fix.css: fixes the bulk-actions "Run" button staying hidden.
+    # sidebar_colors.css: color-codes the sidebar's section headings.
+    # See each file's own comment for why.
+    "STYLES": [
+        lambda request: static("admin/css/action_fix.css"),
+        lambda request: static("admin/css/sidebar_colors.css"),
+    ],
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "COLORS": {

@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -82,11 +83,21 @@ class InvoiceAdmin(admin.ModelAdmin):
 
 @admin.register(SalesRep)
 class SalesRepAdmin(admin.ModelAdmin):
-    list_display = ("photo_thumb", "rep_name", "phone", "verification_status", "invoice_count", "created_at")
+    """A rep who no longer works with the company is deactivated here
+    rather than deleted - Invoice.sales_rep is PROTECT-ed against deletion
+    anyway (there's no safe way to delete a rep with invoices on record),
+    and the point is to keep their invoice/receipt history intact for
+    tracking, not lose it. Deactivating revokes login immediately (reuses
+    Django's own User.is_active) and the "Active" filter in the sidebar is
+    the "former staff" section the invoices/receipts stay visible under."""
+    list_display = ("photo_thumb", "rep_name", "phone", "status", "verification_status",
+                    "invoice_count", "created_at")
+    list_filter = ("user__is_active", "employment_verification__status")
     search_fields = ("user__first_name", "user__last_name", "user__email",
                      "phone_number", "employment_verification__phone_number")
     readonly_fields = ("user", "created_at", "photo_thumb")
     inlines = (InvoiceInline,)
+    actions = ("deactivate_selected", "reactivate_selected")
 
     @admin.display(description="Photo")
     def photo_thumb(self, obj):
@@ -110,6 +121,22 @@ class SalesRepAdmin(admin.ModelAdmin):
         # number a rep provided lives on their EmploymentVerification.
         verification = getattr(obj, "employment_verification", None)
         return (verification.phone_number if verification else "") or obj.phone_number or "-"
+
+    @admin.display(description="Status", ordering="user__is_active")
+    def status(self, obj):
+        return "Active" if obj.user.is_active else "Inactive (no longer staff)"
+
+    @admin.action(description="Deactivate selected sales reps (revokes portal access)")
+    def deactivate_selected(self, request, queryset):
+        count = get_user_model().objects.filter(sales_rep__in=queryset).update(is_active=False)
+        self.message_user(
+            request, f"{count} sales rep(s) deactivated - they can no longer log in. "
+                     "Their invoices and receipts are unchanged.", messages.SUCCESS)
+
+    @admin.action(description="Reactivate selected sales reps (restores portal access)")
+    def reactivate_selected(self, request, queryset):
+        count = get_user_model().objects.filter(sales_rep__in=queryset).update(is_active=True)
+        self.message_user(request, f"{count} sales rep(s) reactivated.", messages.SUCCESS)
 
     @admin.display(description="Employment status")
     def verification_status(self, obj):

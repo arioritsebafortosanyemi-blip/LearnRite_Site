@@ -22,6 +22,12 @@ logger = logging.getLogger(__name__)
 # doesn't exist under reps.subdomain_urls - that urlconf only knows
 # "reps:login". Without this, every one of these views 500s for a logged-out
 # visitor instead of redirecting to the rep login page.
+#
+# A rep deactivated mid-session (see SalesRepAdmin.deactivate_selected)
+# needs no extra handling here: ModelBackend.get_user() (inherited by
+# EmailBackend) already refuses to return an inactive user, so Django's own
+# AuthenticationMiddleware treats them as logged out on their very next
+# request - @login_required alone is enough to redirect them.
 reps_login_required = functools.partial(login_required, login_url="reps:login")
 
 

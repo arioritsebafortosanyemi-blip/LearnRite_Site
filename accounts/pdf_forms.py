@@ -5,6 +5,8 @@ disk, which also keeps it clear of Render's ephemeral filesystem.
 """
 from io import BytesIO
 
+from django.contrib.staticfiles.finders import find as find_static
+
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
@@ -16,6 +18,13 @@ RULE = (200, 200, 200)
 COMPANY = "LEARNRITE INTERNATIONAL PUBLISHERS LTD."
 STRAPLINE = "(International Standard Book Publishers)"
 HEAD_OFFICE = "HEAD OFFICE: 5, Adegbola Street, Lawanson, Surulere, Lagos."
+
+# Extracted from the original paper forms' own scanned countersignature -
+# see the "SCHOOL'S STAMP" line on the mandate form and the letterhead on
+# the consent form, both signed by the same person.
+CEO_NAME = "Judeson A. Ogberaha"
+CEO_TITLE = "CEO/MD - For: LearnRite International Publishers Ltd"
+SIGNATURE_WIDTH = 32
 
 BOOK_LEVELS = [
     ("Ages 2-3", "books_ages_2_3"),
@@ -207,6 +216,24 @@ def build_consent_pdf(verification):
 
 def _signature_block(pdf, verification):
     pdf.ln(6)
+
+    signature_path = find_static("store/ceo_signature.png")
+    if signature_path:
+        sig_x = pdf.w - pdf.r_margin - SIGNATURE_WIDTH
+        sig_y = pdf.get_y()
+        try:
+            pdf.image(signature_path, x=sig_x, y=sig_y, w=SIGNATURE_WIDTH)
+        except Exception:
+            pass
+        pdf.set_y(sig_y + 17)
+        pdf.set_font("Helvetica", "", 8)
+        pdf.set_text_color(*DARK)
+        pdf.cell(0, 4.5, CEO_NAME, align="R", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.set_font("Helvetica", "", 7)
+        pdf.set_text_color(*MUTED)
+        pdf.cell(0, 4, CEO_TITLE, align="R", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.ln(2)
+
     pdf.set_x(pdf.l_margin)
     pdf.set_font("Helvetica", "", 8)
     pdf.set_text_color(*MUTED)

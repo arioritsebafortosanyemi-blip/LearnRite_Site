@@ -74,7 +74,11 @@ def employment_verification(request):
             messages.success(request, "Thanks - your employment and guarantor forms are with our team for review.")
             return redirect("reps:employment_verification_status")
     else:
-        initial = {"full_name": request.user.first_name, "phone_number": sales_rep.phone_number}
+        initial = {
+            "first_name": request.user.first_name,
+            "last_name": request.user.last_name,
+            "phone_number": sales_rep.phone_number,
+        }
         form = EmploymentVerificationForm(instance=existing, initial=initial)
         guarantor_form = GuarantorForm(instance=existing_guarantor, prefix="guarantor")
 

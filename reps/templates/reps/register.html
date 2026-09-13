@@ -10,7 +10,20 @@
             <div class="account-info-card mb-4">
                 <form method="post">
                     {% csrf_token %}
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold" for="{{ register_form.first_name.id_for_label }}">{{ register_form.first_name.label }}</label>
+                            {{ register_form.first_name }}
+                            {% for error in register_form.first_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold" for="{{ register_form.last_name.id_for_label }}">{{ register_form.last_name.label }}</label>
+                            {{ register_form.last_name }}
+                            {% for error in register_form.last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
                     {% for field in register_form %}
+                    {% if field.name not in "first_name,last_name" %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}
@@ -21,6 +34,7 @@
                         <div class="text-danger small">{{ error }}</div>
                         {% endfor %}
                     </div>
+                    {% endif %}
                     {% endfor %}
                     <p class="locked-field-note small"><i class="bi bi-shield-lock-fill"></i> Use at least 8 characters, starting with a capital letter and including a symbol (e.g. !, @, #, $). Avoid common passwords or anything close to your name or email.</p>
                     <button class="btn btn-dark btn-large px-4 py-2 w-100" type="submit">Create Account</button>

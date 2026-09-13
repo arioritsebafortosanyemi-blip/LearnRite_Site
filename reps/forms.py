@@ -57,15 +57,18 @@ class IDPhotoFormMixin:
 
 
 class RepRegisterForm(UserCreationForm):
-    full_name = forms.CharField(label="Full Name", max_length=150)
     email = forms.EmailField(required=True)
 
     class Meta:
         model = get_user_model()
-        fields = ("full_name", "email", "password1", "password2")
+        fields = ("first_name", "last_name", "email", "password1", "password2")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # first_name/last_name are blank=True on the built-in User model -
+        # required here since every rep needs a real name on file.
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
         # Django auto-generates a bulleted list of every validator's help
         # text here - dropped in favour of the single summarised callout the
         # template renders, rather than showing the same rules twice.
@@ -82,7 +85,6 @@ class RepRegisterForm(UserCreationForm):
         user = super().save(commit=False)
         user.username = f"rep_{uuid.uuid4().hex[:12]}"
         user.email = self.cleaned_data["email"]
-        user.first_name = self.cleaned_data["full_name"]
         if commit:
             user.save()
         return user
@@ -102,7 +104,7 @@ class EmploymentVerificationForm(IDPhotoFormMixin, forms.ModelForm):
     class Meta:
         model = EmploymentVerification
         fields = (
-            "full_name", "date_of_birth", "gender", "marital_status",
+            "first_name", "last_name", "date_of_birth", "gender", "marital_status",
             "state_of_origin", "local_government_area", "home_address", "phone_number",
             "id_type", "id_number",
             "bank_verification_number", "bank_name", "bank_account_number", "bank_account_name",
@@ -135,7 +137,7 @@ class GuarantorForm(IDPhotoFormMixin, forms.ModelForm):
     class Meta:
         model = Guarantor
         fields = (
-            "full_name", "occupation", "employer_name", "office_address", "home_address",
+            "first_name", "last_name", "occupation", "employer_name", "office_address", "home_address",
             "phone_number", "email", "relationship_to_applicant", "years_known",
             "id_type", "id_number",
             "declaration_name", "agreed",

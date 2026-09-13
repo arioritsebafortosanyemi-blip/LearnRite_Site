@@ -70,7 +70,8 @@ class EmploymentVerification(models.Model):
         SalesRep, on_delete=models.CASCADE, related_name="employment_verification")
 
     # Bio-data
-    full_name = models.CharField(max_length=150)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
     date_of_birth = models.DateField()
     gender = models.CharField(choices=Gender.choices, max_length=10)
     marital_status = models.CharField(choices=MaritalStatus.choices, max_length=20)
@@ -118,6 +119,10 @@ class EmploymentVerification(models.Model):
         return f"{self.full_name} ({self.get_status_display()})"
 
     @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
     def is_approved(self):
         return self.status == self.Status.APPROVED
 
@@ -132,7 +137,8 @@ class Guarantor(models.Model):
     employment_verification = models.OneToOneField(
         EmploymentVerification, on_delete=models.CASCADE, related_name="guarantor")
 
-    full_name = models.CharField(max_length=150)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
     occupation = models.CharField(max_length=150)
     employer_name = models.CharField(max_length=150, verbose_name="Employer/place of work")
     office_address = models.TextField()
@@ -154,6 +160,10 @@ class Guarantor(models.Model):
 
     def __str__(self):
         return self.full_name
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
 
 def _generate_invoice_number():

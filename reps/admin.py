@@ -75,7 +75,7 @@ class GuarantorInline(admin.StackedInline):
     model = Guarantor
     extra = 0
     can_delete = False
-    fields = ("full_name", "occupation", "employer_name", "office_address", "home_address",
+    fields = ("first_name", "last_name", "occupation", "employer_name", "office_address", "home_address",
               "phone_number", "email", "relationship_to_applicant", "years_known",
               "id_type", "id_number", "photo", "declaration_name", "agreed")
     readonly_fields = fields
@@ -94,14 +94,15 @@ class GuarantorInline(admin.StackedInline):
 @admin.register(EmploymentVerification)
 class EmploymentVerificationAdmin(admin.ModelAdmin):
     list_display = ("full_name", "sales_rep", "id_type", "status", "submitted_at")
+    list_display_links = ("full_name",)
     list_filter = ("status", "id_type")
-    search_fields = ("full_name", "id_number", "bank_verification_number", "sales_rep__user__email")
+    search_fields = ("first_name", "last_name", "id_number", "bank_verification_number", "sales_rep__user__email")
     readonly_fields = ("sales_rep", "submitted_at", "reviewed_at", "photo")
     actions = ("approve_selected", "reject_selected")
     inlines = (GuarantorInline,)
     fieldsets = (
         ("Review", {"fields": ("status", "review_notes", "photo", "sales_rep", "submitted_at", "reviewed_at")}),
-        ("Applicant", {"fields": ("full_name", "date_of_birth", "gender", "marital_status",
+        ("Applicant", {"fields": (("first_name", "last_name"), "date_of_birth", "gender", "marital_status",
                                   "state_of_origin", "local_government_area",
                                   "home_address", "phone_number", "id_type", "id_number")}),
         ("Bank Details", {"fields": ("bank_verification_number", "bank_name",

@@ -20,8 +20,20 @@
 
                 <div class="account-info-card mb-4">
                     <h6 class="text-uppercase text-muted small fw-bold mb-3">Employment Form - Your details</h6>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold" for="{{ verification_form.first_name.id_for_label }}">{{ verification_form.first_name.label }}</label>
+                            {{ verification_form.first_name }}
+                            {% for error in verification_form.first_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold" for="{{ verification_form.last_name.id_for_label }}">{{ verification_form.last_name.label }}</label>
+                            {{ verification_form.last_name }}
+                            {% for error in verification_form.last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
                     {% for field in verification_form %}
-                    {% if field.name in "full_name,date_of_birth,gender,marital_status,state_of_origin,local_government_area,home_address,phone_number,id_type,id_number,passport_photo" %}
+                    {% if field.name in "date_of_birth,gender,marital_status,state_of_origin,local_government_area,home_address,phone_number,id_type,id_number,passport_photo" %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}
@@ -81,8 +93,20 @@
                 <div class="account-info-card mb-4">
                     <h6 class="text-uppercase text-muted small fw-bold mb-3">Guarantor's Form</h6>
                     <p class="text-muted small">Someone who has known you for a while and can vouch for your character - not a relative you live with. They'll be contacted to confirm these details.</p>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold" for="{{ guarantor_form.first_name.id_for_label }}">{{ guarantor_form.first_name.label }}</label>
+                            {{ guarantor_form.first_name }}
+                            {% for error in guarantor_form.first_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold" for="{{ guarantor_form.last_name.id_for_label }}">{{ guarantor_form.last_name.label }}</label>
+                            {{ guarantor_form.last_name }}
+                            {% for error in guarantor_form.last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
                     {% for field in guarantor_form %}
-                    {% if field.name in "full_name,occupation,employer_name,office_address,home_address,phone_number,email,relationship_to_applicant,years_known,id_type,id_number,passport_photo" %}
+                    {% if field.name in "occupation,employer_name,office_address,home_address,phone_number,email,relationship_to_applicant,years_known,id_type,id_number,passport_photo" %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}

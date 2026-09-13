@@ -184,7 +184,15 @@ class Invoice(models.Model):
         PAID = "PAID", "Paid"
         CANCELLED = "CANCELLED", "Cancelled"
 
-    sales_rep = models.ForeignKey(SalesRep, on_delete=models.PROTECT, related_name="invoices")
+    # Nullable/SET_NULL rather than PROTECT: a rep's account can be deleted
+    # completely (see SalesRepAdmin.delete_completely) without touching the
+    # financial record of what they sold. sales_rep_name snapshots who
+    # issued it at creation time, same as InvoiceItem.title snapshots the
+    # book's title, so the invoice/receipt still reads correctly once the
+    # rep is gone.
+    sales_rep = models.ForeignKey(SalesRep, on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name="invoices")
+    sales_rep_name = models.CharField(max_length=200, blank=True)
     invoice_number = models.CharField(max_length=20, unique=True, default=_generate_invoice_number)
     customer_name = models.CharField(max_length=200, help_text="School or institution name.")
     customer_address = models.TextField(blank=True)

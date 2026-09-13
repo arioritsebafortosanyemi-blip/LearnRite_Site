@@ -49,10 +49,10 @@ class InvoiceAdmin(admin.ModelAdmin):
     that needs to change (payment confirmed, cancelled) happens through the
     rep's own portal, so there's always a straight record of who did what
     rather than a figure quietly changed in admin."""
-    list_display = ("invoice_number", "customer_name", "location", "sales_rep", "status", "created_at", "paid_at")
+    list_display = ("invoice_number", "customer_name", "location", "issued_by", "status", "created_at", "paid_at")
     list_filter = ("status", "location", "sales_rep")
-    search_fields = ("invoice_number", "customer_name", "sales_rep__user__email")
-    readonly_fields = ("invoice_number", "sales_rep", "customer_name", "customer_address", "customer_phone",
+    search_fields = ("invoice_number", "customer_name", "sales_rep_name", "sales_rep__user__email")
+    readonly_fields = ("invoice_number", "issued_by", "customer_name", "customer_address", "customer_phone",
                        "location", "status", "notes", "created_at", "paid_at", "pdf_links")
     inlines = (InvoiceItemInline, ReceiptInline)
 
@@ -64,6 +64,13 @@ class InvoiceAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    @admin.display(description="Issued By", ordering="sales_rep_name")
+    def issued_by(self, obj):
+        # sales_rep_name is a snapshot taken when the invoice was created,
+        # so this still shows correctly after the rep's account is deleted
+        # (see SalesRepAdmin.delete_completely).
+        return obj.sales_rep_name or "-"
 
     @admin.display(description="Documents")
     def pdf_links(self, obj):
@@ -83,13 +90,17 @@ class InvoiceAdmin(admin.ModelAdmin):
 
 @admin.register(SalesRep)
 class SalesRepAdmin(admin.ModelAdmin):
-    """A rep who no longer works with the company is deactivated here
-    rather than deleted - Invoice.sales_rep is PROTECT-ed against deletion
-    anyway (there's no safe way to delete a rep with invoices on record),
-    and the point is to keep their invoice/receipt history intact for
-    tracking, not lose it. Deactivating revokes login immediately (reuses
-    Django's own User.is_active) and the "Active" filter in the sidebar is
-    the "former staff" section the invoices/receipts stay visible under."""
+    """Deactivate for a rep who's left but might come back or whose record
+    should stay queryable as staff - revokes login immediately (reuses
+    Django's own User.is_active) without touching anything else.
+
+    Delete completely for a rep whose account should stop existing on the
+    server outright. Django's default per-object Delete is turned off here
+    because its cascade-permission check has no way to know Invoice/Receipt
+    should survive; delete_completely below does that safely instead -
+    Invoice.sales_rep is SET_NULL, and sales_rep_name (snapshotted when each
+    invoice was created) keeps every invoice and receipt readable and on
+    record after the account is gone."""
     list_display = ("photo_thumb", "rep_name", "phone", "status", "verification_status",
                     "invoice_count", "created_at")
     list_filter = ("user__is_active", "employment_verification__status")
@@ -97,7 +108,10 @@ class SalesRepAdmin(admin.ModelAdmin):
                      "phone_number", "employment_verification__phone_number")
     readonly_fields = ("user", "created_at", "photo_thumb")
     inlines = (InvoiceInline,)
-    actions = ("deactivate_selected", "reactivate_selected")
+    actions = ("deactivate_selected", "reactivate_selected", "delete_completely")
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     @admin.display(description="Photo")
     def photo_thumb(self, obj):
@@ -137,6 +151,18 @@ class SalesRepAdmin(admin.ModelAdmin):
     def reactivate_selected(self, request, queryset):
         count = get_user_model().objects.filter(sales_rep__in=queryset).update(is_active=True)
         self.message_user(request, f"{count} sales rep(s) reactivated.", messages.SUCCESS)
+
+    @admin.action(description="Delete completely (removes the account - invoices/receipts stay on record)")
+    def delete_completely(self, request, queryset):
+        count = 0
+        for rep in queryset:
+            rep.invoices.update(sales_rep_name=rep.user.get_full_name() or rep.user.email)
+            rep.user.delete()
+            count += 1
+        self.message_user(
+            request, f"{count} sales rep account(s) deleted from the server. "
+                     "Their invoices and receipts remain on record under the name they were issued in.",
+            messages.SUCCESS)
 
     @admin.display(description="Employment status")
     def verification_status(self, obj):

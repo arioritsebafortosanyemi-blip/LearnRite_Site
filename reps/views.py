@@ -165,6 +165,7 @@ def invoice_create(request):
         if form.is_valid() and formset.is_valid():
             invoice = form.save(commit=False)
             invoice.sales_rep = sales_rep
+            invoice.sales_rep_name = sales_rep.user.get_full_name() or sales_rep.user.email
             invoice.save()
             formset.instance = invoice
             formset.save()

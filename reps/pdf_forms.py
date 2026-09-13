@@ -97,7 +97,7 @@ def build_invoice_pdf(invoice):
     pdf.header_block("INVOICE")
     pdf.field("Invoice Number", invoice.invoice_number)
     pdf.field("Date", invoice.created_at.strftime("%d %B %Y"))
-    pdf.field("Issued By", invoice.sales_rep.user.get_full_name() or invoice.sales_rep.user.email)
+    pdf.field("Issued By", invoice.sales_rep_name)
     pdf.field("Customer", invoice.customer_name)
     if invoice.customer_address:
         pdf.field("Address", invoice.customer_address)
@@ -117,7 +117,7 @@ def build_receipt_pdf(invoice):
     pdf.field("Receipt Number", receipt.receipt_number)
     pdf.field("Date", receipt.issued_at.strftime("%d %B %Y"))
     pdf.field("Invoice Number", invoice.invoice_number)
-    pdf.field("Issued By", invoice.sales_rep.user.get_full_name() or invoice.sales_rep.user.email)
+    pdf.field("Issued By", invoice.sales_rep_name)
     pdf.field("Customer", invoice.customer_name)
     pdf.ln(3)
     _items_table(pdf, invoice)

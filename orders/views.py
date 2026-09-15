@@ -45,18 +45,37 @@ def _cart_count(user):
     return CartItem.objects.filter(cart__user=user, book__is_published=True).aggregate(total=Sum("quantity"))["total"] or 0
 
 
+def _school_purchase_block(profile):
+    """(message, verification_redirect) if this profile can't buy online
+    yet, else None. verification_redirect is the named URL for the specific
+    reason - None for the plain individual-account case, since callers
+    already have their own place to send those back to."""
+    if profile.account_type != BookPrice.AccountType.SCHOOL:
+        return "Only institution accounts can order online - individuals should contact us.", None
+
+    # The client requires a signed mandate and stamping consent from every
+    # school before it can order, so buying waits on staff approval.
+    verification = getattr(profile, "school_verification", None)
+    if verification is None:
+        return "Please complete your school's mandate and consent forms before ordering.", "school_verification"
+    if not verification.is_approved:
+        return "Your school's forms are still being reviewed - we'll email you once they're approved.", "school_verification_status"
+    return None
+
+
 @login_required
 @require_POST
 def add_to_cart(request, pk):
     book = get_object_or_404(Book, pk=pk)
     profile = request.user.profile
 
-    if profile.account_type != BookPrice.AccountType.SCHOOL:
-        message = "Only institution accounts can order online - individuals should contact us."
+    block = _school_purchase_block(profile)
+    if block:
+        message, verification_redirect = block
         if _is_ajax(request):
             return JsonResponse({"success": False, "message": message}, status=400)
         messages.error(request, message)
-        return _redirect_back(request, "books")
+        return redirect(verification_redirect) if verification_redirect else _redirect_back(request, "books")
 
     if get_book_price(book, profile) is None:
         message = f'Pricing for "{book.title}" isn\'t set up for your account yet - contact us to order.'
@@ -144,19 +163,11 @@ def checkout(request):
     profile = request.user.profile
     cart = get_or_create_cart(request.user)
 
-    if profile.account_type != BookPrice.AccountType.SCHOOL:
-        messages.error(request, "Only institution accounts can order online - individuals should contact us.")
-        return redirect("cart_detail")
-
-    # The client requires a signed mandate and stamping consent from every
-    # school before it can order, so checkout waits on staff approval.
-    verification = getattr(profile, "school_verification", None)
-    if verification is None:
-        messages.error(request, "Please complete your school's mandate and consent forms before checking out.")
-        return redirect("school_verification")
-    if not verification.is_approved:
-        messages.error(request, "Your school's forms are still being reviewed - we'll email you once they're approved.")
-        return redirect("school_verification_status")
+    block = _school_purchase_block(profile)
+    if block:
+        message, verification_redirect = block
+        messages.error(request, message)
+        return redirect(verification_redirect or "cart_detail")
 
     lines, subtotal = price_cart(cart, profile)
     if not lines:

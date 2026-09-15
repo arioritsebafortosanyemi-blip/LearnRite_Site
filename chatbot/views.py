@@ -21,8 +21,16 @@ MAX_TOOL_ROUNDS = 4
 
 TOOLS = [
     {
+        "name": "list_recent_orders",
+        "description": "List the current customer's own recent orders (reference, date, status, total) - use this "
+                       "when they ask about their orders in general, or 'my last order', without naming a specific "
+                       "reference number, so they don't have to look it up themselves first.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
+    {
         "name": "get_order_status",
-        "description": "Look up the status of the current customer's own order by its reference number, e.g. LR-ABC12345.",
+        "description": "Look up full details of one of the current customer's own orders by its reference number, "
+                       "e.g. LR-ABC12345 - status, date, items, delivery/pickup details, and the price breakdown.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -53,7 +61,28 @@ def _serialize_block(block):
     return {"type": block.type}
 
 
+MAX_RECENT_ORDERS = 10
+
+
 def _execute_tool(tool_name, tool_input, user):
+    if tool_name == "list_recent_orders":
+        if not user.is_authenticated:
+            return {"error": "The customer isn't logged in - ask them to log in and check their Order History page."}
+        orders = Order.objects.filter(user=user).order_by("-created_at")[:MAX_RECENT_ORDERS]
+        if not orders:
+            return {"orders": [], "note": "This customer has no orders yet."}
+        return {
+            "orders": [
+                {
+                    "order_reference": order.order_reference,
+                    "date": order.created_at.strftime("%Y-%m-%d"),
+                    "status": order.status_display,
+                    "total": str(order.total),
+                }
+                for order in orders
+            ],
+        }
+
     if tool_name == "get_order_status":
         if not user.is_authenticated:
             return {"error": "The customer isn't logged in - ask them to log in and check their Order History page."}
@@ -61,12 +90,28 @@ def _execute_tool(tool_name, tool_input, user):
         order = Order.objects.filter(order_reference__iexact=order_reference, user=user).first()
         if not order:
             return {"error": "No order with that reference was found on this customer's account."}
-        return {
+        result = {
             "order_reference": order.order_reference,
+            "date": order.created_at.strftime("%Y-%m-%d"),
             "status": order.status_display,
             "delivery_method": order.get_delivery_method_display(),
+            "items": [
+                {"title": item.title, "quantity": item.quantity,
+                 "unit_price": str(item.unit_price), "line_total": str(item.line_total)}
+                for item in order.items.all()
+            ],
+            "subtotal": str(order.subtotal),
+            "discount_amount": str(order.discount_amount),
+            "coupon_discount_amount": str(order.coupon_discount_amount),
             "total": str(order.total),
         }
+        if order.delivery_method == Order.DeliveryMethod.DELIVERY and order.shipping_address:
+            address = order.shipping_address
+            result["shipping_address"] = ", ".join(filter(None, [
+                address.address_line1, address.address_line2, address.landmark,
+                address.city, address.state, address.country,
+            ]))
+        return result
 
     if tool_name == "get_book_price":
         if not user.is_authenticated:

@@ -14,7 +14,10 @@
 {% endblock %}
 {% block content %}
 <div class="container mt-5 mb-5">
-    <h3 class="h3 mb-1">Order {{ order.order_reference }}</h3>
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <h3 class="h3 mb-1">Order {{ order.order_reference }}</h3>
+        <a class="btn btn-outline-dark btn-sm" href="{% url 'order_invoice_pdf' order.pk %}" target="_blank"><i class="bi bi-file-earmark-pdf"></i> Download Invoice</a>
+    </div>
 
     {% if order.status == "CANCELLED" %}
     <span class="status-badge status-cancelled"><i class="bi bi-x-circle-fill"></i> Cancelled</span>

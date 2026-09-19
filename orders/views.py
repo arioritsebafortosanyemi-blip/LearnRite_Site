@@ -3,7 +3,7 @@ from decimal import Decimal, InvalidOperation
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -16,6 +16,7 @@ from store.utils import get_book_price
 from orders.emails import send_order_confirmation, send_payment_claimed_notification
 from orders.forms import CheckoutForm
 from orders.models import BulkDiscountRule, CartItem, Coupon, Order, OrderItem, PaymentAccount
+from orders.pdf_forms import build_order_invoice_pdf
 from orders.utils import get_or_create_cart, price_cart
 
 
@@ -257,6 +258,18 @@ def order_detail(request, pk):
         "pipeline_index": order.pipeline_index,
         "form": SearchForm(request.GET),
     })
+
+
+@login_required
+def order_invoice_pdf(request, pk):
+    if request.user.is_staff:
+        order = get_object_or_404(Order, pk=pk)
+    else:
+        order = get_object_or_404(Order, pk=pk, user=request.user)
+    content = build_order_invoice_pdf(order)
+    response = HttpResponse(content, content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename="{order.order_reference}.pdf"'
+    return response
 
 
 @login_required

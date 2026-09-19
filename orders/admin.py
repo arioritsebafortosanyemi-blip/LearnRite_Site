@@ -1,5 +1,7 @@
 from django.contrib import admin, messages
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import format_html
 
 from orders.emails import send_pickup_ready_notification
 from orders.models import BulkDiscountRule, Cart, CartItem, Coupon, Order, OrderItem, PaymentAccount
@@ -32,13 +34,22 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ("order_reference", "user", "email", "full_name", "phone_number", "delivery_method",
                        "shipping_address", "subtotal", "discount_amount", "coupon",
                        "coupon_discount_amount", "total", "amount_paid", "amount_claimed",
-                       "balance_due_display", "created_at")
+                       "balance_due_display", "invoice_link", "created_at")
     inlines = [OrderItemInline]
     actions = ("approve_payment_claim",)
 
     @admin.display(description="Balance Due")
     def balance_due_display(self, obj):
         return obj.balance_due
+
+    @admin.display(description="Invoice")
+    def invoice_link(self, obj):
+        if not obj.pk:
+            return "-"
+        style = ("display:inline-block;padding:6px 14px;border-radius:6px;"
+                 "background:#fe5d26;color:#fff;font-weight:600;text-decoration:none;")
+        url = reverse("order_invoice_pdf", args=[obj.pk])
+        return format_html('<a style="{}" href="{}" target="_blank">Invoice (PDF)</a>', style, url)
 
     @admin.action(description="Approve payment claim (adds to amount paid, updates status)")
     def approve_payment_claim(self, request, queryset):

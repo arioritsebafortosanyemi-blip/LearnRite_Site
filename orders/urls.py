@@ -11,4 +11,5 @@ urlpatterns = [
     path('history/', views.order_history, name='order_history'),
     path('history/<int:pk>/', views.order_detail, name='order_detail'),
     path('history/<int:pk>/claim-payment/', views.claim_payment, name='claim_payment'),
+    path('history/<int:pk>/invoice.pdf', views.order_invoice_pdf, name='order_invoice_pdf'),
 ]

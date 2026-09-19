@@ -818,11 +818,13 @@ li .bi{
    between the status pill (order list/detail) and the stepper circles
    (order_detail.html) so both always agree on a stage's color. */
 .status-pending { background-color: #adb5bd; }
-.status-received { background-color: #2a9d8f; }
-.status-processing { background-color: #fe5d26; }
-.status-out_for_delivery { background-color: #9d75cb; }
-.status-delivered { background-color: #59cd90; }
+.status-part_payment_received { background-color: #fee440; color: #262626; }
+.status-full_payment_received { background-color: #2a9d8f; }
+.status-received { background-color: #fe5d26; }
+.status-ready_for_pickup { background-color: #9d75cb; }
+.status-picked_up { background-color: #59cd90; }
 .status-cancelled { background-color: #dc3545; }
+.status-processing { background-color: #fe5d26; }
 
 /* Order-detail stepper: a completed step always reads as a green
    checkmark (not tied to a specific pipeline stage's own color), the

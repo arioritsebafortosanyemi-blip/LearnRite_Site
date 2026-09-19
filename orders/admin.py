@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils import timezone
 
 from orders.emails import send_pickup_ready_notification
@@ -25,22 +25,41 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("order_reference", "full_name", "email", "delivery_method", "status", "total", "created_at")
-    list_filter = ("status", "delivery_method")
+    list_display = ("order_reference", "full_name", "email", "status", "amount_paid", "balance_due_display",
+                     "total", "created_at")
+    list_filter = ("status",)
     search_fields = ("order_reference", "full_name", "email", "phone_number")
     readonly_fields = ("order_reference", "user", "email", "full_name", "phone_number", "delivery_method",
                        "shipping_address", "subtotal", "discount_amount", "coupon",
-                       "coupon_discount_amount", "total", "created_at")
+                       "coupon_discount_amount", "total", "amount_paid", "amount_claimed",
+                       "balance_due_display", "created_at")
     inlines = [OrderItemInline]
+    actions = ("approve_payment_claim",)
+
+    @admin.display(description="Balance Due")
+    def balance_due_display(self, obj):
+        return obj.balance_due
+
+    @admin.action(description="Approve payment claim (adds to amount paid, updates status)")
+    def approve_payment_claim(self, request, queryset):
+        count = 0
+        for order in queryset.filter(amount_claimed__isnull=False):
+            order.amount_paid += order.amount_claimed
+            order.amount_claimed = None
+            order.status = (
+                Order.Status.FULL_PAYMENT_RECEIVED if order.amount_paid >= order.total
+                else Order.Status.PART_PAYMENT_RECEIVED
+            )
+            order.save(update_fields=["amount_paid", "amount_claimed", "status"])
+            count += 1
+        self.message_user(request, f"{count} payment claim(s) approved.", messages.SUCCESS)
 
     def save_model(self, request, obj, form, change):
-        """Emails a PICKUP customer the moment staff move their order to the
-        "ready" stage of the pipeline (labelled "Ready for Pickup" for these
-        orders - see Order.PICKUP_STATUS_LABELS)."""
+        """Emails a customer the moment staff move their order to the
+        "ready" stage of the pipeline."""
         just_became_ready = (
             change and "status" in form.changed_data
-            and obj.status == Order.Status.OUT_FOR_DELIVERY
-            and obj.delivery_method == Order.DeliveryMethod.PICKUP
+            and obj.status == Order.Status.READY_FOR_PICKUP
             and not obj.pickup_ready_notified_at
         )
         super().save_model(request, obj, form, change)

@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -177,7 +177,6 @@ def checkout(request):
         messages.error(request, "Some items in your cart don't have pricing set up yet - remove them or contact us to order.")
         return redirect("cart_detail")
 
-    default_address = request.user.addresses.filter(is_default=True).first() or request.user.addresses.first()
     discount_amount = _apply_bulk_discount(subtotal)
     coupon_discount_amount = Decimal("0")
 
@@ -199,20 +198,11 @@ def checkout(request):
             coupon_discount_amount = coupon.calculate_discount(subtotal) if coupon else Decimal("0")
             total = max(subtotal - discount_amount - coupon_discount_amount, Decimal("0"))
 
-            delivery_method = checkout_form.cleaned_data["delivery_method"]
-            shipping_address = None
-            if delivery_method == Order.DeliveryMethod.DELIVERY:
-                shipping_address = checkout_form.save(commit=False)
-                shipping_address.user = request.user
-                shipping_address.save()
-
             order = Order.objects.create(
                 user=request.user,
                 email=request.user.email,
                 full_name=checkout_form.cleaned_data["full_name"],
                 phone_number=checkout_form.cleaned_data["phone_number"],
-                delivery_method=delivery_method,
-                shipping_address=shipping_address,
                 subtotal=subtotal,
                 discount_amount=discount_amount,
                 coupon=coupon,
@@ -239,7 +229,10 @@ def checkout(request):
 
             return redirect("order_detail", pk=order.pk)
     else:
-        checkout_form = CheckoutForm(instance=default_address)
+        checkout_form = CheckoutForm(initial={
+            "full_name": request.user.get_full_name() or request.user.username,
+            "phone_number": profile.phone_number,
+        })
 
     total = max(subtotal - discount_amount - coupon_discount_amount, Decimal("0"))
     return render(request, "orders/checkout.html", {
@@ -257,16 +250,11 @@ def checkout(request):
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk, user=request.user)
     payment_accounts = PaymentAccount.objects.filter(active=True)
-    pipeline_index = (
-        Order.PIPELINE_STATUSES.index(order.status)
-        if order.status in Order.PIPELINE_STATUSES
-        else None
-    )
     return render(request, "orders/order_detail.html", {
         "order": order,
         "payment_accounts": payment_accounts,
         "pipeline_statuses": order.pipeline_status_choices(),
-        "pipeline_index": pipeline_index,
+        "pipeline_index": order.pipeline_index,
         "form": SearchForm(request.GET),
     })
 
@@ -284,9 +272,27 @@ def order_history(request):
 @require_POST
 def claim_payment(request, pk):
     order = get_object_or_404(Order, pk=pk, user=request.user)
-    if order.status == Order.Status.PENDING and not order.payment_claimed_at:
-        order.payment_claimed_at = timezone.now()
-        order.save(update_fields=["payment_claimed_at"])
-        send_payment_claimed_notification(order)
-        messages.success(request, "Thanks - we've been notified and will confirm your payment shortly.")
+
+    # Nothing to claim: already cancelled, already fully paid, or a previous
+    # claim is still awaiting staff approval (see OrderAdmin.approve_payment_claim).
+    if order.status == Order.Status.CANCELLED or order.balance_due <= 0 or order.amount_claimed is not None:
+        return redirect("order_detail", pk=order.pk)
+
+    if request.POST.get("payment_type") == "part":
+        try:
+            amount = Decimal((request.POST.get("amount") or "").strip())
+        except InvalidOperation:
+            messages.error(request, "Enter a valid amount.")
+            return redirect("order_detail", pk=order.pk)
+        if amount <= 0 or amount > order.balance_due:
+            messages.error(request, f"Enter an amount up to your balance of N{order.balance_due}.")
+            return redirect("order_detail", pk=order.pk)
+    else:
+        amount = order.balance_due
+
+    order.amount_claimed = amount
+    order.payment_claimed_at = timezone.now()
+    order.save(update_fields=["amount_claimed", "payment_claimed_at"])
+    send_payment_claimed_notification(order)
+    messages.success(request, "Thanks - we've been notified and will confirm your payment shortly.")
     return redirect("order_detail", pk=order.pk)

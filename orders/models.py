@@ -106,30 +106,28 @@ def _generate_order_reference():
 class Order(models.Model):
     class Status(models.TextChoices):
         PENDING = "PENDING", "Pending Payment"
+        FULL_PAYMENT_RECEIVED = "FULL_PAYMENT_RECEIVED", "Full Payment Received"
+        PART_PAYMENT_RECEIVED = "PART_PAYMENT_RECEIVED", "Part Payment Received"
         RECEIVED = "RECEIVED", "Order Received"
-        PROCESSING = "PROCESSING", "Processing"
-        OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY", "Out for Delivery"
-        DELIVERED = "DELIVERED", "Delivered"
+        READY_FOR_PICKUP = "READY_FOR_PICKUP", "Order Ready for Pick-up"
+        PICKED_UP = "PICKED_UP", "Picked Up"
         CANCELLED = "CANCELLED", "Cancelled"
 
     class DeliveryMethod(models.TextChoices):
+        # DELIVERY is kept only so historical orders placed before delivery
+        # was removed still display correctly - checkout no longer offers it.
         DELIVERY = "DELIVERY", "Delivery"
         PICKUP = "PICKUP", "Store Pickup"
 
-    # The delivery pipeline shown as a progress tracker on the order detail
-    # page - in order, once payment is confirmed (staff move it out of
-    # PENDING). Reused for the review-eligibility gate too: any status here
-    # means payment was confirmed, regardless of how far delivery has got.
-    PIPELINE_STATUSES = [Status.RECEIVED, Status.PROCESSING, Status.OUT_FOR_DELIVERY, Status.DELIVERED]
-
-    # PICKUP orders reuse the same underlying status values as DELIVERY
-    # orders (so the review-eligibility gate and admin filtering stay
-    # simple) but read oddly worded ("Out for Delivery" for a pickup order)
-    # - these labels are swapped in for display only.
-    PICKUP_STATUS_LABELS = {
-        Status.OUT_FOR_DELIVERY: "Ready for Pickup",
-        Status.DELIVERED: "Picked Up",
-    }
+    # The progress tracker shown on the order detail page, in order. Reused
+    # for the review-eligibility gate too: any status here means payment was
+    # at least claimed and approved to some degree, regardless of how far
+    # fulfillment has got - matches the leniency the gate already had before
+    # (it never required "fully delivered", just "payment confirmed").
+    PIPELINE_STATUSES = [
+        Status.FULL_PAYMENT_RECEIVED, Status.PART_PAYMENT_RECEIVED,
+        Status.RECEIVED, Status.READY_FOR_PICKUP, Status.PICKED_UP,
+    ]
 
     user = models.ForeignKey \
         (auth.get_user_model(), null=True, on_delete=models.SET_NULL, related_name="orders")
@@ -138,10 +136,10 @@ class Order(models.Model):
     full_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20)
     delivery_method = models.CharField \
-        (choices=DeliveryMethod.choices, max_length=20, default=DeliveryMethod.DELIVERY)
+        (choices=DeliveryMethod.choices, max_length=20, default=DeliveryMethod.PICKUP)
     shipping_address = models.ForeignKey \
         (Address, null=True, on_delete=models.SET_NULL, related_name="orders")
-    status = models.CharField(choices=Status.choices, max_length=20, default=Status.PENDING)
+    status = models.CharField(choices=Status.choices, max_length=25, default=Status.PENDING)
     subtotal = models.DecimalField(max_digits=12, decimal_places=2)
     discount_amount = models.DecimalField \
         (max_digits=12, decimal_places=2, default=0, help_text="Automatic bulk-order discount only.")
@@ -149,6 +147,13 @@ class Order(models.Model):
         (Coupon, null=True, blank=True, on_delete=models.SET_NULL, related_name="orders")
     coupon_discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=12, decimal_places=2)
+    amount_paid = models.DecimalField \
+        (max_digits=12, decimal_places=2, default=0,
+         help_text="Cumulative confirmed payments - only changes via the 'Approve payment claim' admin action.")
+    amount_claimed = models.DecimalField \
+        (max_digits=12, decimal_places=2, null=True, blank=True,
+         help_text="What the customer just said they paid (full or part) - a claim, not confirmed. Cleared "
+                    "once staff approve it into amount_paid.")
     payment_claimed_at = models.DateTimeField \
         (null=True, blank=True,
          help_text="Set when the customer clicks 'I have completed payment' - a claim, not confirmed payment.")
@@ -163,14 +168,34 @@ class Order(models.Model):
 
     @property
     def status_display(self):
-        if self.delivery_method == self.DeliveryMethod.PICKUP and self.status in self.PICKUP_STATUS_LABELS:
-            return self.PICKUP_STATUS_LABELS[self.status]
         return self.get_status_display()
 
+    @property
+    def balance_due(self):
+        return max(self.total - self.amount_paid, Decimal("0"))
+
     def pipeline_status_choices(self):
-        if self.delivery_method == self.DeliveryMethod.PICKUP:
-            return [(s.value, self.PICKUP_STATUS_LABELS.get(s, s.label)) for s in self.PIPELINE_STATUSES]
-        return [(s.value, s.label) for s in self.PIPELINE_STATUSES]
+        # Full and part payment are two outcomes of the same "payment" stage,
+        # not two sequential steps - collapsed into one stepper entry so a
+        # part-paid order doesn't show "Full Payment Received" as already
+        # done. Reflects the real balance rather than just the status value,
+        # so it stays accurate even if staff push an order past payment
+        # while a balance is still outstanding.
+        payment_label = self.Status.FULL_PAYMENT_RECEIVED.label if self.balance_due <= 0 else self.Status.PART_PAYMENT_RECEIVED.label
+        return [
+            (None, payment_label),
+            (self.Status.RECEIVED.value, self.Status.RECEIVED.label),
+            (self.Status.READY_FOR_PICKUP.value, self.Status.READY_FOR_PICKUP.label),
+            (self.Status.PICKED_UP.value, self.Status.PICKED_UP.label),
+        ]
+
+    @property
+    def pipeline_index(self):
+        mapping = {
+            self.Status.FULL_PAYMENT_RECEIVED: 0, self.Status.PART_PAYMENT_RECEIVED: 0,
+            self.Status.RECEIVED: 1, self.Status.READY_FOR_PICKUP: 2, self.Status.PICKED_UP: 3,
+        }
+        return mapping.get(self.Status(self.status))
 
 
 class OrderItem(models.Model):

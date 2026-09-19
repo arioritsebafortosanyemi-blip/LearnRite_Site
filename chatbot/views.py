@@ -30,7 +30,7 @@ TOOLS = [
     {
         "name": "get_order_status",
         "description": "Look up full details of one of the current customer's own orders by its reference number, "
-                       "e.g. LR-ABC12345 - status, date, items, delivery/pickup details, and the price breakdown.",
+                       "e.g. LR-ABC12345 - status, date, items, the price breakdown, and the amount paid/balance due.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -78,6 +78,7 @@ def _execute_tool(tool_name, tool_input, user):
                     "date": order.created_at.strftime("%Y-%m-%d"),
                     "status": order.status_display,
                     "total": str(order.total),
+                    "balance_due": str(order.balance_due),
                 }
                 for order in orders
             ],
@@ -90,11 +91,10 @@ def _execute_tool(tool_name, tool_input, user):
         order = Order.objects.filter(order_reference__iexact=order_reference, user=user).first()
         if not order:
             return {"error": "No order with that reference was found on this customer's account."}
-        result = {
+        return {
             "order_reference": order.order_reference,
             "date": order.created_at.strftime("%Y-%m-%d"),
             "status": order.status_display,
-            "delivery_method": order.get_delivery_method_display(),
             "items": [
                 {"title": item.title, "quantity": item.quantity,
                  "unit_price": str(item.unit_price), "line_total": str(item.line_total)}
@@ -104,14 +104,9 @@ def _execute_tool(tool_name, tool_input, user):
             "discount_amount": str(order.discount_amount),
             "coupon_discount_amount": str(order.coupon_discount_amount),
             "total": str(order.total),
+            "amount_paid": str(order.amount_paid),
+            "balance_due": str(order.balance_due),
         }
-        if order.delivery_method == Order.DeliveryMethod.DELIVERY and order.shipping_address:
-            address = order.shipping_address
-            result["shipping_address"] = ", ".join(filter(None, [
-                address.address_line1, address.address_line2, address.landmark,
-                address.city, address.state, address.country,
-            ]))
-        return result
 
     if tool_name == "get_book_price":
         if not user.is_authenticated:

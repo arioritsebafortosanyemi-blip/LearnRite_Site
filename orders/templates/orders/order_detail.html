@@ -21,7 +21,7 @@
     {% elif order.status == "PENDING" %}
     <span class="status-badge status-pending"><i class="bi bi-hourglass-split"></i> Pending Payment</span>
     {% else %}
-    <div class="d-flex justify-content-between mt-4 mb-4" style="max-width: 600px;">
+    <div class="d-flex justify-content-between mt-4 mb-4" style="max-width: 700px;">
         {% for status_value, status_label in pipeline_statuses %}
         <div class="text-center flex-fill">
             <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center {% if forloop.counter0 < pipeline_index %}status-step-complete text-white{% elif forloop.counter0 == pipeline_index %}status-step-current text-white{% else %}bg-light text-muted{% endif %}" style="width: 32px; height: 32px;">
@@ -63,26 +63,27 @@
                     <span>Total</span>
                     <span>&#8358;{{ order.total }}</span>
                 </li>
+                {% if order.amount_paid %}
+                <li class="list-group-item d-flex justify-content-between text-success">
+                    <span>Amount Paid</span>
+                    <span>&#8358;{{ order.amount_paid }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between fw-bold">
+                    <span>Balance Due</span>
+                    <span>&#8358;{{ order.balance_due }}</span>
+                </li>
+                {% endif %}
             </ul>
 
-            <h5 class="mb-3">{% if order.delivery_method == "PICKUP" %}Pickup Details{% else %}Delivery Details{% endif %}</h5>
+            <h5 class="mb-3">Pickup Details</h5>
             <p class="mb-1">{{ order.full_name }}</p>
             <p class="mb-1">{{ order.phone_number }}</p>
-            {% if order.delivery_method == "PICKUP" %}
             <p class="mb-1"><span class="status-badge status-processing"><i class="bi bi-shop"></i> Store Pickup</span></p>
             <p class="text-muted small mt-2">We'll email you at {{ order.email }} when your order is ready for pickup.</p>
-            {% else %}
-            {% if order.shipping_address %}
-            <p class="mb-1">{{ order.shipping_address.address_line1 }}{% if order.shipping_address.address_line2 %}, {{ order.shipping_address.address_line2 }}{% endif %}</p>
-            {% if order.shipping_address.landmark %}<p class="mb-1">Landmark: {{ order.shipping_address.landmark }}</p>{% endif %}
-            <p class="mb-1">{{ order.shipping_address.city }}, {{ order.shipping_address.state }}</p>
-            {% endif %}
-            <p class="text-muted small mt-2">Delivery updates will be sent to the phone number or email above.</p>
-            {% endif %}
         </div>
 
         <div class="col-md-5">
-            {% if order.status == "PENDING" %}
+            {% if order.status != "CANCELLED" and order.balance_due > 0 %}
             <div class="border rounded p-3">
                 <h5 class="mb-3">Pay by Bank Transfer</h5>
                 <p class="small text-muted">Payment is by bank transfer. Details are on confirmation page and will be emailed to you.</p>
@@ -92,11 +93,25 @@
                 <p class="mb-3">{{ account.account_number }}</p>
                 {% endfor %}
 
-                {% if order.payment_claimed_at %}
-                <p class="text-success small mb-0"><i class="bi bi-check-circle-fill"></i> We've been notified - awaiting confirmation.</p>
+                {% if order.amount_claimed %}
+                <p class="text-success small mb-0"><i class="bi bi-check-circle-fill"></i> We've been notified of your payment of &#8358;{{ order.amount_claimed }} - awaiting confirmation.</p>
                 {% else %}
                 <form method="post" action="{% url 'claim_payment' order.pk %}">
                     {% csrf_token %}
+                    <div class="mb-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="payment_type" id="pay-full" value="full" checked>
+                            <label class="form-check-label" for="pay-full">Full Payment</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="payment_type" id="pay-part" value="part">
+                            <label class="form-check-label" for="pay-part">Part Payment</label>
+                        </div>
+                    </div>
+                    <div class="mb-2" id="part-amount-field" hidden>
+                        <label class="form-label small" for="id_amount">Amount you're paying now (balance: &#8358;{{ order.balance_due }})</label>
+                        <input type="number" step="0.01" min="0.01" max="{{ order.balance_due }}" name="amount" id="id_amount" class="form-control">
+                    </div>
                     <button type="submit" class="btn btn-dark w-100">I have completed payment</button>
                 </form>
                 {% endif %}
@@ -105,4 +120,18 @@
         </div>
     </div>
 </div>
+<script>
+(function () {
+    var partRadio = document.getElementById('pay-part');
+    var fullRadio = document.getElementById('pay-full');
+    var amountField = document.getElementById('part-amount-field');
+    if (!partRadio || !amountField) { return; }
+    function update() {
+        amountField.hidden = !partRadio.checked;
+    }
+    partRadio.addEventListener('change', update);
+    fullRadio.addEventListener('change', update);
+    update();
+})();
+</script>
 {% endblock %}

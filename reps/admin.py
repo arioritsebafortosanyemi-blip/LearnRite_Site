@@ -33,7 +33,7 @@ class InvoiceInline(admin.TabularInline):
     specific rep has logged without leaving their profile."""
     model = Invoice
     extra = 0
-    fields = ("invoice_number", "customer_name", "status", "total", "commission_rate",
+    fields = ("invoice_number", "customer_name", "customer_phone", "status", "total", "commission_rate",
               "commission_amount", "created_at", "paid_at")
     readonly_fields = fields
     can_delete = False

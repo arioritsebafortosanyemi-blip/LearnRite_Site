@@ -5,13 +5,13 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h3 class="h3 mb-1" style="color: #fe5d26;">Log New Invoice</h3>
-            <p class="text-muted">Enter the sale the customer has already confirmed in person. The invoice number is generated automatically.</p>
+            <p class="text-muted">Enter the sale the school has already confirmed in person. The invoice number is generated automatically.</p>
 
             <form method="post">
                 {% csrf_token %}
 
                 <div class="account-info-card mb-4">
-                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Customer</h6>
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">School</h6>
                     {% for field in form %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -51,7 +51,6 @@
 
                 <div class="account-info-card mb-4">
                     <h6 class="text-uppercase text-muted small fw-bold mb-3">Estimated Commission</h6>
-                    <p class="text-muted small mb-2">Based on total book quantity across this invoice - the client's copy never shows this, only your own portal and admin do.</p>
                     <p class="mb-0"><strong>Total books:</strong> <span id="estimated-quantity">0</span> &nbsp;|&nbsp; <strong>Commission rate:</strong> <span id="estimated-rate">0%</span></p>
                 </div>
 

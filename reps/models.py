@@ -194,16 +194,20 @@ class Invoice(models.Model):
                                    related_name="invoices")
     sales_rep_name = models.CharField(max_length=200, blank=True)
     invoice_number = models.CharField(max_length=20, unique=True, default=_generate_invoice_number)
+    # Field names (customer_*) stay as-is to avoid churn, but every
+    # user-facing label reads "School" - reps only ever sell to schools,
+    # never individual customers.
     customer_name = models.CharField(max_length=200, help_text="School or institution name.", verbose_name="School name")
-    customer_address = models.TextField(blank=True)
-    customer_phone = models.CharField(max_length=20, blank=True)
+    customer_address = models.TextField(blank=True, verbose_name="School address")
+    customer_phone = models.CharField(max_length=20, blank=True, verbose_name="School phone")
     customer_email = models.EmailField(
-        blank=True, help_text="The school's own copy of the invoice is sent here once staff send it.")
+        blank=True, verbose_name="School email",
+        help_text="The school's own copy of the invoice is sent here once staff send it.")
     # Institution pricing has a Lagos/outside-Lagos tier like everywhere
     # else on the site - needed to know which BookPrice to show/charge.
     location = models.CharField(
         choices=BookPrice.Location.choices, max_length=20,
-        verbose_name="Customer's location", help_text="Determines the institution price for each book.")
+        verbose_name="School's location", help_text="Determines the institution price for each book.")
     status = models.CharField(choices=Status.choices, max_length=20, default=Status.PENDING_PAYMENT)
     notes = models.TextField(blank=True)
     # Same automatic bulk-order discount as the main website

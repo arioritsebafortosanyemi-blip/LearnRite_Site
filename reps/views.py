@@ -43,7 +43,7 @@ def _get_sales_rep(request):
 def _school_book_prices():
     """Institution-tier book prices keyed by book id then location - lets
     the invoice form auto-fill a unit price once a rep picks a book and the
-    customer's location, instead of the rep needing to know it by memory."""
+    school's location, instead of the rep needing to know it by memory."""
     prices = {}
     for price in BookPrice.objects.filter(
         account_type=BookPrice.AccountType.SCHOOL, price__isnull=False, book__is_published=True

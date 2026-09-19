@@ -25,9 +25,23 @@ class OrderItemInline(admin.TabularInline):
     can_delete = False
 
 
+# Same palette as the customer-facing status badges (static/css/custom.css)
+# so a status reads the same color everywhere - admin has no reason to
+# load that stylesheet, so the colors are inlined here instead.
+STATUS_COLORS = {
+    Order.Status.PENDING: ("#adb5bd", "#fff"),
+    Order.Status.PART_PAYMENT_RECEIVED: ("#fee440", "#262626"),
+    Order.Status.FULL_PAYMENT_RECEIVED: ("#2a9d8f", "#fff"),
+    Order.Status.RECEIVED: ("#fe5d26", "#fff"),
+    Order.Status.READY_FOR_PICKUP: ("#9d75cb", "#fff"),
+    Order.Status.PICKED_UP: ("#59cd90", "#fff"),
+    Order.Status.CANCELLED: ("#dc3545", "#fff"),
+}
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("order_reference", "full_name", "email", "status", "amount_paid", "amount_claimed",
+    list_display = ("order_reference", "full_name", "email", "status_colored", "amount_paid", "amount_claimed",
                      "balance_due_display", "total", "created_at")
     list_filter = ("status", ("amount_claimed", admin.EmptyFieldListFilter))
     search_fields = ("order_reference", "full_name", "email", "phone_number")
@@ -37,6 +51,13 @@ class OrderAdmin(admin.ModelAdmin):
                        "balance_due_display", "invoice_link", "created_at")
     inlines = [OrderItemInline]
     actions = ("approve_payment_claim",)
+
+    @admin.display(description="Status", ordering="status")
+    def status_colored(self, obj):
+        background, color = STATUS_COLORS.get(obj.status, ("#adb5bd", "#fff"))
+        style = (f"display:inline-block;padding:3px 10px;border-radius:12px;"
+                 f"background:{background};color:{color};font-weight:600;font-size:0.85em;white-space:nowrap;")
+        return format_html('<span style="{}">{}</span>', style, obj.status_display)
 
     @admin.display(description="Balance Due")
     def balance_due_display(self, obj):

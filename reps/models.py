@@ -1,10 +1,29 @@
-import secrets
 from decimal import Decimal
 
 from django.contrib import auth
-from django.db import models
+from django.db import models, transaction
 
 from store.models import Book, BookPrice
+
+
+class SequenceCounter(models.Model):
+    """Atomic counters backing human-readable reference numbers (invoice,
+    receipt) - a dedicated row per sequence incremented under a row lock, so
+    concurrent creates can never land on the same number the way deriving
+    "next" from COUNT()/MAX() of existing rows could."""
+    name = models.CharField(max_length=50, unique=True)
+    value = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.name} = {self.value}"
+
+    @classmethod
+    def next_value(cls, name):
+        with transaction.atomic():
+            counter, _ = cls.objects.select_for_update().get_or_create(name=name)
+            counter.value += 1
+            counter.save(update_fields=["value"])
+            return counter.value
 
 
 class SalesRep(models.Model):
@@ -167,11 +186,11 @@ class Guarantor(models.Model):
 
 
 def _generate_invoice_number():
-    return "INV-" + secrets.token_hex(4).upper()
+    return f"LR-{SequenceCounter.next_value('reps_invoice'):04d}"
 
 
 def _generate_receipt_number():
-    return "RCT-" + secrets.token_hex(4).upper()
+    return f"LRP-{SequenceCounter.next_value('reps_receipt'):04d}"
 
 
 class Invoice(models.Model):

@@ -235,6 +235,13 @@ class Invoice(models.Model):
     def total(self):
         return max(self.subtotal - self.discount_amount, Decimal("0"))
 
+    @property
+    def amount_to_remit(self):
+        """What the rep hands back to the company after keeping their
+        commission - total minus commission_amount. Internal figure only,
+        same visibility as commission_amount itself."""
+        return max(self.total - self.commission_amount, Decimal("0"))
+
 
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, related_name="items", on_delete=models.CASCADE)

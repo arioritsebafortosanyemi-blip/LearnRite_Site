@@ -43,6 +43,7 @@
                         {% endif %}
                         <tr class="fw-bold"><td colspan="3" class="text-end">Total</td><td>NGN {{ invoice.total|floatformat:2 }}</td></tr>
                         <tr class="text-muted"><td colspan="3" class="text-end">Your commission ({{ invoice.commission_rate }}%)</td><td>NGN {{ invoice.commission_amount|floatformat:2 }}</td></tr>
+                        <tr class="fw-bold"><td colspan="3" class="text-end">Amount to Remit to Company</td><td>NGN {{ invoice.amount_to_remit|floatformat:2 }}</td></tr>
                     </tfoot>
                 </table>
             </div>

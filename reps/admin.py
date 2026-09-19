@@ -34,10 +34,14 @@ class InvoiceInline(admin.TabularInline):
     model = Invoice
     extra = 0
     fields = ("invoice_number", "customer_name", "customer_phone", "status", "total", "commission_rate",
-              "commission_amount", "created_at", "paid_at")
+              "commission_amount", "amount_to_remit_display", "created_at", "paid_at")
     readonly_fields = fields
     can_delete = False
     show_change_link = True
+
+    @admin.display(description="Amount to Remit")
+    def amount_to_remit_display(self, obj):
+        return obj.amount_to_remit
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -53,13 +57,13 @@ class InvoiceAdmin(admin.ModelAdmin):
     is_staff alone isn't enough, so a compromised or careless staff account
     can't erase a sales record."""
     list_display = ("invoice_number", "customer_name", "customer_phone", "location", "issued_by", "status",
-                    "commission_rate", "commission_amount", "created_at", "paid_at")
+                    "commission_rate", "commission_amount", "amount_to_remit_display", "created_at", "paid_at")
     list_filter = ("status", "location", "sales_rep")
     search_fields = ("invoice_number", "customer_name", "customer_phone", "customer_email",
                      "sales_rep_name", "sales_rep__user__email")
     readonly_fields = ("invoice_number", "issued_by", "customer_name", "customer_address", "customer_phone",
                        "customer_email", "location", "status", "notes", "discount_amount", "commission_rate",
-                       "commission_amount", "created_at", "paid_at", "pdf_links")
+                       "commission_amount", "amount_to_remit_display", "created_at", "paid_at", "pdf_links")
     inlines = (InvoiceItemInline, ReceiptInline)
     actions = ("send_to_school",)
 
@@ -71,6 +75,10 @@ class InvoiceAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+    @admin.display(description="Amount to Remit")
+    def amount_to_remit_display(self, obj):
+        return obj.amount_to_remit
 
     @admin.action(description="Send invoice to school by email")
     def send_to_school(self, request, queryset):

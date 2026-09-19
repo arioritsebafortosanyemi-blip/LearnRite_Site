@@ -106,7 +106,11 @@ def _items_table(pdf, invoice, show_commission=False):
         pdf.cell(sum(col_widths[:3]), 7, f"Sales Rep Commission ({invoice.commission_rate}%)", border=1, align="R")
         pdf.cell(col_widths[3], 7, f"NGN {invoice.commission_amount:,.2f}", border=1, align="R")
         pdf.ln()
+        pdf.set_font("Helvetica", "B", 9.5)
         pdf.set_text_color(*DARK)
+        pdf.cell(sum(col_widths[:3]), 7, "Amount to Remit to Company", border=1, align="R")
+        pdf.cell(col_widths[3], 7, f"NGN {invoice.amount_to_remit:,.2f}", border=1, align="R")
+        pdf.ln()
 
 
 def _build_invoice_pdf(invoice, show_commission):

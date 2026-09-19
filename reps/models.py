@@ -194,9 +194,11 @@ class Invoice(models.Model):
                                    related_name="invoices")
     sales_rep_name = models.CharField(max_length=200, blank=True)
     invoice_number = models.CharField(max_length=20, unique=True, default=_generate_invoice_number)
-    customer_name = models.CharField(max_length=200, help_text="School or institution name.")
+    customer_name = models.CharField(max_length=200, help_text="School or institution name.", verbose_name="School name")
     customer_address = models.TextField(blank=True)
     customer_phone = models.CharField(max_length=20, blank=True)
+    customer_email = models.EmailField(
+        blank=True, help_text="The school's own copy of the invoice is sent here once staff send it.")
     # Institution pricing has a Lagos/outside-Lagos tier like everywhere
     # else on the site - needed to know which BookPrice to show/charge.
     location = models.CharField(
@@ -204,6 +206,17 @@ class Invoice(models.Model):
         verbose_name="Customer's location", help_text="Determines the institution price for each book.")
     status = models.CharField(choices=Status.choices, max_length=20, default=Status.PENDING_PAYMENT)
     notes = models.TextField(blank=True)
+    # Same automatic bulk-order discount as the main website
+    # (orders.BulkDiscountRule) - applied here too so a rep-entered order
+    # gets the same break a school would get ordering online themselves.
+    discount_amount = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0, help_text="Automatic bulk-order discount, same rule as the main website.")
+    # Auto-calculated from the total book quantity at creation time (see
+    # reps.commission) - the rep's earned commission, shown only on the
+    # internal invoice copy (see reps.pdf_forms.build_internal_invoice_pdf)
+    # and their own portal, never on the copy sent to the school.
+    commission_rate = models.DecimalField(max_digits=4, decimal_places=2, default=0)
+    commission_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     paid_at = models.DateTimeField(null=True, blank=True)
 
@@ -211,8 +224,12 @@ class Invoice(models.Model):
         return f"{self.invoice_number} ({self.customer_name})"
 
     @property
-    def total(self):
+    def subtotal(self):
         return sum((item.line_total for item in self.items.all()), Decimal("0"))
+
+    @property
+    def total(self):
+        return max(self.subtotal - self.discount_amount, Decimal("0"))
 
 
 class InvoiceItem(models.Model):

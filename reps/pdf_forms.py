@@ -68,7 +68,7 @@ def _new_pdf():
     return pdf
 
 
-def _items_table(pdf, invoice):
+def _items_table(pdf, invoice, show_commission=False):
     col_widths = (88, 22, 33, 31)
     pdf.set_font("Helvetica", "B", 9.5)
     pdf.set_fill_color(*BRAND)
@@ -86,19 +86,36 @@ def _items_table(pdf, invoice):
         pdf.cell(col_widths[3], 7, f"NGN {item.line_total:,.2f}", border=1, align="R")
         pdf.ln()
 
+    pdf.set_font("Helvetica", "", 9.5)
+    pdf.cell(sum(col_widths[:3]), 7, "Subtotal", border=1, align="R")
+    pdf.cell(col_widths[3], 7, f"NGN {invoice.subtotal:,.2f}", border=1, align="R")
+    pdf.ln()
+    if invoice.discount_amount:
+        pdf.cell(sum(col_widths[:3]), 7, "Bulk discount", border=1, align="R")
+        pdf.cell(col_widths[3], 7, f"-NGN {invoice.discount_amount:,.2f}", border=1, align="R")
+        pdf.ln()
+
     pdf.set_font("Helvetica", "B", 9.5)
     pdf.cell(sum(col_widths[:3]), 7, "Total", border=1, align="R")
     pdf.cell(col_widths[3], 7, f"NGN {invoice.total:,.2f}", border=1, align="R")
     pdf.ln()
 
+    if show_commission:
+        pdf.set_font("Helvetica", "", 9.5)
+        pdf.set_text_color(*MUTED)
+        pdf.cell(sum(col_widths[:3]), 7, f"Sales Rep Commission ({invoice.commission_rate}%)", border=1, align="R")
+        pdf.cell(col_widths[3], 7, f"NGN {invoice.commission_amount:,.2f}", border=1, align="R")
+        pdf.ln()
+        pdf.set_text_color(*DARK)
 
-def build_invoice_pdf(invoice):
+
+def _build_invoice_pdf(invoice, show_commission):
     pdf = _new_pdf()
     pdf.header_block("INVOICE")
     pdf.field("Invoice Number", invoice.invoice_number)
     pdf.field("Date", invoice.created_at.strftime("%d %B %Y"))
     pdf.field("Issued By", invoice.sales_rep_name)
-    pdf.field("Customer", invoice.customer_name)
+    pdf.field("School", invoice.customer_name)
     if invoice.customer_address:
         pdf.field("Address", invoice.customer_address)
     if invoice.customer_phone:
@@ -106,8 +123,19 @@ def build_invoice_pdf(invoice):
     pdf.field("Location", invoice.get_location_display())
     pdf.field("Status", invoice.get_status_display())
     pdf.ln(3)
-    _items_table(pdf, invoice)
+    _items_table(pdf, invoice, show_commission=show_commission)
     return bytes(pdf.output())
+
+
+def build_invoice_pdf(invoice):
+    """The copy sent to the school - never shows the rep's commission."""
+    return _build_invoice_pdf(invoice, show_commission=False)
+
+
+def build_internal_invoice_pdf(invoice):
+    """Staff/admin reference only - includes the rep's commission, so this
+    exact copy should never go to the school (see build_invoice_pdf)."""
+    return _build_invoice_pdf(invoice, show_commission=True)
 
 
 def build_receipt_pdf(invoice):
@@ -118,7 +146,7 @@ def build_receipt_pdf(invoice):
     pdf.field("Date", receipt.issued_at.strftime("%d %B %Y"))
     pdf.field("Invoice Number", invoice.invoice_number)
     pdf.field("Issued By", invoice.sales_rep_name)
-    pdf.field("Customer", invoice.customer_name)
+    pdf.field("School", invoice.customer_name)
     pdf.ln(3)
     _items_table(pdf, invoice)
     pdf.ln(4)

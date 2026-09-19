@@ -1,19 +1,24 @@
 import functools
 import logging
+from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordResetView as BasePasswordResetView
+from django.db.models import Sum
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from orders.models import BulkDiscountRule
+
+from reps.commission import commission_rate_for_quantity
 from reps.emails import send_employment_verification_decision
 from reps.forms import EmploymentVerificationForm, GuarantorForm, InvoiceForm, InvoiceItemFormSet, RepRegisterForm
 from reps.models import EmploymentVerification, Guarantor, Invoice, Receipt, SalesRep
-from reps.pdf_forms import build_invoice_pdf, build_receipt_pdf
+from reps.pdf_forms import build_internal_invoice_pdf, build_invoice_pdf, build_receipt_pdf
 from store.models import BookPrice
 
 logger = logging.getLogger(__name__)
@@ -169,6 +174,23 @@ def invoice_create(request):
             invoice.save()
             formset.instance = invoice
             formset.save()
+
+            # Same automatic bulk-order discount as the main website, then
+            # the rep's commission tier off what's left - both computed
+            # from the items that were just saved.
+            subtotal = invoice.subtotal
+            rule = BulkDiscountRule.objects.filter(active=True).first()
+            discount_amount = Decimal("0")
+            if rule and subtotal >= rule.minimum_order_amount:
+                discount_amount = (subtotal * rule.discount_percentage / Decimal("100")).quantize(Decimal("0.01"))
+            total_quantity = invoice.items.aggregate(total=Sum("quantity"))["total"] or 0
+            commission_rate = commission_rate_for_quantity(total_quantity)
+            commission_amount = ((subtotal - discount_amount) * commission_rate / Decimal("100")).quantize(Decimal("0.01"))
+            invoice.discount_amount = discount_amount
+            invoice.commission_rate = commission_rate
+            invoice.commission_amount = commission_amount
+            invoice.save(update_fields=["discount_amount", "commission_rate", "commission_amount"])
+
             messages.success(request, f"Invoice {invoice.invoice_number} created.")
             return redirect("reps:invoice_detail", pk=invoice.pk)
     else:
@@ -214,6 +236,21 @@ def invoice_pdf(request, pk):
     content = build_invoice_pdf(invoice)
     response = HttpResponse(content, content_type="application/pdf")
     response["Content-Disposition"] = f'inline; filename="{invoice.invoice_number}.pdf"'
+    return response
+
+
+@reps_login_required
+def internal_invoice_pdf(request, pk):
+    """The commission-inclusive copy, staff-only - the rep can already see
+    their own commission on their portal, but this exact document (with a
+    "Sales Rep Commission" line) is for internal reference and should never
+    reach the school (see invoice_pdf/build_invoice_pdf for that copy)."""
+    if not request.user.is_staff:
+        raise Http404
+    invoice = get_object_or_404(Invoice, pk=pk)
+    content = build_internal_invoice_pdf(invoice)
+    response = HttpResponse(content, content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename="{invoice.invoice_number}-internal.pdf"'
     return response
 
 

@@ -151,7 +151,7 @@ class GuarantorForm(IDPhotoFormMixin, forms.ModelForm):
 class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
-        fields = ("customer_name", "customer_address", "customer_phone", "location", "notes")
+        fields = ("customer_name", "customer_address", "customer_phone", "customer_email", "location", "notes")
         widgets = {
             "customer_address": forms.Textarea(attrs={"rows": 2}),
             "notes": forms.Textarea(attrs={"rows": 2}),

@@ -24,6 +24,7 @@ urlpatterns = [
     path('invoices/<int:pk>/', views.invoice_detail, name='invoice_detail'),
     path('invoices/<int:pk>/mark-paid/', views.invoice_mark_paid, name='invoice_mark_paid'),
     path('invoices/<int:pk>/invoice.pdf', views.invoice_pdf, name='invoice_pdf'),
+    path('invoices/<int:pk>/internal-invoice.pdf', views.internal_invoice_pdf, name='internal_invoice_pdf'),
     path('invoices/<int:pk>/receipt.pdf', views.receipt_pdf, name='receipt_pdf'),
 
     path('password-reset/',

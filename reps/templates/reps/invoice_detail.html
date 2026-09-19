@@ -34,13 +34,21 @@
                         {% endfor %}
                     </tbody>
                     <tfoot>
+                        <tr><td colspan="3" class="text-end">Subtotal</td><td>NGN {{ invoice.subtotal|floatformat:2 }}</td></tr>
+                        {% if invoice.discount_amount %}
+                        <tr class="text-success"><td colspan="3" class="text-end">Bulk discount</td><td>-NGN {{ invoice.discount_amount|floatformat:2 }}</td></tr>
+                        {% endif %}
                         <tr class="fw-bold"><td colspan="3" class="text-end">Total</td><td>NGN {{ invoice.total|floatformat:2 }}</td></tr>
+                        <tr class="text-muted"><td colspan="3" class="text-end">Your commission ({{ invoice.commission_rate }}%)</td><td>NGN {{ invoice.commission_amount|floatformat:2 }}</td></tr>
                     </tfoot>
                 </table>
             </div>
 
             <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-outline-dark px-4 py-2" href="{% url 'reps:invoice_pdf' invoice.pk %}" target="_blank">Download Invoice (PDF)</a>
+                <a class="btn btn-outline-dark px-4 py-2" href="{% url 'reps:invoice_pdf' invoice.pk %}" target="_blank">Download Invoice for School (PDF)</a>
+                {% if request.user.is_staff %}
+                <a class="btn btn-outline-secondary px-4 py-2" href="{% url 'reps:internal_invoice_pdf' invoice.pk %}" target="_blank">Internal Copy with Commission (PDF)</a>
+                {% endif %}
                 {% if invoice.status == "PENDING_PAYMENT" %}
                 <form method="post" action="{% url 'reps:invoice_mark_paid' invoice.pk %}">
                     {% csrf_token %}

@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
-from reps.emails import send_employment_verification_decision
+from reps.emails import send_employment_verification_decision, send_invoice_to_school
 from reps.models import EmploymentVerification, Guarantor, Invoice, InvoiceItem, Receipt, SalesRep
 
 
@@ -51,12 +51,15 @@ class InvoiceAdmin(admin.ModelAdmin):
     admin. Deleting an old invoice/receipt is reserved for superusers -
     is_staff alone isn't enough, so a compromised or careless staff account
     can't erase a sales record."""
-    list_display = ("invoice_number", "customer_name", "location", "issued_by", "status", "created_at", "paid_at")
+    list_display = ("invoice_number", "customer_name", "location", "issued_by", "status",
+                    "commission_rate", "commission_amount", "created_at", "paid_at")
     list_filter = ("status", "location", "sales_rep")
-    search_fields = ("invoice_number", "customer_name", "sales_rep_name", "sales_rep__user__email")
+    search_fields = ("invoice_number", "customer_name", "customer_email", "sales_rep_name", "sales_rep__user__email")
     readonly_fields = ("invoice_number", "issued_by", "customer_name", "customer_address", "customer_phone",
-                       "location", "status", "notes", "created_at", "paid_at", "pdf_links")
+                       "customer_email", "location", "status", "notes", "discount_amount", "commission_rate",
+                       "commission_amount", "created_at", "paid_at", "pdf_links")
     inlines = (InvoiceItemInline, ReceiptInline)
+    actions = ("send_to_school",)
 
     def has_add_permission(self, request):
         return False
@@ -66,6 +69,21 @@ class InvoiceAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+    @admin.action(description="Send invoice to school by email")
+    def send_to_school(self, request, queryset):
+        count = 0
+        skipped = 0
+        for invoice in queryset:
+            if not invoice.customer_email:
+                skipped += 1
+                continue
+            send_invoice_to_school(invoice)
+            count += 1
+        message = f"Invoice sent to {count} school(s)."
+        if skipped:
+            message += f" Skipped {skipped} with no email on file."
+        self.message_user(request, message, messages.SUCCESS if count else messages.WARNING)
 
     @admin.display(description="Issued By", ordering="sales_rep_name")
     def issued_by(self, obj):
@@ -80,14 +98,18 @@ class InvoiceAdmin(admin.ModelAdmin):
             return "-"
         style = ("display:inline-block;padding:6px 14px;margin-right:8px;border-radius:6px;"
                  "background:#fe5d26;color:#fff;font-weight:600;text-decoration:none;")
+        internal_style = style.replace("#fe5d26", "#5a5a5a")
         invoice_url = reverse("reps:invoice_pdf", args=[obj.pk])
+        internal_url = reverse("reps:internal_invoice_pdf", args=[obj.pk])
+        links = format_html(
+            '<a style="{}" href="{}" target="_blank">Invoice for school (PDF)</a>'
+            '<a style="{}" href="{}" target="_blank">Internal copy with commission (PDF)</a>',
+            style, invoice_url, internal_style, internal_url)
         if hasattr(obj, "receipt"):
             receipt_url = reverse("reps:receipt_pdf", args=[obj.pk])
-            return format_html(
-                '<a style="{}" href="{}" target="_blank">Invoice (PDF)</a>'
-                '<a style="{}" href="{}" target="_blank">Receipt (PDF)</a>',
-                style, invoice_url, style, receipt_url)
-        return format_html('<a style="{}" href="{}" target="_blank">Invoice (PDF)</a>', style, invoice_url)
+            links += format_html(
+                '<a style="{}" href="{}" target="_blank">Receipt (PDF)</a>', style, receipt_url)
+        return links
 
 
 @admin.register(SalesRep)

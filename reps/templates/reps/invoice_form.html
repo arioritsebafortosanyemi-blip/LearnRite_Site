@@ -49,6 +49,12 @@
                     <p class="text-muted small mb-0">Leave rows blank to skip them, or reload the page and use "Log New Invoice" again for more than {{ formset|length }} books.</p>
                 </div>
 
+                <div class="account-info-card mb-4">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Estimated Commission</h6>
+                    <p class="text-muted small mb-2">Based on total book quantity across this invoice - the client's copy never shows this, only your own portal and admin do.</p>
+                    <p class="mb-0"><strong>Total books:</strong> <span id="estimated-quantity">0</span> &nbsp;|&nbsp; <strong>Commission rate:</strong> <span id="estimated-rate">0%</span></p>
+                </div>
+
                 <button class="btn btn-dark btn-large px-4 py-2 w-100" type="submit">Create Invoice</button>
             </form>
         </div>
@@ -78,6 +84,36 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('select[name$="-book"]').forEach(updateRow);
         });
     }
+
+    // Mirrors reps.commission.COMMISSION_TIERS - a live estimate only, the
+    // real figure is always calculated server-side on submit.
+    var COMMISSION_TIERS = [
+        [1, 40, 5.7],
+        [41, 80, 6.65],
+        [81, 250, 7.6],
+        [251, null, 9.5],
+    ];
+    function commissionRateFor(qty) {
+        if (qty <= 0) { return 0; }
+        for (var i = 0; i < COMMISSION_TIERS.length; i++) {
+            var low = COMMISSION_TIERS[i][0], high = COMMISSION_TIERS[i][1], rate = COMMISSION_TIERS[i][2];
+            if (qty >= low && (high === null || qty <= high)) { return rate; }
+        }
+        return 0;
+    }
+    function updateCommissionEstimate() {
+        var total = 0;
+        document.querySelectorAll('input[name$="-quantity"]').forEach(function (input) {
+            var val = parseInt(input.value, 10);
+            if (!isNaN(val)) { total += val; }
+        });
+        document.getElementById('estimated-quantity').textContent = total;
+        document.getElementById('estimated-rate').textContent = commissionRateFor(total) + '%';
+    }
+    document.querySelectorAll('input[name$="-quantity"]').forEach(function (input) {
+        input.addEventListener('input', updateCommissionEstimate);
+    });
+    updateCommissionEstimate();
 });
 </script>
 {% endblock %}

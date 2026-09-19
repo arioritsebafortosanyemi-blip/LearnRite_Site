@@ -74,8 +74,8 @@ class SchoolVerificationAdmin(admin.ModelAdmin):
             return "-"
         style = ("display:inline-block;padding:6px 14px;border-radius:6px;"
                  "background:#fe5d26;color:#fff;font-weight:600;text-decoration:none;")
-        url = f"https://www.google.com/maps/search/?api=1&query={quote(obj.school_address)}"
-        return format_html('<a style="{}" href="{}" target="_blank">Open in Google Maps</a>', style, url)
+        url = f"https://earth.google.com/web/search/{quote(obj.school_address)}"
+        return format_html('<a style="{}" href="{}" target="_blank">Open in Google Earth</a>', style, url)
 
     def _set_status(self, request, queryset, status):
         # Iterated rather than queryset.update() so each school gets the

@@ -117,7 +117,7 @@ class SchoolVerification(models.Model):
     passport_photo_content_type = models.CharField(max_length=50, editable=False)
 
     # A photograph of the school itself (building/signage), so staff can
-    # cross-check it against the declared address on Google Maps/Earth -
+    # cross-check it against the declared address on Google Earth -
     # separate from the authorized staff's passport photo above.
     school_photo = models.BinaryField(editable=False, blank=True, default=b"")
     school_photo_content_type = models.CharField(max_length=50, blank=True, editable=False)

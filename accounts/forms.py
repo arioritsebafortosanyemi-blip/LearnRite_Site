@@ -94,7 +94,7 @@ class AccountSetupForm(forms.ModelForm):
 
 MAX_PHOTO_BYTES = 5 * 1024 * 1024
 PHOTO_MAX_EDGE = 600
-# The school photo is checked against Google Maps/Earth imagery rather than
+# The school photo is checked against Google Earth imagery rather than
 # just displayed as a small thumbnail, so it's kept larger than the
 # passport photo above.
 SCHOOL_PHOTO_MAX_EDGE = 1200
@@ -111,7 +111,7 @@ class SchoolVerificationForm(forms.ModelForm):
     school_photo = forms.ImageField(
         label="Photograph of the school",
         help_text="A clear photo of the school building or signage, so we can verify it against your "
-                   "declared address on Google Maps. JPEG or PNG, up to 5MB.")
+                   "declared address on Google Earth. JPEG or PNG, up to 5MB.")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

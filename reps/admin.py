@@ -52,10 +52,11 @@ class InvoiceAdmin(admin.ModelAdmin):
     admin. Deleting an old invoice/receipt is reserved for superusers -
     is_staff alone isn't enough, so a compromised or careless staff account
     can't erase a sales record."""
-    list_display = ("invoice_number", "customer_name", "location", "issued_by", "status",
+    list_display = ("invoice_number", "customer_name", "customer_phone", "location", "issued_by", "status",
                     "commission_rate", "commission_amount", "created_at", "paid_at")
     list_filter = ("status", "location", "sales_rep")
-    search_fields = ("invoice_number", "customer_name", "customer_email", "sales_rep_name", "sales_rep__user__email")
+    search_fields = ("invoice_number", "customer_name", "customer_phone", "customer_email",
+                     "sales_rep_name", "sales_rep__user__email")
     readonly_fields = ("invoice_number", "issued_by", "customer_name", "customer_address", "customer_phone",
                        "customer_email", "location", "status", "notes", "discount_amount", "commission_rate",
                        "commission_amount", "created_at", "paid_at", "pdf_links")

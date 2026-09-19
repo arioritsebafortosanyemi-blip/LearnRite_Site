@@ -88,7 +88,11 @@
         <div class="col-md-5">
             {% if order.status != "CANCELLED" and order.balance_due > 0 %}
             <div class="border rounded p-3">
+                {% if order.amount_paid %}
+                <h5 class="mb-3">Balance Due: &#8358;{{ order.balance_due }}</h5>
+                {% else %}
                 <h5 class="mb-3">Pay by Bank Transfer</h5>
+                {% endif %}
                 <p class="small text-muted">Payment is by bank transfer. Details are on confirmation page and will be emailed to you.</p>
                 {% for account in payment_accounts %}
                 <p class="mb-1"><strong>{{ account.bank_name }}</strong></p>
@@ -115,7 +119,7 @@
                         <label class="form-label small" for="id_amount">Amount you're paying now (balance: &#8358;{{ order.balance_due }})</label>
                         <input type="number" step="0.01" min="0.01" max="{{ order.balance_due }}" name="amount" id="id_amount" class="form-control">
                     </div>
-                    <button type="submit" class="btn btn-dark w-100">I have completed payment</button>
+                    <button type="submit" class="btn btn-dark w-100">{% if order.amount_paid %}Pay Now{% else %}I have completed payment{% endif %}</button>
                 </form>
                 {% endif %}
             </div>

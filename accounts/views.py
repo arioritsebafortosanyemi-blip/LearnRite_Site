@@ -115,6 +115,12 @@ def confirm_account_setup(request):
             address.phone_number = setup_form.cleaned_data["phone_number"]
             address.is_default = True
             address.save()
+            # A school account can't order until its mandate/consent forms
+            # are approved (see orders.views._school_purchase_block) and had
+            # no way to find that form otherwise - nothing in the nav links
+            # to it, so send them there directly instead of the homepage.
+            if profile.account_type == BookPrice.AccountType.SCHOOL:
+                return redirect("school_verification")
             return redirect("index")
     else:
         setup_form = AccountSetupForm(instance=profile)
@@ -149,9 +155,14 @@ def profile(request):
         for book in Book.objects.filter(pk__in=purchased_book_ids)
     ]
 
+    school_verification = None
+    if request.user.profile.account_type == BookPrice.AccountType.SCHOOL:
+        school_verification = SchoolVerification.objects.filter(profile=request.user.profile).first()
+
     return render(request, "accounts/profile.html", {
         "profile_form": profile_form,
         "reviewable_books": reviewable_books,
+        "school_verification": school_verification,
         "form": SearchForm(request.GET),
     })
 

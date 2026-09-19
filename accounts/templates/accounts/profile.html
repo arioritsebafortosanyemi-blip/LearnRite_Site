@@ -42,6 +42,24 @@
                 <p class="locked-field-note mb-0 mt-3"><i class="bi bi-lock-fill"></i> Account type, location, organization name and email can't be changed here - email <a href="mailto:learninsideout@yahoo.com">learninsideout@yahoo.com</a> if any of these need updating.</p>
             </div>
 
+            {% if user.profile.account_type == "SCHOOL" %}
+            <div class="account-info-card mb-4">
+                <label class="form-label text-muted small mb-1">Mandate &amp; Consent Forms</label>
+                {% if not school_verification %}
+                <p class="mb-2">You'll need to submit these before your school can order online.</p>
+                <a class="btn btn-dark btn-sm px-3" href="{% url 'school_verification' %}">Fill Out Forms</a>
+                {% elif school_verification.status == "APPROVED" %}
+                <div><span class="account-badge" style="background:#59cd9022;color:#2f8a5c;"><i class="bi bi-patch-check-fill"></i> Approved - you can order online</span></div>
+                {% elif school_verification.status == "REJECTED" %}
+                <p class="mb-2">We couldn't approve your last submission{% if school_verification.review_notes %}: {{ school_verification.review_notes }}{% endif %}.</p>
+                <a class="btn btn-dark btn-sm px-3" href="{% url 'school_verification' %}">Submit Again</a>
+                {% else %}
+                <div><span class="account-badge" style="background:#fe5d2622;color:#c94a1e;"><i class="bi bi-hourglass-split"></i> Under review</span></div>
+                <p class="text-muted small mt-2 mb-0"><a href="{% url 'school_verification_status' %}">View status</a></p>
+                {% endif %}
+            </div>
+            {% endif %}
+
             <form method="post">
                 {% csrf_token %}
                 {% for field in profile_form %}

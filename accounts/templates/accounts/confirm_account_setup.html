@@ -16,29 +16,13 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <h3 class="h3 mb-1" style="color: #fe5d26;">One last step, {{ user.first_name|default:user.username }}</h3>
-            <p class="fs-6 text-muted">Tell us who's buying and where to reach you, so we can show you the right pricing and load your delivery address automatically at checkout.</p>
+            <p class="fs-6 text-muted">Tell us who's buying and where to reach you, so we can show you the right pricing.</p>
 
             <div class="account-info-card mb-4">
                 <form method="post">
                     {% csrf_token %}
                     <h6 class="text-uppercase text-muted small fw-bold mb-3">Account</h6>
                     {% for field in setup_form %}
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                        <div class="form-text">{{ field.help_text }}</div>
-                        {% endif %}
-                        {% for error in field.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    {% endfor %}
-
-                    <hr class="my-4">
-                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Delivery Address</h6>
-                    <p class="text-muted small">This loads automatically at checkout - you can still change it there for a specific order.</p>
-                    {% for field in address_form %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}

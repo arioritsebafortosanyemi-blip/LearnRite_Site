@@ -19,7 +19,7 @@ class Profile(models.Model):
          # Also selects the customer's BookPrice tier, but that is deliberately
          # never said out loud: help_text is rendered on the account setup form,
          # and the client doesn't want customers knowing price varies by state.
-         help_text="Self-declared, used to arrange delivery.")
+         help_text="Self-declared, for our records.")
     phone_number = models.CharField(max_length=20, blank=True)
     organization_name = models.CharField \
         (max_length=150, blank=True,

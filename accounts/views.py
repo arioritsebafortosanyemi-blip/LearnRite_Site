@@ -17,7 +17,7 @@ from store.models import Book, BookPrice, Review
 
 from accounts.pdf_forms import build_consent_pdf, build_mandate_pdf
 from accounts.emails import send_verification_email
-from accounts.forms import (AccountSetupForm, AddressSetupForm, ProfileForm, RegisterForm,
+from accounts.forms import (AccountSetupForm, ProfileForm, RegisterForm,
                             SchoolVerificationForm)
 from accounts.models import Profile, SchoolVerification, WishlistItem
 from accounts.tokens import email_verification_token
@@ -103,18 +103,10 @@ def confirm_account_setup(request):
     if not profile.is_verified:
         return redirect("verify_email_pending")
 
-    default_address = request.user.addresses.filter(is_default=True).first()
     if request.method == "POST":
         setup_form = AccountSetupForm(request.POST, instance=profile)
-        address_form = AddressSetupForm(request.POST, instance=default_address)
-        if setup_form.is_valid() and address_form.is_valid():
+        if setup_form.is_valid():
             setup_form.save()
-            address = address_form.save(commit=False)
-            address.user = request.user
-            address.full_name = request.user.first_name or request.user.username
-            address.phone_number = setup_form.cleaned_data["phone_number"]
-            address.is_default = True
-            address.save()
             # A school account can't order until its mandate/consent forms
             # are approved (see orders.views._school_purchase_block) and had
             # no way to find that form otherwise - nothing in the nav links
@@ -124,10 +116,8 @@ def confirm_account_setup(request):
             return redirect("index")
     else:
         setup_form = AccountSetupForm(instance=profile)
-        address_form = AddressSetupForm(instance=default_address)
     return render(request, "accounts/confirm_account_setup.html", {
         "setup_form": setup_form,
-        "address_form": address_form,
         "form": SearchForm(request.GET),
     })
 

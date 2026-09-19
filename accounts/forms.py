@@ -6,14 +6,14 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 
 from store.models import BookPrice
-from accounts.models import Address, Profile, SchoolVerification
+from accounts.models import Profile, SchoolVerification
 
 
 class RegisterForm(UserCreationForm):
     """Deliberately minimal - just enough to create the account. Account
-    type, location, organization name, phone and address are all collected
-    afterward in one place (see AccountSetupForm/AddressSetupForm), whether
-    the customer registered here or signed up with Google."""
+    type, location, organization name and phone are all collected
+    afterward in one place (see AccountSetupForm), whether the customer
+    registered here or signed up with Google."""
     full_name = forms.CharField(
         label="Full Name / Institution Name", max_length=150,
         help_text="Schools: enter your institution's name.")
@@ -90,16 +90,6 @@ class AccountSetupForm(forms.ModelForm):
         if commit:
             profile.save()
         return profile
-
-
-class AddressSetupForm(forms.ModelForm):
-    """Collected alongside AccountSetupForm so checkout can auto-fill a
-    default delivery address - full_name/phone_number come from the
-    account itself rather than being asked a second time."""
-
-    class Meta:
-        model = Address
-        fields = ("address_line1", "address_line2", "landmark", "city", "state")
 
 
 MAX_PHOTO_BYTES = 5 * 1024 * 1024

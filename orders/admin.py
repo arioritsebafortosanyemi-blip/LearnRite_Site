@@ -27,9 +27,9 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("order_reference", "full_name", "email", "status", "amount_paid", "balance_due_display",
-                     "total", "created_at")
-    list_filter = ("status",)
+    list_display = ("order_reference", "full_name", "email", "status", "amount_paid", "amount_claimed",
+                     "balance_due_display", "total", "created_at")
+    list_filter = ("status", ("amount_claimed", admin.EmptyFieldListFilter))
     search_fields = ("order_reference", "full_name", "email", "phone_number")
     readonly_fields = ("order_reference", "user", "email", "full_name", "phone_number", "delivery_method",
                        "shipping_address", "subtotal", "discount_amount", "coupon",

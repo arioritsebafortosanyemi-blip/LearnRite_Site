@@ -66,10 +66,17 @@ class AccountSetupForm(forms.ModelForm):
         required=False, label="School/Organization Name",
         help_text="Required for institution accounts. Subject to verification.")
     phone_number = forms.CharField(label="Phone Number")
+    has_sales_rep = forms.BooleanField(
+        required=False, label="We already work with a LearnRite sales rep",
+        help_text="Institution accounts only - leave unticked if you're dealing with LearnRite directly.")
+    sales_rep_name = forms.CharField(
+        required=False, label="Sales rep's name",
+        help_text="If known - for our records only.")
 
     class Meta:
         model = Profile
-        fields = ("account_type", "location", "organization_name", "phone_number")
+        fields = ("account_type", "location", "organization_name", "phone_number",
+                  "has_sales_rep", "sales_rep_name")
 
     def clean(self):
         cleaned_data = super().clean()
@@ -97,6 +104,10 @@ class AddressSetupForm(forms.ModelForm):
 
 MAX_PHOTO_BYTES = 5 * 1024 * 1024
 PHOTO_MAX_EDGE = 600
+# The school photo is checked against Google Maps/Earth imagery rather than
+# just displayed as a small thumbnail, so it's kept larger than the
+# passport photo above.
+SCHOOL_PHOTO_MAX_EDGE = 1200
 
 
 class SchoolVerificationForm(forms.ModelForm):
@@ -107,14 +118,22 @@ class SchoolVerificationForm(forms.ModelForm):
     passport_photo = forms.ImageField(
         label="Passport photograph of authorized staff",
         help_text="A clear head-and-shoulders photo. JPEG or PNG, up to 5MB.")
+    school_photo = forms.ImageField(
+        label="Photograph of the school",
+        help_text="A clear photo of the school building or signage, so we can verify it against your "
+                   "declared address on Google Maps. JPEG or PNG, up to 5MB.")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Resubmitting after a rejection keeps the photo already on file, so
+        # Resubmitting after a rejection keeps a photo already on file, so
         # only ask for one again when there isn't one.
         if self.instance.pk and self.instance.passport_photo:
             self.fields["passport_photo"].required = False
             self.fields["passport_photo"].help_text = (
+                "Leave empty to keep the photo already on file, or upload a new one to replace it.")
+        if self.instance.pk and self.instance.school_photo:
+            self.fields["school_photo"].required = False
+            self.fields["school_photo"].help_text = (
                 "Leave empty to keep the photo already on file, or upload a new one to replace it.")
     mandate_agreed = forms.BooleanField(
         label="I affirm the declaration above on behalf of the school.")
@@ -148,23 +167,37 @@ class SchoolVerificationForm(forms.ModelForm):
             raise forms.ValidationError("That photo is larger than 5MB - please upload a smaller one.")
         return photo
 
+    def clean_school_photo(self):
+        photo = self.cleaned_data.get("school_photo")
+        if photo and photo.size > MAX_PHOTO_BYTES:
+            raise forms.ValidationError("That photo is larger than 5MB - please upload a smaller one.")
+        return photo
+
+    @staticmethod
+    def _downscaled_jpeg(photo, max_edge):
+        # Downscaled and re-encoded rather than stored as uploaded: these
+        # live in the database, and a phone camera original would bloat
+        # every row.
+        from PIL import Image
+
+        image = Image.open(photo)
+        if image.mode not in ("RGB", "L"):
+            image = image.convert("RGB")
+        image.thumbnail((max_edge, max_edge))
+        buffer = BytesIO()
+        image.save(buffer, format="JPEG", quality=85)
+        return buffer.getvalue()
+
     def save(self, commit=True):
         verification = super().save(commit=False)
-        photo = self.cleaned_data.get("passport_photo")
-        if photo:
-            # Downscaled and re-encoded rather than stored as uploaded: these
-            # live in the database, and a phone camera original would bloat
-            # every row.
-            from PIL import Image
-
-            image = Image.open(photo)
-            if image.mode not in ("RGB", "L"):
-                image = image.convert("RGB")
-            image.thumbnail((PHOTO_MAX_EDGE, PHOTO_MAX_EDGE))
-            buffer = BytesIO()
-            image.save(buffer, format="JPEG", quality=85)
-            verification.passport_photo = buffer.getvalue()
+        passport_photo = self.cleaned_data.get("passport_photo")
+        if passport_photo:
+            verification.passport_photo = self._downscaled_jpeg(passport_photo, PHOTO_MAX_EDGE)
             verification.passport_photo_content_type = "image/jpeg"
+        school_photo = self.cleaned_data.get("school_photo")
+        if school_photo:
+            verification.school_photo = self._downscaled_jpeg(school_photo, SCHOOL_PHOTO_MAX_EDGE)
+            verification.school_photo_content_type = "image/jpeg"
         if commit:
             verification.save()
         return verification

@@ -222,8 +222,8 @@ def school_verification_status(request):
 
 @login_required
 def school_verification_photo(request, pk):
-    """Serves the passport photo out of the database. Staff can see any;
-    a customer can only see their own."""
+    """Serves the authorized staff's passport photo out of the database.
+    Staff can see any; a customer can only see their own."""
     verification = get_object_or_404(SchoolVerification, pk=pk)
     if not request.user.is_staff and verification.profile.user_id != request.user.id:
         raise Http404
@@ -231,6 +231,20 @@ def school_verification_photo(request, pk):
         raise Http404
     return HttpResponse(bytes(verification.passport_photo),
                         content_type=verification.passport_photo_content_type or "image/jpeg")
+
+
+@login_required
+def school_verification_school_photo(request, pk):
+    """Serves the photo of the school itself out of the database - separate
+    from the staff passport photo above, used to cross-check the declared
+    address against Google Maps/Earth."""
+    verification = get_object_or_404(SchoolVerification, pk=pk)
+    if not request.user.is_staff and verification.profile.user_id != request.user.id:
+        raise Http404
+    if not verification.school_photo:
+        raise Http404
+    return HttpResponse(bytes(verification.school_photo),
+                        content_type=verification.school_photo_content_type or "image/jpeg")
 
 
 @staff_member_required

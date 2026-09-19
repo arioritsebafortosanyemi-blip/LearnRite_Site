@@ -15,6 +15,8 @@ urlpatterns = [
     path('school-verification/', views.school_verification, name='school_verification'),
     path('school-verification/status/', views.school_verification_status, name='school_verification_status'),
     path('school-verification/<int:pk>/photo/', views.school_verification_photo, name='school_verification_photo'),
+    path('school-verification/<int:pk>/school-photo/', views.school_verification_school_photo,
+         name='school_verification_school_photo'),
     path('school-verification/<int:pk>/<str:which>.pdf', views.school_verification_pdf, name='school_verification_pdf'),
     path('wishlist/', views.wishlist_view, name='wishlist'),
     path('wishlist/toggle/<int:pk>/', views.wishlist_toggle, name='wishlist_toggle'),

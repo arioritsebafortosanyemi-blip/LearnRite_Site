@@ -30,6 +30,13 @@ class Profile(models.Model):
                     "(as opposed to still sitting on the signal-created defaults, e.g. "
                     "right after a Google sign-up). Once set, account_type/location/"
                     "organization_name are locked - a customer must email us to change them.")
+    has_sales_rep = models.BooleanField \
+        (default=False,
+         help_text="Institution accounts only - whether this school already works with a "
+                    "LearnRite sales rep rather than dealing with us directly.")
+    sales_rep_name = models.CharField \
+        (max_length=150, blank=True,
+         help_text="Informational only, not linked to any sales rep account - the rep's name, if known.")
     email_verified = models.BooleanField \
         (default=False,
          help_text="Set once the customer clicks the link in their verification email. "
@@ -108,6 +115,12 @@ class SchoolVerification(models.Model):
     # ephemeral, so an uploaded file would vanish on the next deploy.
     passport_photo = models.BinaryField(editable=False)
     passport_photo_content_type = models.CharField(max_length=50, editable=False)
+
+    # A photograph of the school itself (building/signage), so staff can
+    # cross-check it against the declared address on Google Maps/Earth -
+    # separate from the authorized staff's passport photo above.
+    school_photo = models.BinaryField(editable=False, blank=True, default=b"")
+    school_photo_content_type = models.CharField(max_length=50, blank=True, editable=False)
 
     # Part D + consent form declarations. Typed name stands in for the
     # signature; the school stamp has no online equivalent, so staff verify

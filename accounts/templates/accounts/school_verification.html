@@ -32,7 +32,7 @@
                 <div class="account-info-card mb-4">
                     <h6 class="text-uppercase text-muted small fw-bold mb-3">Part A - About your school</h6>
                     {% for field in verification_form %}
-                    {% if field.name in "school_name,school_address,first_time_buyer,years_as_customer,number_of_branches" %}
+                    {% if field.name in "school_name,school_address,school_photo,first_time_buyer,years_as_customer,number_of_branches" %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}

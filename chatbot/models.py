@@ -9,7 +9,7 @@ class KnowledgeSection(models.Model):
     class Section(models.TextChoices):
         PRICING = "PRICING", "Pricing & Account Types"
         SIGNUP = "SIGNUP", "Signing Up & Accounts"
-        SHIPPING = "SHIPPING", "Shipping & Delivery"
+        SHIPPING = "SHIPPING", "Pickup"
         PAYMENT = "PAYMENT", "Payment Methods"
         RETURNS = "RETURNS", "Returns & Refunds"
         CONTACT = "CONTACT", "Contact Info"
